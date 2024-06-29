@@ -1,0 +1,267 @@
+{
+    "success": true,
+    "data": {
+        "topQuery": {
+            "results": [
+                {
+                    "id": "FB8WBiWv",
+                    "title": "Sajni",
+                    "image": [
+                        {
+                            "quality": "50x50",
+                            "url": "https://c.saavncdn.com/252/Laapataa-Ladies-Hindi-2024-20240213151004-50x50.jpg"
+                        },
+                        {
+                            "quality": "150x150",
+                            "url": "https://c.saavncdn.com/252/Laapataa-Ladies-Hindi-2024-20240213151004-150x150.jpg"
+                        },
+                        {
+                            "quality": "500x500",
+                            "url": "https://c.saavncdn.com/252/Laapataa-Ladies-Hindi-2024-20240213151004-500x500.jpg"
+                        }
+                    ],
+                    "album": "Laapataa Ladies",
+                    "url": "https://www.jiosaavn.com/song/sajni/NipTZjZZYEU",
+                    "type": "song",
+                    "language": "hindi",
+                    "description": "Song by Ram Sampath, Arijit Singh and Prashant Pandey",
+                    "primaryArtists": "Ram Sampath, Arijit Singh, Prashant Pandey",
+                    "singers": "Ram Sampath, Arijit Singh, Prashant Pandey"
+                }
+            ],
+            "position": 0
+        },
+        "songs": {
+            "results": [
+                {
+                    "id": "FB8WBiWv",
+                    "title": "Sajni",
+                    "image": [
+                        {
+                            "quality": "50x50",
+                            "url": "https://c.saavncdn.com/252/Laapataa-Ladies-Hindi-2024-20240213151004-50x50.jpg"
+                        },
+                        {
+                            "quality": "150x150",
+                            "url": "https://c.saavncdn.com/252/Laapataa-Ladies-Hindi-2024-20240213151004-150x150.jpg"
+                        },
+                        {
+                            "quality": "500x500",
+                            "url": "https://c.saavncdn.com/252/Laapataa-Ladies-Hindi-2024-20240213151004-500x500.jpg"
+                        }
+                    ],
+                    "album": "Laapataa Ladies",
+                    "url": "https://www.jiosaavn.com/song/sajni/NipTZjZZYEU",
+                    "type": "song",
+                    "description": "Laapataa Ladies · Ram Sampath, Arijit Singh, Prashant Pandey",
+                    "primaryArtists": "Ram Sampath, Arijit Singh, Prashant Pandey",
+                    "singers": "Ram Sampath, Arijit Singh, Prashant Pandey",
+                    "language": "hindi"
+                },
+                {
+                    "id": "nKZdLSOA",
+                    "title": "Sajni",
+                    "image": [
+                        {
+                            "quality": "50x50",
+                            "url": "https://c.saavncdn.com/521/Boondh-Hindi-2008-20240408213857-50x50.jpg"
+                        },
+                        {
+                            "quality": "150x150",
+                            "url": "https://c.saavncdn.com/521/Boondh-Hindi-2008-20240408213857-150x150.jpg"
+                        },
+                        {
+                            "quality": "500x500",
+                            "url": "https://c.saavncdn.com/521/Boondh-Hindi-2008-20240408213857-500x500.jpg"
+                        }
+                    ],
+                    "album": "Boondh",
+                    "url": "https://www.jiosaavn.com/song/sajni/HiMxVThjeHI",
+                    "type": "song",
+                    "description": "Boondh · Jal",
+                    "primaryArtists": "Jal",
+                    "singers": "",
+                    "language": "hindi"
+                },
+                {
+                    "id": "12PAtuqJ",
+                    "title": "Sajni Remix(Remix By Dj Basque)",
+                    "image": [
+                        {
+                            "quality": "50x50",
+                            "url": "https://c.saavncdn.com/662/Sajni-Remix-Hindi-2024-20240611181010-50x50.jpg"
+                        },
+                        {
+                            "quality": "150x150",
+                            "url": "https://c.saavncdn.com/662/Sajni-Remix-Hindi-2024-20240611181010-150x150.jpg"
+                        },
+                        {
+                            "quality": "500x500",
+                            "url": "https://c.saavncdn.com/662/Sajni-Remix-Hindi-2024-20240611181010-500x500.jpg"
+                        }
+                    ],
+                    "album": "Sajni Remix",
+                    "url": "https://www.jiosaavn.com/song/sajni-remixremix-by-dj-basque/QVo7cABFRnk",
+                    "type": "song",
+                    "description": "Sajni Remix · Arijit Singh, Ram Sampath",
+                    "primaryArtists": "Arijit Singh, Ram Sampath",
+                    "singers": "Arijit Singh, Ram Sampath",
+                    "language": "hindi"
+                }
+            ],
+            "position": 2
+        },
+        "albums": {
+            "results": [
+                {
+                    "id": "55140287",
+                    "title": "Sajni Remix",
+                    "image": [
+                        {
+                            "quality": "50x50",
+                            "url": "https://c.saavncdn.com/662/Sajni-Remix-Hindi-2024-20240611181010-50x50.jpg"
+                        },
+                        {
+                            "quality": "150x150",
+                            "url": "https://c.saavncdn.com/662/Sajni-Remix-Hindi-2024-20240611181010-150x150.jpg"
+                        },
+                        {
+                            "quality": "500x500",
+                            "url": "https://c.saavncdn.com/662/Sajni-Remix-Hindi-2024-20240611181010-500x500.jpg"
+                        }
+                    ],
+                    "artist": "Arijit Singh, Ram Sampath",
+                    "url": "https://www.jiosaavn.com/album/sajni-remix/LSFtkxRR6J4_",
+                    "type": "album",
+                    "description": "2024 · Hindi Album · Arijit Singh, Ram Sampath",
+                    "year": "2024",
+                    "songIds": "12PAtuqJ",
+                    "language": "hindi"
+                },
+                {
+                    "id": "34876660",
+                    "title": "Sajni",
+                    "image": [
+                        {
+                            "quality": "50x50",
+                            "url": "https://c.saavncdn.com/912/Sajni-Unknown-2021-20220511014233-50x50.jpg"
+                        },
+                        {
+                            "quality": "150x150",
+                            "url": "https://c.saavncdn.com/912/Sajni-Unknown-2021-20220511014233-150x150.jpg"
+                        },
+                        {
+                            "quality": "500x500",
+                            "url": "https://c.saavncdn.com/912/Sajni-Unknown-2021-20220511014233-500x500.jpg"
+                        }
+                    ],
+                    "artist": "JalRaj",
+                    "url": "https://www.jiosaavn.com/album/sajni/nax66CBG,5E_",
+                    "type": "album",
+                    "description": "2021 · Album · JalRaj",
+                    "year": "2021",
+                    "songIds": "_DQZlXdI",
+                    "language": "unknown"
+                },
+                {
+                    "id": "50619602",
+                    "title": "Saazni",
+                    "image": [
+                        {
+                            "quality": "50x50",
+                            "url": "https://c.saavncdn.com/386/Saazni-Marathi-2023-20231222183011-50x50.jpg"
+                        },
+                        {
+                            "quality": "150x150",
+                            "url": "https://c.saavncdn.com/386/Saazni-Marathi-2023-20231222183011-150x150.jpg"
+                        },
+                        {
+                            "quality": "500x500",
+                            "url": "https://c.saavncdn.com/386/Saazni-Marathi-2023-20231222183011-500x500.jpg"
+                        }
+                    ],
+                    "artist": "Shekhar Ravjiani",
+                    "url": "https://www.jiosaavn.com/album/saazni/TECPMPNj4BQ_",
+                    "type": "album",
+                    "description": "2023 · Marathi Album · Shekhar Ravjiani",
+                    "year": "2023",
+                    "songIds": "it4BXLkm",
+                    "language": "marathi"
+                }
+            ],
+            "position": 1
+        },
+        "artists": {
+            "results": [
+                {
+                    "id": "7208643",
+                    "title": "Sajni Srivasatava",
+                    "image": [
+                        {
+                            "quality": "50x50",
+                            "url": "https://c.saavncdn.com/802/Dhoka-English-2019-20191115060254-50x50.jpg"
+                        },
+                        {
+                            "quality": "150x150",
+                            "url": "https://c.saavncdn.com/802/Dhoka-English-2019-20191115060254-150x150.jpg"
+                        },
+                        {
+                            "quality": "500x500",
+                            "url": "https://c.saavncdn.com/802/Dhoka-English-2019-20191115060254-500x500.jpg"
+                        }
+                    ],
+                    "type": "artist",
+                    "description": "Artist",
+                    "position": 1
+                },
+                {
+                    "id": "7543086",
+                    "title": "Saleem Sajni",
+                    "image": [
+                        {
+                            "quality": "50x50",
+                            "url": "https://www.jiosaavn.com/_i/3.0/artist-default-music.png"
+                        },
+                        {
+                            "quality": "150x150",
+                            "url": "https://www.jiosaavn.com/_i/3.0/artist-default-music.png"
+                        },
+                        {
+                            "quality": "500x500",
+                            "url": "https://www.jiosaavn.com/_i/3.0/artist-default-music.png"
+                        }
+                    ],
+                    "type": "artist",
+                    "description": "Singer",
+                    "position": 2
+                },
+                {
+                    "id": "6050257",
+                    "title": "Sajnit Raja",
+                    "image": [
+                        {
+                            "quality": "50x50",
+                            "url": "https://www.jiosaavn.com/_i/3.0/artist-default-music.png"
+                        },
+                        {
+                            "quality": "150x150",
+                            "url": "https://www.jiosaavn.com/_i/3.0/artist-default-music.png"
+                        },
+                        {
+                            "quality": "500x500",
+                            "url": "https://www.jiosaavn.com/_i/3.0/artist-default-music.png"
+                        }
+                    ],
+                    "type": "artist",
+                    "description": "Lyricist",
+                    "position": 3
+                }
+            ],
+            "position": 4
+        },
+        "playlists": {
+            "results": [],
+            "position": 3
+        }
+    }
+}
