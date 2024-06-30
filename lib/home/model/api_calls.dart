@@ -49,6 +49,9 @@ Future<List<FeaturedPlaylist>> featuredPlaylist() async {
     final data = jsonDecode(response.body)['featured_playlists'];
     List<FeaturedPlaylist> featuredList = [];
     for (int i = 0; i < data.length; i++) {
+      if(data[i]['perma_url'] == 'https://www.jiosaavn.com/featured/surprise-me/1ZOczFTRyFw_') {
+        continue;
+      }
       final id = data[i]['listid'];
       final title = data[i]['listname'];
       final image = data[i]['image'];

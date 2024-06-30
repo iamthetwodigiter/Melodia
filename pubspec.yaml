@@ -39,8 +39,6 @@ dependencies:
   cached_network_image: ^3.3.1
   just_audio: ^0.9.38
   audio_video_progress_bar: ^2.0.3
-  just_audio_background: ^0.0.1-beta.12
-  rxdart: ^0.27.7
   swipe_to: ^1.0.6
   permission_handler: ^11.3.1
   dio: ^5.4.3+1
@@ -75,7 +73,6 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/chevron.png
     - assets/logo.png
     - assets/user.png
 

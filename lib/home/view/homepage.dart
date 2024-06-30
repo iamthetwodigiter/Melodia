@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:melodia/album/view/albums_details_page.dart';
+import 'package:melodia/core/color_pallete.dart';
 import 'package:melodia/home/model/api_calls.dart';
 import 'package:melodia/home/model/homepage_repository.dart';
 import 'package:melodia/search/view/search_page.dart';
@@ -50,27 +51,30 @@ class _HomePageState extends State<HomePage> {
                       shape: BoxShape.circle,
                       border: Border.all(
                         width: 0.175,
-                        color: CupertinoColors.white,
+                        color: AppPallete.secondaryColor,
                       ),
                     ),
                     child: IconButton(
                       onPressed: () {
                         Navigator.push(
-                            context,
-                            CupertinoPageRoute(
-                                builder: (context) => const Settings()));
+                          context,
+                          CupertinoPageRoute(
+                            builder: (context) => const Settings(),
+                          ),
+                        );
                       },
                       icon: const Icon(
                         CupertinoIcons.bars,
-                        color: CupertinoColors.white,
+                        color: AppPallete.secondaryColor,
                         size: 20,
                       ),
                     ),
                   ),
-                  const Text(
+                  Text(
                     'Melodia',
                     style: TextStyle(
-                      fontSize: 18,
+                      color: AppPallete().accentColor,
+                      fontSize: 25,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -85,16 +89,18 @@ class _HomePageState extends State<HomePage> {
                 value = value.trimRight();
                 if (value.isNotEmpty) {
                   Navigator.push(
-                      context,
-                      CupertinoPageRoute(
-                          builder: (context) => SearchResults(query: value)));
+                    context,
+                    CupertinoPageRoute(
+                      builder: (context) => SearchResults(query: value),
+                    ),
+                  );
                 }
                 _searchController.clear();
               },
               padding: const EdgeInsets.all(10),
               placeholder: 'Search',
               placeholderStyle: TextStyle(
-                color: CupertinoColors.white.withOpacity(
+                color: AppPallete.secondaryColor.withOpacity(
                   0.4,
                 ),
               ),
@@ -105,10 +111,10 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             const SizedBox(height: 25),
-            const Text(
+            Text(
               'New Albums',
               style: TextStyle(
-                  color: CupertinoColors.white,
+                  color: AppPallete().accentColor,
                   fontWeight: FontWeight.bold,
                   fontSize: 25),
             ),
@@ -160,7 +166,9 @@ class _HomePageState extends State<HomePage> {
                                     imageUrl:
                                         data.image.replaceAll('150', '500'),
                                     placeholder: (context, url) {
-                                      return const SizedBox(width: 150, child: CupertinoActivityIndicator());
+                                      return const SizedBox(
+                                          width: 150,
+                                          child: CupertinoActivityIndicator());
                                     },
                                     errorWidget: (context, url, error) {
                                       return CachedNetworkImage(
@@ -189,10 +197,10 @@ class _HomePageState extends State<HomePage> {
               },
             ),
             const SizedBox(height: 25),
-            const Text(
+            Text(
               'Featured Playlists',
               style: TextStyle(
-                  color: CupertinoColors.white,
+                  color: AppPallete().accentColor,
                   fontWeight: FontWeight.bold,
                   fontSize: 25),
             ),
@@ -208,9 +216,12 @@ class _HomePageState extends State<HomePage> {
                     ConnectionState.waiting) {
                   return const Center(
                     child: CupertinoActivityIndicator(
-                        radius: 20.0, color: CupertinoColors.activeBlue),
+                      radius: 20.0,
+                      color: CupertinoColors.activeBlue,
+                    ),
                   );
                 }
+
                 return SizedBox(
                   height: 200,
                   child: ListView.builder(
@@ -270,10 +281,10 @@ class _HomePageState extends State<HomePage> {
               },
             ),
             const SizedBox(height: 25),
-            const Text(
+            Text(
               'Other Playlists',
               style: TextStyle(
-                  color: CupertinoColors.white,
+                  color: AppPallete().accentColor,
                   fontWeight: FontWeight.bold,
                   fontSize: 25),
             ),
