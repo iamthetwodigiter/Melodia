@@ -46,12 +46,16 @@ dependencies:
   hive_flutter:
   path_provider:
   flutter_localization:
+  flutter_riverpod:
+  riverpod_annotation:
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   hive_generator:
   build_runner:
+  riverpod_generator:
+  riverpod_lint:
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

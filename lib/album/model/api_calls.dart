@@ -2,10 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:melodia/album/model/albums_repository.dart';
 
-
 const albumUrl = "https://melodia-six.vercel.app/api/albums?id=";
 const playlistUrl = "https://melodia-six.vercel.app/api/playlists?id=";
-
 
 Future<Albums> fetchAlbumData(String type, String endpoint) async {
   String baseUrl = (type == 'album') ? albumUrl + endpoint : '$playlistUrl$endpoint&limit=50';
@@ -21,33 +19,30 @@ Future<Albums> fetchAlbumData(String type, String endpoint) async {
     year ??= 0;
     final url = albumData['url'];
     final songsCount = albumData['songCount'];
-    
+
     final artists = (type == 'album') ? albumData['artists']['all'] : albumData['artists'];
     List<Artist> artistsList = [];
     for (var items in artists) {
-      
-      String imageUrl = items['image'].length == 0
-          ? ''
-          : items['image'][0]['url'].toString();
+      String imageUrl = items['image'].length == 0 ? '' : items['image'][0]['url'].toString();
       final artistData = Artist(
-          id: items['id'],
-          name: items['name'],
-          imageUrl: imageUrl,
-          role: items['role'],
-          url: items['url']);
+        id: items['id'],
+        name: items['name'],
+        imageUrl: imageUrl,
+        role: items['role'],
+        url: items['url'],
+      );
 
       artistsList.add(artistData);
     }
-    final image =
-        albumData['image'][0]['url'].toString().replaceAll('50', '500');
+    final image = albumData['image'][0]['url'].toString().replaceAll('50', '500');
     List<Songs> songs = [];
     for (var songItems in albumData['songs']) {
       List<String> downloadUrlList = [];
-      for(var links in songItems['downloadUrl']) {
+      for (var links in songItems['downloadUrl']) {
         downloadUrlList.add(links['url'].toString());
       }
       List<String> artistsList = [];
-      for(var singers in songItems['artists']['primary']) {
+      for (var singers in songItems['artists']['primary']) {
         artistsList.add(singers['name'].toString());
       }
       final songsData = Songs(

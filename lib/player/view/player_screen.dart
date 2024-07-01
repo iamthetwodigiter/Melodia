@@ -10,6 +10,13 @@ import 'package:melodia/album/model/playlist_model.dart';
 import 'package:melodia/player/model/api_calls.dart';
 import 'package:melodia/player/view/mini_player.dart';
 
+class CustomPageRoute extends CupertinoPageRoute {
+  CustomPageRoute({builder}) : super(builder: builder);
+
+  @override
+  Duration get transitionDuration => const Duration(milliseconds: 0);
+}
+
 class MusicPlayer extends StatefulWidget {
   final String link;
   final String id;
@@ -100,9 +107,8 @@ class _MusicPlayerState extends State<MusicPlayer> {
       index = (index - 1) % _songsCount;
     });
 
-    Navigator.pushReplacement(
-      context,
-      CupertinoPageRoute(
+    Navigator.of(context).pushReplacement(
+      CustomPageRoute(
         builder: (context) => MusicPlayer(
           link: widget.playlistData!.linkList.elementAt(index),
           id: widget.playlistData!.idList.elementAt(index),
@@ -125,10 +131,8 @@ class _MusicPlayerState extends State<MusicPlayer> {
     setState(() {
       index = (index + 1) % _songsCount;
     });
-
-    Navigator.pushReplacement(
-      context,
-      CupertinoPageRoute(
+    Navigator.of(context).pushReplacement(
+      CustomPageRoute(
         builder: (context) => MusicPlayer(
           link: widget.playlistData!.linkList.elementAt(index),
           id: widget.playlistData!.idList.elementAt(index),
@@ -137,7 +141,7 @@ class _MusicPlayerState extends State<MusicPlayer> {
           duration: widget.playlistData!.durationList.elementAt(index),
           artists: widget.playlistData!.artistsList.elementAt(index),
           playlistData: widget.playlistData,
-          index: index,
+          index: index++,
           shuffleMode: _shuffleMode,
         ),
       ),
@@ -151,9 +155,8 @@ class _MusicPlayerState extends State<MusicPlayer> {
       index = temp.nextInt(_songsCount);
     });
     player.seek(Duration.zero, index: index);
-    Navigator.pushReplacement(
-      context,
-      CupertinoPageRoute(
+    Navigator.of(context).pushReplacement(
+      CustomPageRoute(
         builder: (context) => MusicPlayer(
           link: widget.playlistData!.linkList.elementAt(index),
           id: widget.playlistData!.idList.elementAt(index),
@@ -162,7 +165,7 @@ class _MusicPlayerState extends State<MusicPlayer> {
           duration: widget.playlistData!.durationList.elementAt(index),
           artists: widget.playlistData!.artistsList.elementAt(index),
           playlistData: widget.playlistData,
-          index: index,
+          index: index++,
           shuffleMode: _shuffleMode,
         ),
       ),

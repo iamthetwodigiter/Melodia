@@ -36,7 +36,6 @@ class MiniPlayer extends StatefulWidget {
 }
 
 class _MiniPlayerState extends State<MiniPlayer> {
-
   @override
   Widget build(BuildContext context) {
     Box settings = Hive.box('settings');
@@ -53,6 +52,23 @@ class _MiniPlayerState extends State<MiniPlayer> {
             child: CachedNetworkImage(
               imageUrl: widget.imageUrl,
               height: 60,
+              placeholder: (context, url) {
+                return const SizedBox(width: 60);
+              },
+              errorWidget: (context, url, error) {
+                return const SizedBox(
+                  width: 60,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        CupertinoIcons.nosign,
+                        color: CupertinoColors.white,
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
           ),
           const SizedBox(width: 10),

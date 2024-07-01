@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:melodia/core/app_theme.dart';
 import 'package:melodia/home/view/homepage.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -17,7 +18,7 @@ Future<void> main() async {
     settings.put('cache_songs', 'false');
     settings.put('playing', 'false');
     settings.put('darkMode', 'false');
-    settings.put('accent_color', [255,255,255,255]);
+    settings.put('accent_color', [255, 255, 255, 255]);
     settings.put('download_path',
         '${(await getExternalStorageDirectory())!.path}/Melodia');
   }
@@ -26,7 +27,7 @@ Future<void> main() async {
       Permission.manageExternalStorage.request();
     }
   }
-  runApp(const MyApp());
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
