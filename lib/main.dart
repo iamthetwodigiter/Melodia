@@ -16,9 +16,9 @@ Future<void> main() async {
     settings.put('streaming_quality', '320');
     settings.put('shuffle', 0);
     settings.put('cache_songs', 'false');
-    settings.put('playing', 'false');
     settings.put('darkMode', 'false');
     settings.put('accent_color', [255, 255, 255, 255]);
+    settings.put('currentSong', null);
     settings.put('download_path',
         '${(await getExternalStorageDirectory())!.path}/Melodia');
   }

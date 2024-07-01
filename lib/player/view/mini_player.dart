@@ -1,46 +1,27 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
-import 'package:just_audio/just_audio.dart';
-import 'package:melodia/album/model/playlist_model.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:melodia/player/model/songs_model.dart';
+import 'package:melodia/provider/songs_notifier.dart';
 
-class MiniPlayer extends StatefulWidget {
-  final String link;
-  final String id;
-  final String name;
-  final String duration;
-  final String imageUrl;
-  final List<String> artists;
-  final Playlist? playlistData;
-  final int index;
-  final bool shuffleMode;
-  final AudioPlayer player;
-
+class MiniPlayer extends ConsumerStatefulWidget {
+  final SongModel? song;
   const MiniPlayer({
     super.key,
-    required this.link,
-    required this.id,
-    required this.name,
-    required this.duration,
-    required this.imageUrl,
-    required this.artists,
-    this.playlistData,
-    required this.index,
-    required this.shuffleMode,
-    required this.player,
+    this.song,
   });
 
   @override
-  State<MiniPlayer> createState() => _MiniPlayerState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _MiniPlayerState();
 }
 
-class _MiniPlayerState extends State<MiniPlayer> {
+class _MiniPlayerState extends ConsumerState<MiniPlayer> {
   @override
   Widget build(BuildContext context) {
     Box settings = Hive.box('settings');
-    String playing = settings.get('playing');
-    bool isPlaying = playing == 'false' ? false : true;
+    final song = settings.get('currentSong');
     return Container(
       height: 75,
       padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -50,7 +31,7 @@ class _MiniPlayerState extends State<MiniPlayer> {
           ClipRRect(
             borderRadius: BorderRadius.circular(5),
             child: CachedNetworkImage(
-              imageUrl: widget.imageUrl,
+              imageUrl: widget.song!.imageUrl,
               height: 60,
               placeholder: (context, url) {
                 return const SizedBox(width: 60);
@@ -78,12 +59,12 @@ class _MiniPlayerState extends State<MiniPlayer> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  widget.name,
+                  widget.song!.name,
                   style: const TextStyle(fontSize: 18),
                 ),
                 const SizedBox(height: 5),
                 Text(
-                  widget.artists.join(", "),
+                  widget.song!.artists.join(", "),
                   style: const TextStyle(fontSize: 13),
                   softWrap: true,
                   maxLines: 2,
@@ -95,37 +76,32 @@ class _MiniPlayerState extends State<MiniPlayer> {
             children: [
               IconButton(
                 onPressed: () {
-                  isPlaying ? widget.player.pause() : widget.player.play();
-                  setState(() {
-                    isPlaying = !isPlaying;
-                    settings.put('playing', isPlaying.toString());
-                  });
+                  bool isPlaying = ref.read(isPlayingProvider);
+                  if (isPlaying) {
+                    widget.song!.player!.pause();
+                  } else {
+                    widget.song!.player!.play();
+                  }
+                  ref.read(isPlayingProvider.notifier).state = !isPlaying;
                 },
                 icon: Icon(
-                  isPlaying
+                  ref.watch(isPlayingProvider)
                       ? CupertinoIcons.pause_fill
                       : CupertinoIcons.play_fill,
                   color: CupertinoColors.white,
+                  size: 35,
                 ),
               ),
-              // IconButton(
-              //   onPressed: () {
-              //     ();
-              //   },
-              //   icon: Icon(
-              //     CupertinoIcons.forward_end_fill,
-              //     color: CupertinoColors.white,
-              //   ),
-              // ),
               IconButton(
-                  onPressed: () {
-                    widget.player.stop();
-                    Navigator.of(context).pop();
-                  },
-                  icon: const Icon(
-                    Icons.close,
-                    color: CupertinoColors.white,
-                  ))
+                onPressed: () {
+                  widget.song!.player!.stop();
+                  settings.put('currentSong', null);
+                },
+                icon: const Icon(
+                  Icons.close,
+                  color: CupertinoColors.white,
+                ),
+              ),
             ],
           )
         ],

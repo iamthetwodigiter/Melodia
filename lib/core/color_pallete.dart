@@ -5,7 +5,7 @@ Box settings = Hive.box('settings');
 List<int> x = settings.get('accent_color');
 
 class AppPallete {
-  static const scaffoldBackgroundColor = CupertinoColors.black;
+  static const scaffoldBackgroundColor = CupertinoColors.darkBackgroundGray;
   static const primaryColor = CupertinoColors.activeBlue;
   static const secondaryColor = CupertinoColors.white;
   final accentColor = Color.fromARGB(x.first, x.elementAt(1), x.elementAt(2), x.last);

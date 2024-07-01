@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:melodia/album/model/playlist_model.dart';
+import 'package:melodia/player/model/songs_model.dart';
 import 'package:melodia/player/view/player_screen.dart';
 import 'package:melodia/search/model/api_calls.dart';
 
@@ -199,8 +200,8 @@ class _SearchResultsState extends State<SearchResults> {
                                               Navigator.push(
                                                 context,
                                                 CupertinoPageRoute(
-                                                  builder: (context) =>
-                                                      MusicPlayer(
+                                                    builder: (context) {
+                                                  final song = SongModel(
                                                     link:
                                                         value.downloadUrls.last,
                                                     id: value.id,
@@ -224,8 +225,11 @@ class _SearchResultsState extends State<SearchResults> {
                                                     ]),
                                                     index: 0,
                                                     shuffleMode: false,
-                                                  ),
-                                                ),
+                                                  );
+                                                  return MusicPlayer(
+                                                    song: song,
+                                                  );
+                                                }),
                                               );
                                             },
                                             icon: const Icon(
