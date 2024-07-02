@@ -37,7 +37,7 @@ class _ThemeSettingsState extends State<ThemeSettings> {
                 color: AppPallete().accentColor,
                 size: 20,
               ),
-              title: const Text('Dark Theme'),
+              title: Text('Dark Theme', style: TextStyle(color: AppPallete().accentColor),),
               trailing: CupertinoSwitch(
                 value: switchValue,
                 activeColor: AppPallete().accentColor,
@@ -66,7 +66,7 @@ class _ThemeSettingsState extends State<ThemeSettings> {
                   color: AppPallete().accentColor,
                   size: 20,
                 ),
-                title: const Text('Accent Color'),
+                title: Text('Accent Color', style: TextStyle(color: AppPallete().accentColor),),
                 subtitle: const Text('Please reload after changing color'),
                 trailing: const CupertinoListTileChevron()),
           ],

@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:melodia/core/color_pallete.dart';
 import 'package:melodia/home/view/homepage.dart';
 
 class LandingScreen extends StatefulWidget {
@@ -109,7 +110,7 @@ class _LandingScreenState extends State<LandingScreen> {
                         child: Image.asset(
                           'assets/chevron.png',
                           height: 20,
-                          color: CupertinoColors.white.withAlpha(220),
+                          color: AppPallete().accentColor.withAlpha(220),
                         )),
                   ),
                   const SizedBox(width: 30),

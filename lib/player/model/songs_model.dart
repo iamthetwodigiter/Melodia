@@ -1,17 +1,28 @@
-import 'package:just_audio/just_audio.dart';
+import 'package:hive/hive.dart';
 import 'package:melodia/album/model/playlist_model.dart';
 
-class SongModel {
+part 'songs_model.g.dart';
+
+@HiveType(typeId: 0)
+class SongModel extends HiveObject {
+  @HiveField(0)
   final String link;
+  @HiveField(1)
   final String id;
+  @HiveField(2)
   final String name;
+  @HiveField(3)
   final String duration;
+  @HiveField(4)
   final String imageUrl;
+  @HiveField(5)
   final List<String> artists;
+  @HiveField(6)
   final Playlist? playlistData;
+  @HiveField(7)
   final int index;
+  @HiveField(8)
   final bool shuffleMode;
-  final AudioPlayer? player;
 
   SongModel({
     required this.link,
@@ -23,6 +34,7 @@ class SongModel {
     this.playlistData,
     required this.index,
     required this.shuffleMode,
-    this.player,
   });
 }
+
+// Define Playlist adapter similarly if needed

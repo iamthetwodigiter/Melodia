@@ -7,7 +7,6 @@ import 'package:hive/hive.dart';
 import 'package:melodia/album/view/albums_details_page.dart';
 import 'package:melodia/core/color_pallete.dart';
 import 'package:melodia/home/model/api_calls.dart';
-import 'package:melodia/player/model/songs_model.dart';
 import 'package:melodia/player/view/mini_player.dart';
 import 'package:melodia/provider/songs_notifier.dart';
 import 'package:melodia/search/view/search_page.dart';
@@ -22,36 +21,10 @@ class HomePage extends ConsumerStatefulWidget {
 
 class _HomePageState extends ConsumerState<HomePage> {
   final TextEditingController _searchController = TextEditingController();
-  Box historyBox = Hive.box<SongModel>('history');
-
+  Box historyBox = Hive.box('history');
   @override
   void initState() {
     super.initState();
-    // if (historyBox.isNotEmpty) {
-    //   for (int i = 0; i < historyBox.length; i++) {
-    //     var items = historyBox.values.elementAt(i);
-    //     songs.add(
-    //       SongModel(
-    //           link: items.elementAt(0).toString(),
-    //           id: items.elementAt(1).toString(),
-    //           name: items.elementAt(2).toString(),
-    //           duration: items.elementAt(3).toString(),
-    //           imageUrl: items.elementAt(4).toString(),
-    //           playlistData: Playlist(
-    //             idList: [],
-    //             linkList: [],
-    //             imageUrlList: [],
-    //             nameList: [],
-    //             artistsList: [],
-    //             durationList: [],
-    //           ),
-    //           artists: items.elementAt(5),
-    //           index: historyBox.length - i,
-    //           shuffleMode:
-    //               Hive.box('settings').get('shuffle') == 0 ? false : true),
-    //     );
-    //   }
-    // }
   }
 
   @override
@@ -245,96 +218,48 @@ class _HomePageState extends ConsumerState<HomePage> {
                           );
                         },
                       ),
-                      // historyBox.isNotEmpty
-                      //     ? Column(
-                      //         crossAxisAlignment: CrossAxisAlignment.start,
-                      //         children: [
-                      //           Container(height: 10),
-                      //           Text(
-                      //             'Last Played',
-                      //             style: TextStyle(
-                      //               color: AppPallete().accentColor,
-                      //               fontWeight: FontWeight.bold,
-                      //               fontSize: 25,
-                      //             ),
-                      //           ),
-                      //           Container(height: 25),
-                      //         ],
-                      //       )
-                      //     : const SizedBox(),
-                      // historyBox.isNotEmpty
-                      //     ? SizedBox(
-                      //         height: 160,
-                      //         child: ListView.builder(
-                      //             scrollDirection: Axis.horizontal,
-                      //             itemCount: historyBox.length > 10
-                      //                 ? 5
-                      //                 : historyBox.length,
-                      //             itemBuilder: (context, index) {
-                      //               int i = historyBox.length - index - 1;
-                      //               return Container(
-                      //                 constraints:
-                      //                     const BoxConstraints(maxWidth: 150),
-                      //                 padding: const EdgeInsets.only(right: 10),
-                      //                 child: Text(historyBox.length.toString()),
-                      //                 // child: Column(
-                      //                 //   children: [
-                      //                 //     TextButton(
-                      //                 //       style: ButtonStyle(
-                      //                 //           padding:
-                      //                 //               MaterialStateProperty.all(
-                      //                 //                   EdgeInsets.zero)),
-                      //                 //       onPressed: () {
-                      //                 //         Navigator.push(
-                      //                 //           context,
-                      //                 //           CustomPageRoute(
-                      //                 //             builder: (context) =>
-                      //                 //                 MusicPlayer(
-                      //                 //               song: songs.elementAt(
-                      //                 //                 i,
-                      //                 //               ),
-                      //                 //             ),
-                      //                 //           ),
-                      //                 //         );
-                      //                 //       },
-                      //                 //       child: ClipRRect(
-                      //                 //         borderRadius:
-                      //                 //             BorderRadius.circular(10),
-                      //                 //         child: SizedBox(
-                      //                 //           width: 175,
-                      //                 //           child: CachedNetworkImage(
-                      //                 //             imageUrl: historyBox.values
-                      //                 //                 .elementAt(i).imageUrl
-                      //                 //                 .toString(),
-                      //                 //             errorWidget:
-                      //                 //                 (context, url, error) {
-                      //                 //               return const SizedBox(
-                      //                 //                 height: 141,
-                      //                 //                 child: Icon(
-                      //                 //                   Icons.error,
-                      //                 //                 ),
-                      //                 //               );
-                      //                 //             },
-                      //                 //           ),
-                      //                 //         ),
-                      //                 //       ),
-                      //                 //     ),
-                      //                 //     const SizedBox(height: 5),
-                      //                 //     Text(
-                      //                 //       historyBox.values
-                      //                 //           .elementAt(i).name
-                      //                 //           .toString(),
-                      //                 //       style: const TextStyle(
-                      //                 //         fontSize: 12,
-                      //                 //       ),
-                      //                 //       softWrap: true,
-                      //                 //       maxLines: 2,
-                      //                 //     ),
-                      //                 //   ],
-                      //                 // ),
-                      //               );
-                      //             }))
-                      //     : Container(),
+                      historyBox.isNotEmpty
+                          ? Container(height: 25)
+                          : const SizedBox(),
+                      historyBox.isNotEmpty
+                          ? Container(
+                              height: 200,
+                              color: Colors.red,
+                              child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: historyBox.length > 10
+                                      ? 5
+                                      : historyBox.length,
+                                  itemBuilder: (context, index) {
+                                    return Column(
+                                      children: [
+                                        CachedNetworkImage(
+                                          imageUrl: historyBox.values
+                                              .elementAt(index)[4]
+                                              .toString(),
+                                          height: 150,
+                                        ),
+                                        Text(historyBox.values
+                                              .elementAt(index)[2]
+                                              .toString(),)
+                                      ],
+                                    );
+                                  })
+
+                              // child: ListView.builder(
+                              //     itemCount: historyBox.length > 10
+                              //         ? 5
+                              //         : ((historyBox.length) ~/ 2),
+                              //     itemBuilder: (context, index) {
+
+                              //       return Container(
+                              //         height: 200,
+                              //         color: Colors.red,
+                              //         child: Text(historyBox.length.toString()),
+                              //       );
+                              //     }),
+                              )
+                          : Container(),
                       const SizedBox(height: 25),
                       Text(
                         'Featured Playlists',
@@ -474,21 +399,18 @@ class _HomePageState extends ConsumerState<HomePage> {
                                             child: SizedBox(
                                               width: 175,
                                               child: CachedNetworkImage(
-                                                imageUrl: data.imageUrl
-                                                    .replaceAll('150', '500'),
-                                                errorWidget:
-                                                    (context, url, error) {
-                                                  return CachedNetworkImage(
-                                                    imageUrl: data.imageUrl,
-                                                  );
-                                                },
+                                                imageUrl: historyBox.values
+                                              .elementAt(index)[4]
+                                              .toString(),
                                               ),
                                             ),
                                           ),
                                         ),
                                         const SizedBox(height: 5),
                                         Text(
-                                          data.name,
+                                          historyBox.values
+                                              .elementAt(index)[2]
+                                              .toString(),
                                           style: const TextStyle(
                                             fontSize: 12,
                                           ),

@@ -90,7 +90,7 @@ class _SettingsState extends State<Settings> {
                       color: AppPallete().accentColor,
                       size: 15,
                     ),
-                    title: const Text('Theme'),
+                    title: Text('Theme', style: TextStyle(color: AppPallete().accentColor),),
                     subtitle: const Text('Make the app your own'),
                     trailing: const CupertinoListTileChevron(),
                   ),
@@ -128,9 +128,9 @@ class _SettingsState extends State<Settings> {
                       color: AppPallete().accentColor,
                       size: 15,
                     ),
-                    title: const Text('Download'),
+                    title: Text('Download', style: TextStyle(color: AppPallete().accentColor),),
                     subtitle: const Text('Choose Download Quality'),
-                    additionalInfo: Text('$downloadQuality kbps'),
+                    additionalInfo: Text('$downloadQuality kbps', style: TextStyle(fontSize: 15 ,color: AppPallete().accentColor),),
                     trailing: const CupertinoListTileChevron(),
                   ),
                   CupertinoListTile(
@@ -167,9 +167,9 @@ class _SettingsState extends State<Settings> {
                       color: AppPallete().accentColor,
                       size: 20,
                     ),
-                    title: const Text('Streaming'),
+                    title: Text('Streaming', style: TextStyle(color: AppPallete().accentColor),),
                     subtitle: const Text('Choose Streaming Quality'),
-                    additionalInfo: Text('$streamingQuality kbps'),
+                    additionalInfo: Text('$streamingQuality kbps', style: TextStyle(fontSize: 15 ,color: AppPallete().accentColor),),
                     trailing: const CupertinoListTileChevron(),
                   ),
                   CupertinoListTile(
@@ -179,7 +179,7 @@ class _SettingsState extends State<Settings> {
                       color: AppPallete().accentColor,
                       size: 15,
                     ),
-                    title: const Text('Keep Shuffle Mode On'),
+                    title: Text('Keep Shuffle Mode On', style: TextStyle(color: AppPallete().accentColor),),
                     trailing: CupertinoSwitch(
                       value: switchValue,
                       activeColor: AppPallete().accentColor,
@@ -198,7 +198,7 @@ class _SettingsState extends State<Settings> {
                       color: AppPallete().accentColor,
                       size: 15,
                     ),
-                    title: const Text('Cache Songs?'),
+                    title:  Text('Cache Songs?', style: TextStyle(color: AppPallete().accentColor),),
                     subtitle: const Text(
                         'Will take up storage space  [Experimental]'),
                     trailing: CupertinoSwitch(
@@ -230,7 +230,7 @@ class _SettingsState extends State<Settings> {
                       color: AppPallete().accentColor,
                       size: 15,
                     ),
-                    title: const Text('Clear Songs Cache'),
+                    title: Text('Clear Songs Cache', style: TextStyle(color: AppPallete().accentColor),),
                     subtitle: const Text(
                         'Does the magic silently...  [Experimental]'),
                   ),

@@ -38,6 +38,7 @@ dependencies:
   http: ^1.2.1
   cached_network_image: ^3.3.1
   just_audio: ^0.9.38
+  just_audio_background:
   audio_video_progress_bar: ^2.0.3
   swipe_to: ^1.0.6
   permission_handler: ^11.3.1
@@ -48,6 +49,7 @@ dependencies:
   flutter_localization:
   flutter_riverpod:
   riverpod_annotation:
+  provider: ^6.1.2
 
 dev_dependencies:
   flutter_test:
