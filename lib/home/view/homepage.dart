@@ -9,6 +9,7 @@ import 'package:melodia/core/color_pallete.dart';
 import 'package:melodia/home/model/api_calls.dart';
 import 'package:melodia/player/model/songs_model.dart';
 import 'package:melodia/player/view/mini_player.dart';
+import 'package:melodia/provider/dark_mode_provider.dart';
 import 'package:melodia/provider/songs_notifier.dart';
 import 'package:melodia/search/view/search_page.dart';
 import 'package:melodia/settings/view/settings_page.dart';
@@ -222,9 +223,11 @@ class _HomePageState extends ConsumerState<HomePage> {
                                         const SizedBox(height: 5),
                                         Text(
                                           data.title,
-                                          style: const TextStyle(
+                                          style: TextStyle(
+                                            color: AppPallete().subtitleTextColor,
                                             fontSize: 12,
                                           ),
+                                          textAlign: TextAlign.center,
                                           softWrap: true,
                                           maxLines: 2,
                                         ),
@@ -400,9 +403,11 @@ class _HomePageState extends ConsumerState<HomePage> {
                                         const SizedBox(height: 5),
                                         Text(
                                           data.listname,
-                                          style: const TextStyle(
+                                          style: TextStyle(
+                                            color: AppPallete().subtitleTextColor,
                                             fontSize: 12,
                                           ),
+                                          textAlign: TextAlign.center,
                                           softWrap: true,
                                           maxLines: 2,
                                         ),
@@ -489,9 +494,12 @@ class _HomePageState extends ConsumerState<HomePage> {
                                         const SizedBox(height: 5),
                                         Text(
                                           data.name,
-                                          style: const TextStyle(
+                                          style: TextStyle(
+                                            color:
+                                                    AppPallete().subtitleTextColor,
                                             fontSize: 12,
                                           ),
+                                          textAlign: TextAlign.center,
                                           softWrap: true,
                                           maxLines: 2,
                                         ),

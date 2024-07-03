@@ -3,12 +3,15 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive/hive.dart';
 import 'package:melodia/album/model/api_calls.dart';
 import 'package:melodia/album/model/playlist_model.dart';
 import 'package:melodia/core/color_pallete.dart';
 import 'package:melodia/player/model/songs_model.dart';
 import 'package:melodia/player/view/mini_player.dart';
 import 'package:melodia/player/view/player_screen.dart';
+import 'package:melodia/player/widgets/custom_page_route.dart';
+import 'package:melodia/provider/dark_mode_provider.dart';
 import 'package:melodia/provider/songs_notifier.dart';
 
 class AlbumDetails extends ConsumerStatefulWidget {
@@ -28,6 +31,8 @@ class _AlbumDetailsState extends ConsumerState<AlbumDetails> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final song = ref.watch(currentSongProvider);
+    ref.watch(darkModeProvider);
+    bool darkMode = Hive.box('settings').get('darkMode');
     // final isMinimised = ref.watch(isMinimisedProvider);
 
     List<String> idList = [];
@@ -152,8 +157,14 @@ class _AlbumDetailsState extends ConsumerState<AlbumDetails> {
                                           children: [
                                             Text(
                                               data.type.toUpperCase(),
-                                              style:
-                                                  const TextStyle(fontSize: 12),
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: darkMode
+                                                    ? AppPallete
+                                                        .subtitleDarkTextColor
+                                                    : AppPallete()
+                                                        .subtitleTextColor,
+                                              ),
                                             ),
                                             data.year.toString() != '0'
                                                 ? Text(
@@ -161,11 +172,26 @@ class _AlbumDetailsState extends ConsumerState<AlbumDetails> {
                                                     style: const TextStyle(
                                                         fontSize: 12),
                                                   )
-                                                : const Text('--__--'),
+                                                : Text(
+                                                    '--__--',
+                                                    style: TextStyle(
+                                                      color: darkMode
+                                                          ? AppPallete
+                                                              .subtitleDarkTextColor
+                                                          : AppPallete()
+                                                              .subtitleTextColor,
+                                                    ),
+                                                  ),
                                             Text(
                                               '${data.songsCount.toString()} Song(s)',
-                                              style:
-                                                  const TextStyle(fontSize: 12),
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: darkMode
+                                                    ? AppPallete
+                                                        .subtitleDarkTextColor
+                                                    : AppPallete()
+                                                        .subtitleTextColor,
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -220,8 +246,13 @@ class _AlbumDetailsState extends ConsumerState<AlbumDetails> {
                                         ),
                                         Text(
                                           data.artists.elementAt(index).name,
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontSize: 10,
+                                            color: darkMode
+                                                ? AppPallete
+                                                    .subtitleDarkTextColor
+                                                : AppPallete()
+                                                    .subtitleTextColor,
                                           ),
                                           softWrap: true,
                                           maxLines: 2,
@@ -290,9 +321,8 @@ class _AlbumDetailsState extends ConsumerState<AlbumDetails> {
                                                   .play();
 
                                               Navigator.of(context).push(
-                                                CupertinoPageRoute(
-                                                  builder: (context) =>
-                                                      MusicPlayer(song: song),
+                                                CustomPageRoute(
+                                                  page: MusicPlayer(song: song),
                                                 ),
                                               );
                                             },
@@ -331,9 +361,8 @@ class _AlbumDetailsState extends ConsumerState<AlbumDetails> {
                                                   .play();
 
                                               Navigator.of(context).push(
-                                                CupertinoPageRoute(
-                                                  builder: (context) =>
-                                                      MusicPlayer(song: song),
+                                                CustomPageRoute(
+                                                  page: MusicPlayer(song: song),
                                                 ),
                                               );
                                             },
@@ -400,9 +429,8 @@ class _AlbumDetailsState extends ConsumerState<AlbumDetails> {
                                                   .play();
 
                                               Navigator.of(context).push(
-                                                CupertinoPageRoute(
-                                                  builder: (context) =>
-                                                      MusicPlayer(song: song),
+                                                CustomPageRoute(
+                                                  page: MusicPlayer(song: song),
                                                 ),
                                               );
                                             },
@@ -450,15 +478,31 @@ class _AlbumDetailsState extends ConsumerState<AlbumDetails> {
                                                 color: AppPallete().accentColor,
                                               ),
                                             ),
-                                            title: Text(data.songs
-                                                .elementAt(index)
-                                                .name
-                                                .split('(')[0]),
+                                            title: Text(
+                                              data.songs
+                                                  .elementAt(index)
+                                                  .name
+                                                  .split('(')[0],
+                                              style: TextStyle(
+                                                color: darkMode
+                                                    ? AppPallete
+                                                        .subtitleDarkTextColor
+                                                    : AppPallete()
+                                                        .subtitleTextColor,
+                                              ),
+                                            ),
                                             subtitle: Text(
                                               data.songs
                                                   .elementAt(index)
                                                   .artists
                                                   .join(", "),
+                                              style: TextStyle(
+                                                color: darkMode
+                                                    ? AppPallete
+                                                        .subtitleDarkTextColor
+                                                    : AppPallete()
+                                                        .subtitleTextColor,
+                                              ),
                                             ),
                                           ),
                                         ),

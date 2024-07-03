@@ -1,8 +1,10 @@
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:melodia/core/color_pallete.dart';
+import 'package:melodia/provider/dark_mode_provider.dart';
 import 'package:melodia/settings/view/theming_card.dart';
 
 const List<String> qualityList = <String>[
@@ -11,14 +13,14 @@ const List<String> qualityList = <String>[
   '320',
 ];
 
-class Settings extends StatefulWidget {
+class Settings extends ConsumerStatefulWidget {
   const Settings({super.key});
 
   @override
-  State<Settings> createState() => _SettingsState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _SettingsState();
 }
 
-class _SettingsState extends State<Settings> {
+class _SettingsState extends ConsumerState<Settings> {
   void _showDialog(Widget child) {
     showCupertinoModalPopup<void>(
       context: context,
@@ -60,6 +62,8 @@ class _SettingsState extends State<Settings> {
     int shuffle = settings.get('shuffle');
     String cache = settings.get('cache_songs');
     bool switchValue = (shuffle == 0) ? false : true;
+    ref.watch(darkModeProvider);
+    bool darkMode = settings.get('darkMode');
     Directory cacheDir = Directory(
         '/data/user/0/com.thetwodigiter.melodia/cache/just_audio_cache/');
     return CupertinoPageScaffold(
@@ -78,8 +82,16 @@ class _SettingsState extends State<Settings> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 0),
               child: CupertinoListSection(
+                backgroundColor: darkMode
+                    ? AppPallete.scaffoldDarkBackground
+                    : AppPallete.scaffoldBackgroundColor,
+                topMargin: 0,
+                separatorColor: AppPallete().accentColor,
                 children: [
                   CupertinoListTile(
+                    backgroundColor: darkMode
+                        ? AppPallete.scaffoldDarkBackground
+                        : AppPallete.scaffoldBackgroundColor,
                     padding: const EdgeInsets.all(15),
                     onTap: () {
                       Navigator.of(context).push(CupertinoPageRoute(
@@ -90,11 +102,23 @@ class _SettingsState extends State<Settings> {
                       color: AppPallete().accentColor,
                       size: 15,
                     ),
-                    title: Text('Theme', style: TextStyle(color: AppPallete().accentColor),),
-                    subtitle: const Text('Make the app your own'),
+                    title: Text(
+                      'Theme',
+                      style: TextStyle(color: AppPallete().accentColor),
+                    ),
+                    subtitle: Text(
+                      'Make the app your own',
+                      style: TextStyle(
+                          color: darkMode
+                              ? AppPallete.subtitleDarkTextColor
+                              : AppPallete().subtitleTextColor),
+                    ),
                     trailing: const CupertinoListTileChevron(),
                   ),
                   CupertinoListTile(
+                    backgroundColor: darkMode
+                        ? AppPallete.scaffoldDarkBackground
+                        : AppPallete.scaffoldBackgroundColor,
                     padding: const EdgeInsets.all(15),
                     onTap: () {
                       _showDialog(
@@ -128,12 +152,27 @@ class _SettingsState extends State<Settings> {
                       color: AppPallete().accentColor,
                       size: 15,
                     ),
-                    title: Text('Download', style: TextStyle(color: AppPallete().accentColor),),
-                    subtitle: const Text('Choose Download Quality'),
-                    additionalInfo: Text('$downloadQuality kbps', style: TextStyle(fontSize: 15 ,color: AppPallete().accentColor),),
+                    title: Text(
+                      'Download',
+                      style: TextStyle(color: AppPallete().accentColor),
+                    ),
+                    subtitle: Text(
+                      'Choose Download Quality',
+                      style: TextStyle(color: darkMode
+                              ? AppPallete.subtitleDarkTextColor
+                              : AppPallete().subtitleTextColor),
+                    ),
+                    additionalInfo: Text(
+                      '$downloadQuality kbps',
+                      style: TextStyle(
+                          fontSize: 15, color: AppPallete().accentColor),
+                    ),
                     trailing: const CupertinoListTileChevron(),
                   ),
                   CupertinoListTile(
+                    backgroundColor: darkMode
+                        ? AppPallete.scaffoldDarkBackground
+                        : AppPallete.scaffoldBackgroundColor,
                     padding: const EdgeInsets.all(15),
                     onTap: () {
                       _showDialog(
@@ -167,19 +206,39 @@ class _SettingsState extends State<Settings> {
                       color: AppPallete().accentColor,
                       size: 20,
                     ),
-                    title: Text('Streaming', style: TextStyle(color: AppPallete().accentColor),),
-                    subtitle: const Text('Choose Streaming Quality'),
-                    additionalInfo: Text('$streamingQuality kbps', style: TextStyle(fontSize: 15 ,color: AppPallete().accentColor),),
+                    title: Text(
+                      'Streaming',
+                      style: TextStyle(color: AppPallete().accentColor),
+                    ),
+                    subtitle: Text(
+                      'Choose Streaming Quality',
+                      style: TextStyle(color: darkMode
+                              ? AppPallete.subtitleDarkTextColor
+                              : AppPallete().subtitleTextColor),
+                    ),
+                    additionalInfo: Text(
+                      '$streamingQuality kbps',
+                      style: TextStyle(
+                          fontSize: 15, color: AppPallete().accentColor),
+                    ),
                     trailing: const CupertinoListTileChevron(),
                   ),
                   CupertinoListTile(
+                    backgroundColor: darkMode
+                        ? AppPallete.scaffoldDarkBackground
+                        : AppPallete.scaffoldBackgroundColor,
                     padding: const EdgeInsets.all(15),
                     leading: Icon(
                       CupertinoIcons.shuffle,
                       color: AppPallete().accentColor,
                       size: 15,
                     ),
-                    title: Text('Keep Shuffle Mode On', style: TextStyle(color: AppPallete().accentColor),),
+                    title: Text(
+                      'Keep Shuffle Mode On',
+                      style: TextStyle(color: darkMode
+                              ? AppPallete.subtitleDarkTextColor
+                              : AppPallete().subtitleTextColor),
+                    ),
                     trailing: CupertinoSwitch(
                       value: switchValue,
                       activeColor: AppPallete().accentColor,
@@ -192,15 +251,25 @@ class _SettingsState extends State<Settings> {
                     ),
                   ),
                   CupertinoListTile(
+                    backgroundColor: darkMode
+                        ? AppPallete.scaffoldDarkBackground
+                        : AppPallete.scaffoldBackgroundColor,
                     padding: const EdgeInsets.all(15),
                     leading: Icon(
                       CupertinoIcons.folder_fill,
                       color: AppPallete().accentColor,
                       size: 15,
                     ),
-                    title:  Text('Cache Songs?', style: TextStyle(color: AppPallete().accentColor),),
-                    subtitle: const Text(
-                        'Will take up storage space  [Experimental]'),
+                    title: Text(
+                      'Cache Songs?',
+                      style: TextStyle(color: AppPallete().accentColor),
+                    ),
+                    subtitle: Text(
+                      'Will take up storage space  [Experimental]',
+                      style: TextStyle(color: darkMode
+                              ? AppPallete.subtitleDarkTextColor
+                              : AppPallete().subtitleTextColor),
+                    ),
                     trailing: CupertinoSwitch(
                       value: cache == 'false' ? false : true,
                       activeColor: AppPallete().accentColor,
@@ -214,6 +283,9 @@ class _SettingsState extends State<Settings> {
                     ),
                   ),
                   CupertinoListTile(
+                    backgroundColor: darkMode
+                        ? AppPallete.scaffoldDarkBackground
+                        : AppPallete.scaffoldBackgroundColor,
                     padding: const EdgeInsets.all(15),
                     onTap: () async {
                       // final x = await getFolderSize(cacheDir.path);
@@ -230,9 +302,16 @@ class _SettingsState extends State<Settings> {
                       color: AppPallete().accentColor,
                       size: 15,
                     ),
-                    title: Text('Clear Songs Cache', style: TextStyle(color: AppPallete().accentColor),),
-                    subtitle: const Text(
-                        'Does the magic silently...  [Experimental]'),
+                    title: Text(
+                      'Clear Songs Cache',
+                      style: TextStyle(color: AppPallete().accentColor),
+                    ),
+                    subtitle: Text(
+                      'Does the magic silently...  [Experimental]',
+                      style: TextStyle(color: darkMode
+                              ? AppPallete.subtitleDarkTextColor
+                              : AppPallete().subtitleTextColor),
+                    ),
                   ),
                 ],
               ),

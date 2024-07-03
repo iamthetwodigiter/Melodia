@@ -49,7 +49,7 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
         bool shuffle = audioService.shuffle();
         Navigator.of(context).pushReplacement(
           CustomPageRoute(
-            builder: (context) => MusicPlayer(
+            page: MusicPlayer(
               song: shuffle
                   ? audioService.shufflePlayback()
                   : audioService.nextPlayback(),
@@ -60,6 +60,7 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
     });
 
     return CupertinoPageScaffold(
+      // backgroundColor: AppPallete.scaffoldDarkBackground,
       child: Container(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -132,7 +133,10 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
                                                                     TextStyle(
                                                                   color: AppPallete()
                                                                       .accentColor,
-                                                                  fontSize: 15,
+                                                                  fontSize: 20,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
                                                                   fontStyle:
                                                                       FontStyle
                                                                           .italic,
@@ -152,8 +156,9 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
                                                             return Text(
                                                               'No Lyrics Found!',
                                                               style: TextStyle(
-                                                                  color: AppPallete()
-                                                                      .accentColor),
+                                                                color: AppPallete()
+                                                                    .secondaryColor,
+                                                              ),
                                                             );
                                                           },
                                                         ),
@@ -168,7 +173,7 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
                                                       ClipboardData(
                                                           text: lyrics));
                                                 },
-                                                icon: const Icon(
+                                                icon: Icon(
                                                   Icons.copy_rounded,
                                                   color: AppPallete
                                                       .scaffoldBackgroundColor,
@@ -180,9 +185,8 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
                                       ),
                                       ElevatedButton(
                                         style: ElevatedButton.styleFrom(
-                                          backgroundColor:
-                                              CupertinoColors.separator,
-                                        ),
+                                            backgroundColor: Colors.transparent,
+                                            elevation: 0),
                                         onPressed: () {
                                           setState(() {
                                             _lyrics = !_lyrics;
@@ -227,8 +231,8 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
                                 const SizedBox(height: 10),
                                 ElevatedButton(
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: CupertinoColors.separator,
-                                  ),
+                                      backgroundColor: Colors.transparent,
+                                      elevation: 0),
                                   onPressed: () {
                                     setState(() {
                                       _lyrics = !_lyrics;
@@ -251,6 +255,7 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 23,
+                          fontWeight: FontWeight.bold,
                           color: AppPallete().accentColor,
                         ),
                       ),
@@ -287,10 +292,10 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
                           onSeek: audioService?.player.seek,
                           baseBarColor: CupertinoColors.inactiveGray,
                           progressBarColor: AppPallete().accentColor,
-                          bufferedBarColor:
-                              CupertinoColors.activeBlue.withAlpha(150),
+                          // bufferedBarColor:
+                          //     CupertinoColors.activeBlue.withAlpha(150),
                           thumbColor: AppPallete().accentColor,
-                          thumbRadius: 0,
+                          thumbRadius: 10,
                           timeLabelTextStyle:
                               TextStyle(color: AppPallete().secondaryColor),
                           timeLabelPadding: 5,
@@ -364,13 +369,13 @@ class _PlayerControlsState extends ConsumerState<PlayerControls> {
           icon: Icon(CupertinoIcons.shuffle,
               color: shuffleMode
                   ? CupertinoColors.activeBlue
-                  : AppPallete().accentColor),
+                  : AppPallete().secondaryColor),
         ),
         IconButton(
           onPressed: () {
             Navigator.pushReplacement(
               context,
-              CustomPageRoute(
+              PlaybackRoute(
                 builder: (context) => MusicPlayer(
                   song: widget.audioService.previousPlayback(),
                 ),
@@ -399,7 +404,7 @@ class _PlayerControlsState extends ConsumerState<PlayerControls> {
             shuffleMode
                 ? Navigator.pushReplacement(
                     context,
-                    CustomPageRoute(
+                    PlaybackRoute(
                       builder: (context) => MusicPlayer(
                         song: widget.audioService.shufflePlayback(),
                       ),
@@ -407,7 +412,7 @@ class _PlayerControlsState extends ConsumerState<PlayerControls> {
                   )
                 : Navigator.pushReplacement(
                     context,
-                    CustomPageRoute(
+                    PlaybackRoute(
                       builder: (context) => MusicPlayer(
                         song: widget.audioService.nextPlayback(),
                       ),
