@@ -1,8 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:melodia/player/model/offline_song_model.dart';
 import 'package:melodia/player/model/songs_model.dart';
 import 'package:melodia/provider/audio_player.dart';
+import 'package:melodia/provider/offline_audio_player.dart';
 
-final currentSongProvider = StateProvider<SongModel?>((ref) => null);
+final currentSongProvider = StateProvider<SongModel?>((ref) {
+  return null;
+});
 
 final audioServiceProvider = ChangeNotifierProvider((ref) {
   final currentSong = ref.watch(currentSongProvider);
@@ -13,13 +17,17 @@ final audioServiceProvider = ChangeNotifierProvider((ref) {
   }
 });
 
-final isMinimisedProvider = StateProvider<bool>((ref) => false);
+final offlineSongProvider = StateProvider<OfflineSongModel?>((ref) {
+  return null;
+});
 
-// final audioPlayerProvider = Provider<AudioPlayer>((ref) {
-//   final player = AudioPlayer();
-//   ref.onDispose(() {
-//     player.pause();
-//     player.dispose();
-//   });
-//   return player;
-// });
+final offlineAudioServiceProvider = ChangeNotifierProvider((ref) {
+  final offlineSong = ref.watch(offlineSongProvider);
+  if (offlineSong != null) {
+    return OfflineAudioPlayer(song: offlineSong);
+  } else {
+    return null;
+  }
+});
+
+final isMinimisedProvider = StateProvider<bool>((ref) => false);

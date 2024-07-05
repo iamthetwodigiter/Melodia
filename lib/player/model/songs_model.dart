@@ -23,6 +23,10 @@ class SongModel extends HiveObject {
   final int index;
   @HiveField(8)
   final bool shuffleMode;
+  @HiveField(9)
+  final String playlistName;
+  @HiveField(10)
+  final String? year;
 
   SongModel({
     required this.link,
@@ -34,6 +38,8 @@ class SongModel extends HiveObject {
     this.playlistData,
     required this.index,
     required this.shuffleMode,
+    required this.playlistName,
+    this.year = '',
   });
 }
 

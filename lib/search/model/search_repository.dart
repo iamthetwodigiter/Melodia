@@ -6,6 +6,7 @@ class SongsResult {
   final String album;
   final String url;
   final String type;
+  final String? year;
   final List<String> artist;
   final List<String> downloadUrls;
 
@@ -17,32 +18,14 @@ class SongsResult {
     required this.album,
     required this.url,
     required this.type,
+    this.year = '',
     required this.artist,
     required this.downloadUrls,
   });
 }
 
-// class AlbumResult {
-//   final String id;
-//   final String title;
-//   final String imageUrl;
-//   final String url;
-//   final String type;
-//   final String artist;
-
-//   AlbumResult({
-//     required this.id,
-//     required this.title,
-//     required this.imageUrl,
-//     required this.url,
-//     required this.type,
-//     required this.artist,
-//   });
-// }
 
 class SearchResult {
   final List<SongsResult> songs;
-  // final List<AlbumResult> albums;
-
   SearchResult({required this.songs});
 }

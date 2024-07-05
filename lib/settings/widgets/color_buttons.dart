@@ -1,10 +1,11 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:melodia/landing_screen.dart';
 
 Box settings = Hive.box('settings');
-List<int> accentColor = settings.get('accent_color');
 
-class ColorCards extends StatelessWidget {
+class ColorCards extends ConsumerStatefulWidget {
   final Color color1;
   final Color color2;
   final Color color3;
@@ -14,6 +15,12 @@ class ColorCards extends StatelessWidget {
     required this.color2,
     required this.color3,
   });
+
+  @override
+  ConsumerState<ConsumerStatefulWidget> createState() => _ColorCardsState();
+}
+
+class _ColorCardsState extends ConsumerState<ColorCards> {
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -22,31 +29,51 @@ class ColorCards extends StatelessWidget {
         CupertinoButton(
           padding: const EdgeInsets.symmetric(horizontal: 40),
           onPressed: () {
-            settings.put('accent_color',
-                [color1.alpha, color1.red, color1.green, color1.blue]);
+            settings.put('accent_color', [
+              widget.color1.alpha,
+              widget.color1.red,
+              widget.color1.green,
+              widget.color1.blue
+            ]);
+            setState(() {});
+
             Navigator.of(context).pop();
           },
-          color: color1,
+          color: widget.color1,
           child: const Text(''),
         ),
         CupertinoButton(
           padding: const EdgeInsets.symmetric(horizontal: 40),
           onPressed: () {
-            settings.put('accent_color',
-                [color2.alpha, color2.red, color2.green, color2.blue]);
+            settings.put('accent_color', [
+              widget.color2.alpha,
+              widget.color2.red,
+              widget.color2.green,
+              widget.color2.blue
+            ]);
+
+            setState(() {});
+
             Navigator.of(context).pop();
           },
-          color: color2,
+          color: widget.color2,
           child: const Text(''),
         ),
         CupertinoButton(
           padding: const EdgeInsets.symmetric(horizontal: 40),
           onPressed: () {
-            settings.put('accent_color',
-                [color3.alpha, color3.red, color3.green, color3.blue]);
+            settings.put('accent_color', [
+              widget.color3.alpha,
+              widget.color3.red,
+              widget.color3.green,
+              widget.color3.blue
+            ]);
+
+            setState(() {});
+
             Navigator.of(context).pop();
           },
-          color: color3,
+          color: widget.color3,
           child: const Text(''),
         ),
       ],

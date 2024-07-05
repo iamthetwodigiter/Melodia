@@ -7,7 +7,6 @@ Future<SearchResult> searchResult(String query) async {
       "https://melodia-six.vercel.app/api/search/songs?query=${query.replaceAll(" ", "+")}&limit=50"));
   final data = jsonDecode(response.body);
   List<SongsResult> songsResultList = [];
-  // List<AlbumResult> albumResultList = [];
   if (data['success'] == true) {
     try {
       final songsResult = data['data']['results'];
@@ -46,24 +45,6 @@ Future<SearchResult> searchResult(String query) async {
     } catch (e) {
       rethrow;
     }
-    // final albumResults = data['data']['albums']['results'];
-    // for (var items in albumResults) {
-    //   final id = items['id'];
-    //   final title = items['title'];
-    //   final imageUrl = items['image'].last['url'];
-    //   final url = items['url'];
-    //   final type = items['type'];
-    //   final artist = items['artist'];
-
-    //   final albumData = AlbumResult(
-    //       id: id,
-    //       title: title,
-    //       imageUrl: imageUrl,
-    //       url: url,
-    //       type: type,
-    //       artist: artist);
-    //   albumResultList.add(albumData);
-    // }
     return SearchResult(
       songs: songsResultList,
     );

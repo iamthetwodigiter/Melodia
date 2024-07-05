@@ -28,7 +28,7 @@ class AudioService extends ChangeNotifier {
       ),
     );
 
-    await player.setAudioSource(audioSource);
+    player.setAudioSource(audioSource);
     player.play();
     notifyListeners();
   }
@@ -63,8 +63,7 @@ class AudioService extends ChangeNotifier {
   }
 
   SongModel previousPlayback() {
-    player.seekToPrevious();
-    int index = (song.index - 1) % songsCount();
+    int index = shuffle() ? Random().nextInt(songsCount()) :(song.index - 1) % songsCount();
     if (index < 0) index = songsCount() - 1;
 
     final songmodel = _getSongModelAtIndex(index);
@@ -75,31 +74,15 @@ class AudioService extends ChangeNotifier {
   }
 
   SongModel nextPlayback() {
-    player.seekToNext();
-    int index = (song.index + 1) % songsCount();
+    int index = shuffle() ? Random().nextInt(songsCount()) : (song.index + 1) % songsCount();
+
+    if (index >= songsCount()) index = 0;
 
     final songmodel = _getSongModelAtIndex(index);
     song = songmodel;
     _initializePlayer();
     notifyListeners();
     return songmodel;
-  }
-
-  SongModel shufflePlayback() {
-    var temp = Random();
-    int index = temp.nextInt(songsCount());
-
-    player.seek(Duration.zero, index: index);
-
-    final songmodel = _getSongModelAtIndex(index);
-    song = songmodel;
-    _initializePlayer();
-    notifyListeners();
-    return songmodel;
-  }
-
-  SongModel isCompleted() {
-    return shuffle() ? shufflePlayback() : nextPlayback();
   }
 
   SongModel _getSongModelAtIndex(int index) {
@@ -113,6 +96,8 @@ class AudioService extends ChangeNotifier {
       playlistData: song.playlistData,
       index: index,
       shuffleMode: shuffle(),
+      playlistName: song.playlistName,
+      year: song.year
     );
   }
 

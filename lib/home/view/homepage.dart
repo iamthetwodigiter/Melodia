@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -7,11 +6,13 @@ import 'package:hive/hive.dart';
 import 'package:melodia/album/view/albums_details_page.dart';
 import 'package:melodia/core/color_pallete.dart';
 import 'package:melodia/home/model/api_calls.dart';
+import 'package:melodia/offline_music_slab.dart';
 import 'package:melodia/player/model/songs_model.dart';
 import 'package:melodia/player/view/mini_player.dart';
-import 'package:melodia/provider/dark_mode_provider.dart';
+import 'package:melodia/player/view/player_screen.dart';
+import 'package:melodia/player/widgets/custom_page_route.dart';
 import 'package:melodia/provider/songs_notifier.dart';
-import 'package:melodia/search/view/search_page.dart';
+import 'package:melodia/search_page.dart';
 import 'package:melodia/settings/view/settings_page.dart';
 
 class HomePage extends ConsumerStatefulWidget {
@@ -23,36 +24,11 @@ class HomePage extends ConsumerStatefulWidget {
 
 class _HomePageState extends ConsumerState<HomePage> {
   final TextEditingController _searchController = TextEditingController();
-  Box historyBox = Hive.box<SongModel>('history');
+  Box<SongModel> historyBox = Hive.box<SongModel>('history');
 
   @override
   void initState() {
     super.initState();
-    // if (historyBox.isNotEmpty) {
-    //   for (int i = 0; i < historyBox.length; i++) {
-    //     var items = historyBox.values.elementAt(i);
-    //     songs.add(
-    //       SongModel(
-    //           link: items.elementAt(0).toString(),
-    //           id: items.elementAt(1).toString(),
-    //           name: items.elementAt(2).toString(),
-    //           duration: items.elementAt(3).toString(),
-    //           imageUrl: items.elementAt(4).toString(),
-    //           playlistData: Playlist(
-    //             idList: [],
-    //             linkList: [],
-    //             imageUrlList: [],
-    //             nameList: [],
-    //             artistsList: [],
-    //             durationList: [],
-    //           ),
-    //           artists: items.elementAt(5),
-    //           index: historyBox.length - i,
-    //           shuffleMode:
-    //               Hive.box('settings').get('shuffle') == 0 ? false : true),
-    //     );
-    //   }
-    // }
   }
 
   @override
@@ -66,475 +42,490 @@ class _HomePageState extends ConsumerState<HomePage> {
     final size = MediaQuery.of(context).size;
     final song = ref.watch(currentSongProvider.notifier).state;
     ref.watch(currentSongProvider);
+    ref.watch(audioServiceProvider.notifier)?.player.playing;
+    ref.watch(offlineSongProvider);
+    final offlineSong = ref.watch(offlineSongProvider);
 
     return CupertinoPageScaffold(
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            ConstrainedBox(
-              constraints: BoxConstraints(
-                  maxHeight:
-                      song != null ? size.height * 0.9 : size.height * 1),
-              child: SingleChildScrollView(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: Platform.isAndroid ? 20 : 0),
-                      SizedBox(
+      navigationBar: CupertinoNavigationBar(
+        trailing: IconButton(
+          onPressed: () => Navigator.of(context).push(
+            CupertinoPageRoute(
+              builder: (context) => const Settings(),
+            ),
+          ),
+          icon: const Icon(
+            CupertinoIcons.settings_solid,
+            size: 20,
+          ),
+          color: AppPallete().accentColor,
+        ),
+        middle: const Text(
+          'Melodia',
+          style: TextStyle(
+            fontSize: 25,
+          ),
+        ),
+        leading: Image.asset('assets/logo.png'),
+      ),
+      child: Column(
+        children: [
+          SizedBox(
+            height: song == null && offlineSong == null
+                ? size.height * 0.845
+                : size.height * 0.763,
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 20).copyWith(top: 10),
+              child: CustomScrollView(
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: CupertinoButton(
+                      padding: EdgeInsets.zero,
+                      child: Container(
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: Colors.transparent,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: CupertinoColors.separator,
+                            width: 3,
+                          ),
+                        ),
+                        margin: EdgeInsets.zero,
                         height: 50,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Container(
-                              width: 30,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  width: 0.175,
-                                  color: AppPallete().accentColor,
-                                ),
-                              ),
-                              child: IconButton(
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    CupertinoPageRoute(
-                                      builder: (context) => const Settings(),
-                                    ),
-                                  );
-                                },
-                                icon: Icon(
-                                  CupertinoIcons.bars,
-                                  color: AppPallete().accentColor,
-                                  size: 20,
-                                ),
-                              ),
-                            ),
-                            Text(
-                              'Melodia',
-                              style: TextStyle(
-                                color: AppPallete().accentColor,
-                                fontSize: 25,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Image.asset('assets/logo.png', height: 30),
-                          ],
+                        width: double.infinity,
+                        child: Text(
+                          'Click to Search',
+                          style: TextStyle(color: AppPallete().accentColor),
                         ),
                       ),
-                      const SizedBox(height: 15),
-                      CupertinoTextField(
-                        controller: _searchController,
-                        onSubmitted: (value) {
-                          value = value.trimRight();
-                          if (value.isNotEmpty) {
-                            Navigator.push(
-                              context,
-                              CupertinoPageRoute(
-                                builder: (context) =>
-                                    SearchResults(query: value),
+                      onPressed: () => Navigator.of(context).push(
+                        CupertinoPageRoute(
+                          builder: (context) => const SearchPage(),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SliverToBoxAdapter(
+                    child: SizedBox(height: 25),
+                  ),
+                  SliverToBoxAdapter(
+                    child: Text(
+                      'New Albums',
+                      style: TextStyle(
+                        color: AppPallete().accentColor,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 25,
+                      ),
+                    ),
+                  ),
+                  const SliverToBoxAdapter(
+                    child: SizedBox(height: 25),
+                  ),
+                  SliverToBoxAdapter(
+                    child: Consumer(
+                      builder: (context, watch, child) {
+                        final newAlbumsAsyncValue =
+                            ref.watch(newAlbumsProvider);
+
+                        return newAlbumsAsyncValue.when(
+                          data: (newAlbums) => SizedBox(
+                            height: 180,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: newAlbums.length,
+                              itemBuilder: (context, index) {
+                                final data = newAlbums[index];
+                                return Container(
+                                  constraints:
+                                      const BoxConstraints(maxWidth: 150),
+                                  padding: const EdgeInsets.only(right: 10),
+                                  child: Column(
+                                    children: [
+                                      TextButton(
+                                        style: ButtonStyle(
+                                          padding: MaterialStateProperty.all(
+                                            EdgeInsets.zero,
+                                          ),
+                                        ),
+                                        onPressed: () => Navigator.push(
+                                          context,
+                                          CupertinoPageRoute(
+                                            builder: (context) => AlbumDetails(
+                                              type: 'album',
+                                              albumID: data.id,
+                                            ),
+                                          ),
+                                        ),
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          child: SizedBox(
+                                            width: 150,
+                                            child: CachedNetworkImage(
+                                              imageUrl: data.image
+                                                  .replaceAll('150', '500'),
+                                              placeholder: (context, url) {
+                                                return const SizedBox(
+                                                  width: 150,
+                                                  child:
+                                                      CupertinoActivityIndicator(),
+                                                );
+                                              },
+                                              errorWidget:
+                                                  (context, url, error) {
+                                                return CachedNetworkImage(
+                                                  imageUrl: data.image,
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 5),
+                                      Text(
+                                        data.title,
+                                        style: TextStyle(
+                                          color: AppPallete().subtitleTextColor,
+                                          fontSize: 12,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                        softWrap: true,
+                                        maxLines: 2,
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          loading: () => const Center(
+                            child: CupertinoActivityIndicator(
+                                radius: 20.0,
+                                color: CupertinoColors.activeBlue),
+                          ),
+                          error: (error, stack) => const SizedBox(
+                            height: 100,
+                            child: Center(
+                              child: Text('Error occured!!'),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  if (historyBox.isNotEmpty) ...[
+                    SliverToBoxAdapter(
+                      child: Container(height: 10),
+                    ),
+                    SliverToBoxAdapter(
+                      child: Text(
+                        'Last Played',
+                        style: TextStyle(
+                          color: AppPallete().accentColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 25,
+                        ),
+                      ),
+                    ),
+                    SliverToBoxAdapter(
+                      child: Container(height: 25),
+                    ),
+                  ],
+                  if (historyBox.isNotEmpty)
+                    SliverToBoxAdapter(
+                      child: SizedBox(
+                        height: 180,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount:
+                              historyBox.length > 10 ? 10 : historyBox.length,
+                          itemBuilder: (context, index) {
+                            int i = historyBox.length - index - 1;
+                            SongModel song = historyBox.values.elementAt(i);
+                            return Container(
+                              constraints: const BoxConstraints(maxWidth: 150),
+                              padding: const EdgeInsets.only(right: 10),
+                              child: Column(
+                                children: [
+                                  TextButton(
+                                    style: ButtonStyle(
+                                      padding: MaterialStateProperty.all(
+                                          EdgeInsets.zero),
+                                    ),
+                                    onPressed: () {
+                                      ref
+                                          .read(currentSongProvider.notifier)
+                                          .state = song;
+                                      Navigator.push(
+                                        context,
+                                        CustomPageRoute(
+                                          page: MusicPlayer(song: song),
+                                        ),
+                                      );
+                                    },
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: SizedBox(
+                                        width: 175,
+                                        child: CachedNetworkImage(
+                                          imageUrl: song.imageUrl,
+                                          errorWidget: (context, url, error) {
+                                            return SizedBox(
+                                              height: 141,
+                                              child: Image.asset(
+                                                  'assets/song_thumb.png'),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 5),
+                                  Text(
+                                    song.name,
+                                    style: TextStyle(
+                                      color: AppPallete().accentColor,
+                                      fontSize: 12,
+                                    ),
+                                    softWrap: true,
+                                    maxLines: 2,
+                                  ),
+                                ],
                               ),
                             );
-                          }
-                          _searchController.clear();
-                        },
-                        padding: const EdgeInsets.all(10),
-                        placeholder: 'Search',
-                        placeholderStyle: TextStyle(
-                          color: AppPallete().accentColor.withOpacity(0.4),
-                        ),
-                        clearButtonMode: OverlayVisibilityMode.editing,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                                color:
-                                    AppPallete().accentColor.withOpacity(0.4))),
-                      ),
-                      const SizedBox(height: 25),
-                      Text(
-                        'New Albums',
-                        style: TextStyle(
-                          color: AppPallete().accentColor,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 25,
+                          },
                         ),
                       ),
-                      const SizedBox(height: 25),
-                      Consumer(
-                        builder: (context, watch, child) {
-                          final newAlbumsAsyncValue =
-                              ref.watch(newAlbumsProvider);
-
-                          return newAlbumsAsyncValue.when(
-                            data: (newAlbums) => SizedBox(
-                              height: 175,
-                              child: ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: newAlbums.length,
-                                itemBuilder: (context, index) {
-                                  final data = newAlbums[index];
-                                  return Container(
-                                    constraints:
-                                        const BoxConstraints(maxWidth: 150),
-                                    padding: const EdgeInsets.only(right: 10),
-                                    child: Column(
-                                      children: [
-                                        TextButton(
-                                          style: ButtonStyle(
-                                              padding:
-                                                  MaterialStateProperty.all(
-                                                      EdgeInsets.zero)),
-                                          onPressed: () => Navigator.push(
-                                            context,
-                                            CupertinoPageRoute(
-                                              builder: (context) =>
-                                                  AlbumDetails(
-                                                type: 'album',
-                                                albumID: data.id,
-                                              ),
-                                            ),
-                                          ),
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            child: SizedBox(
-                                              width: 150,
-                                              child: CachedNetworkImage(
-                                                imageUrl: data.image
-                                                    .replaceAll('150', '500'),
-                                                placeholder: (context, url) {
-                                                  return const SizedBox(
-                                                      width: 150,
-                                                      child:
-                                                          CupertinoActivityIndicator());
-                                                },
-                                                errorWidget:
-                                                    (context, url, error) {
-                                                  return CachedNetworkImage(
-                                                    imageUrl: data.image,
-                                                  );
-                                                },
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(height: 5),
-                                        Text(
-                                          data.title,
-                                          style: TextStyle(
-                                            color: AppPallete().subtitleTextColor,
-                                            fontSize: 12,
-                                          ),
-                                          textAlign: TextAlign.center,
-                                          softWrap: true,
-                                          maxLines: 2,
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                            loading: () => const Center(
-                              child: CupertinoActivityIndicator(
-                                  radius: 20.0,
-                                  color: CupertinoColors.activeBlue),
-                            ),
-                            error: (error, stack) => Center(
-                              child: Text(error.toString()),
-                            ),
-                          );
-                        },
+                    ),
+                  // SliverToBoxAdapter(
+                  //   child: const SizedBox(height: 25),
+                  // ),
+                  SliverToBoxAdapter(
+                    child: Text(
+                      'Featured Playlists',
+                      style: TextStyle(
+                        color: AppPallete().accentColor,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 25,
                       ),
-                      // historyBox.isNotEmpty
-                      //     ? Column(
-                      //         crossAxisAlignment: CrossAxisAlignment.start,
-                      //         children: [
-                      //           Container(height: 10),
-                      //           Text(
-                      //             'Last Played',
-                      //             style: TextStyle(
-                      //               color: AppPallete().accentColor,
-                      //               fontWeight: FontWeight.bold,
-                      //               fontSize: 25,
-                      //             ),
-                      //           ),
-                      //           Container(height: 25),
-                      //         ],
-                      //       )
-                      //     : const SizedBox(),
-                      // historyBox.isNotEmpty
-                      //     ? SizedBox(
-                      //         height: 160,
-                      //         child: ListView.builder(
-                      //             scrollDirection: Axis.horizontal,
-                      //             itemCount: historyBox.length > 10
-                      //                 ? 5
-                      //                 : historyBox.length,
-                      //             itemBuilder: (context, index) {
-                      //               int i = historyBox.length - index - 1;
-                      //               return Container(
-                      //                 constraints:
-                      //                     const BoxConstraints(maxWidth: 150),
-                      //                 padding: const EdgeInsets.only(right: 10),
-                      //                 child: Text(historyBox.length.toString()),
-                      //                 // child: Column(
-                      //                 //   children: [
-                      //                 //     TextButton(
-                      //                 //       style: ButtonStyle(
-                      //                 //           padding:
-                      //                 //               MaterialStateProperty.all(
-                      //                 //                   EdgeInsets.zero)),
-                      //                 //       onPressed: () {
-                      //                 //         Navigator.push(
-                      //                 //           context,
-                      //                 //           CustomPageRoute(
-                      //                 //             builder: (context) =>
-                      //                 //                 MusicPlayer(
-                      //                 //               song: songs.elementAt(
-                      //                 //                 i,
-                      //                 //               ),
-                      //                 //             ),
-                      //                 //           ),
-                      //                 //         );
-                      //                 //       },
-                      //                 //       child: ClipRRect(
-                      //                 //         borderRadius:
-                      //                 //             BorderRadius.circular(10),
-                      //                 //         child: SizedBox(
-                      //                 //           width: 175,
-                      //                 //           child: CachedNetworkImage(
-                      //                 //             imageUrl: historyBox.values
-                      //                 //                 .elementAt(i).imageUrl
-                      //                 //                 .toString(),
-                      //                 //             errorWidget:
-                      //                 //                 (context, url, error) {
-                      //                 //               return const SizedBox(
-                      //                 //                 height: 141,
-                      //                 //                 child: Icon(
-                      //                 //                   Icons.error,
-                      //                 //                 ),
-                      //                 //               );
-                      //                 //             },
-                      //                 //           ),
-                      //                 //         ),
-                      //                 //       ),
-                      //                 //     ),
-                      //                 //     const SizedBox(height: 5),
-                      //                 //     Text(
-                      //                 //       historyBox.values
-                      //                 //           .elementAt(i).name
-                      //                 //           .toString(),
-                      //                 //       style: const TextStyle(
-                      //                 //         fontSize: 12,
-                      //                 //       ),
-                      //                 //       softWrap: true,
-                      //                 //       maxLines: 2,
-                      //                 //     ),
-                      //                 //   ],
-                      //                 // ),
-                      //               );
-                      //             }))
-                      //     : Container(),
-                      const SizedBox(height: 25),
-                      Text(
-                        'Featured Playlists',
-                        style: TextStyle(
-                          color: AppPallete().accentColor,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 25,
-                        ),
-                      ),
-                      const SizedBox(height: 25),
-                      Consumer(
-                        builder: (context, watch, child) {
-                          final featuredPlaylistAsyncValue =
-                              ref.watch(featuredPlaylistProvider);
-
-                          return featuredPlaylistAsyncValue.when(
-                            data: (featuredPlaylists) => SizedBox(
-                              height: 200,
-                              child: ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: featuredPlaylists.length,
-                                itemBuilder: (context, index) {
-                                  final data = featuredPlaylists[index];
-                                  return Container(
-                                    constraints:
-                                        const BoxConstraints(maxWidth: 175),
-                                    padding: const EdgeInsets.only(right: 10),
-                                    child: Column(
-                                      children: [
-                                        TextButton(
-                                          style: ButtonStyle(
-                                              padding:
-                                                  MaterialStateProperty.all(
-                                                      EdgeInsets.zero)),
-                                          onPressed: () => Navigator.push(
-                                            context,
-                                            CupertinoPageRoute(
-                                              builder: (context) =>
-                                                  AlbumDetails(
-                                                type: 'playlist',
-                                                albumID: data.listID,
-                                              ),
-                                            ),
-                                          ),
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            child: SizedBox(
-                                              width: 175,
-                                              child: CachedNetworkImage(
-                                                imageUrl: data.image
-                                                    .replaceAll('150', '500'),
-                                                errorWidget:
-                                                    (context, url, error) {
-                                                  return CachedNetworkImage(
-                                                    imageUrl: data.image,
-                                                  );
-                                                },
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(height: 5),
-                                        Text(
-                                          data.listname,
-                                          style: TextStyle(
-                                            color: AppPallete().subtitleTextColor,
-                                            fontSize: 12,
-                                          ),
-                                          textAlign: TextAlign.center,
-                                          softWrap: true,
-                                          maxLines: 2,
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                            loading: () => const Center(
-                              child: CupertinoActivityIndicator(
-                                radius: 20.0,
-                                color: CupertinoColors.activeBlue,
-                              ),
-                            ),
-                            error: (error, stack) => Center(
-                              child: Text(error.toString()),
-                            ),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 25),
-                      Text(
-                        'Other Playlists',
-                        style: TextStyle(
-                          color: AppPallete().accentColor,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 25,
-                        ),
-                      ),
-                      const SizedBox(height: 25),
-                      Consumer(
-                        builder: (context, watch, child) {
-                          final otherPlaylistsAsyncValue =
-                              ref.watch(otherPlaylistsProvider);
-
-                          return otherPlaylistsAsyncValue.when(
-                            data: (otherPlaylists) => SizedBox(
-                              height: 200,
-                              child: ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: otherPlaylists.length,
-                                itemBuilder: (context, index) {
-                                  final data = otherPlaylists[index];
-                                  return Container(
-                                    constraints:
-                                        const BoxConstraints(maxWidth: 175),
-                                    padding: const EdgeInsets.only(right: 10),
-                                    child: Column(
-                                      children: [
-                                        TextButton(
-                                          style: ButtonStyle(
-                                              padding:
-                                                  MaterialStateProperty.all(
-                                                      EdgeInsets.zero)),
-                                          onPressed: () => Navigator.push(
-                                            context,
-                                            CupertinoPageRoute(
-                                              builder: (context) =>
-                                                  AlbumDetails(
-                                                type: 'playlist',
-                                                albumID: data.id,
-                                              ),
-                                            ),
-                                          ),
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            child: SizedBox(
-                                              width: 175,
-                                              child: CachedNetworkImage(
-                                                imageUrl: data.imageUrl
-                                                    .replaceAll('150', '500'),
-                                                errorWidget:
-                                                    (context, url, error) {
-                                                  return CachedNetworkImage(
-                                                    imageUrl: data.imageUrl,
-                                                  );
-                                                },
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(height: 5),
-                                        Text(
-                                          data.name,
-                                          style: TextStyle(
-                                            color:
-                                                    AppPallete().subtitleTextColor,
-                                            fontSize: 12,
-                                          ),
-                                          textAlign: TextAlign.center,
-                                          softWrap: true,
-                                          maxLines: 2,
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                            loading: () => const Center(
-                              child: CupertinoActivityIndicator(
-                                  radius: 20.0,
-                                  color: CupertinoColors.activeBlue),
-                            ),
-                            error: (error, stack) => Center(
-                              child: Text(error.toString()),
-                            ),
-                          );
-                        },
-                      ),
-                    ],
+                    ),
                   ),
-                ),
+                  const SliverToBoxAdapter(
+                    child: SizedBox(height: 25),
+                  ),
+                  SliverToBoxAdapter(
+                    child: Consumer(
+                      builder: (context, watch, child) {
+                        final featuredPlaylistAsyncValue =
+                            ref.watch(featuredPlaylistProvider);
+
+                        return featuredPlaylistAsyncValue.when(
+                          data: (featuredPlaylists) => SizedBox(
+                            height: 225,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: featuredPlaylists.length,
+                              itemBuilder: (context, index) {
+                                final data = featuredPlaylists[index];
+                                return Container(
+                                  constraints:
+                                      const BoxConstraints(maxWidth: 175),
+                                  padding: const EdgeInsets.only(right: 10),
+                                  child: Column(
+                                    children: [
+                                      TextButton(
+                                        style: ButtonStyle(
+                                          padding: MaterialStateProperty.all(
+                                              EdgeInsets.zero),
+                                        ),
+                                        onPressed: () => Navigator.push(
+                                          context,
+                                          CupertinoPageRoute(
+                                            builder: (context) => AlbumDetails(
+                                              type: 'playlist',
+                                              albumID: data.listID,
+                                            ),
+                                          ),
+                                        ),
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          child: SizedBox(
+                                            width: 175,
+                                            child: CachedNetworkImage(
+                                              imageUrl: data.image
+                                                  .replaceAll('150', '500'),
+                                              placeholder: (context, url) {
+                                                return const Center(
+                                                  child: SizedBox(
+                                                    height: 150,
+                                                    child:
+                                                        CupertinoActivityIndicator(),
+                                                  ),
+                                                );
+                                              },
+                                              errorWidget:
+                                                  (context, url, error) {
+                                                return CachedNetworkImage(
+                                                  imageUrl: data.image,
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 5),
+                                      Text(
+                                        data.listname,
+                                        style: TextStyle(
+                                          color: AppPallete().subtitleTextColor,
+                                          fontSize: 12,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                        softWrap: true,
+                                        maxLines: 2,
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          loading: () => const Center(
+                            child: CupertinoActivityIndicator(
+                                radius: 20.0,
+                                color: CupertinoColors.activeBlue),
+                          ),
+                          error: (error, stack) => const SizedBox(
+                            height: 100,
+                            child: Center(
+                              child: Text('Error occured!!'),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+
+                  SliverToBoxAdapter(
+                    child: Text(
+                      'Other Playlists',
+                      style: TextStyle(
+                        color: AppPallete().accentColor,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 25,
+                      ),
+                    ),
+                  ),
+                  const SliverToBoxAdapter(
+                    child: SizedBox(height: 25),
+                  ),
+                  SliverToBoxAdapter(
+                    child: Consumer(
+                      builder: (context, watch, child) {
+                        final otherPlaylistsAsyncValue =
+                            ref.watch(otherPlaylistsProvider);
+
+                        return otherPlaylistsAsyncValue.when(
+                          data: (otherPlaylists) => SizedBox(
+                            height: 200,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: otherPlaylists.length,
+                              itemBuilder: (context, index) {
+                                final data = otherPlaylists[index];
+                                return Container(
+                                  constraints:
+                                      const BoxConstraints(maxWidth: 175),
+                                  padding: const EdgeInsets.only(right: 10),
+                                  child: Column(
+                                    children: [
+                                      TextButton(
+                                        style: ButtonStyle(
+                                          padding: MaterialStateProperty.all(
+                                              EdgeInsets.zero),
+                                        ),
+                                        onPressed: () => Navigator.push(
+                                          context,
+                                          CupertinoPageRoute(
+                                            builder: (context) => AlbumDetails(
+                                              type: 'playlist',
+                                              albumID: data.id,
+                                            ),
+                                          ),
+                                        ),
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          child: SizedBox(
+                                            width: 175,
+                                            child: CachedNetworkImage(
+                                              imageUrl: data.imageUrl
+                                                  .replaceAll('150', '500'),
+                                              errorWidget:
+                                                  (context, url, error) {
+                                                return CachedNetworkImage(
+                                                  imageUrl: data.imageUrl,
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 5),
+                                      Text(
+                                        data.name,
+                                        style: TextStyle(
+                                          color: AppPallete().subtitleTextColor,
+                                          fontSize: 12,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                        softWrap: true,
+                                        maxLines: 2,
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          loading: () => const Center(
+                            child: CupertinoActivityIndicator(
+                                radius: 20.0,
+                                color: CupertinoColors.activeBlue),
+                          ),
+                          error: (error, stack) => const SizedBox(
+                            height: 100,
+                            child: Center(
+                              child: Text('Error occured!!'),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
-            song != null
-                ? Container(
-                    color: Colors.transparent,
-                    padding: EdgeInsets.zero,
-                    height: size.height * 0.1,
-                    child: const MiniPlayer(),
-                  )
-                : Container(),
-          ],
-        ),
+          ),
+          song != null
+              ? Container(
+                  color: Colors.transparent,
+                  padding: EdgeInsets.zero,
+                  height: size.height * 0.075,
+                  child: const MiniPlayer(),
+                )
+              : offlineSong != null
+                  ? SizedBox(
+                      height: 65,
+                      child: OfflineMusicSlab(
+                        song: ref.watch(offlineSongProvider)!,
+                      ),
+                    )
+                  : const SizedBox(),
+        ],
       ),
     );
   }

@@ -12,7 +12,7 @@ Future<Albums> fetchAlbumData(String type, String endpoint) async {
   if (data['success'] == true) {
     final albumData = data['data'];
     final id = albumData['id'];
-    final name = albumData['name'];
+    final name = albumData['name'].split('(')[0];
     final description = albumData['description'];
     final type = albumData['type'];
     int? year = albumData['year'];
@@ -51,6 +51,7 @@ Future<Albums> fetchAlbumData(String type, String endpoint) async {
         type: songItems['type'],
         duration: songItems['duration'].toString(),
         label: songItems['label'],
+        year: songItems['year'],
         url: songItems['url'],
         image: songItems['image'][0]['url'].replaceAll('50', '500'),
         downloadUrl: downloadUrlList,

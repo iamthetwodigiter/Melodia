@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 class PlaybackRoute extends CupertinoPageRoute {
   // ignore: use_super_parameters
   PlaybackRoute({builder}) : super(builder: builder);
-
+  
   @override
   Duration get transitionDuration => const Duration(milliseconds: 0);
 }

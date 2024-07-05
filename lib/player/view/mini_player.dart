@@ -36,10 +36,12 @@ class _MiniPlayerState extends ConsumerState<MiniPlayer> {
         ),
         onPressed: () {
           ref.read(isMinimisedProvider.notifier).state = false;
+          
           Navigator.of(context).push(
             CustomPageRoute(
               page: MusicPlayer(song: song),
             ),
+            
           );
         },
         child: SizedBox(

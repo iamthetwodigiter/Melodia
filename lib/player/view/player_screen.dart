@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,6 +10,7 @@ import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:hive/hive.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:melodia/core/color_pallete.dart';
+import 'package:melodia/downloader.dart';
 import 'package:melodia/player/model/api_calls.dart';
 import 'package:melodia/player/model/songs_model.dart';
 import 'package:melodia/provider/audio_player.dart';
@@ -25,17 +29,28 @@ class MusicPlayer extends ConsumerStatefulWidget {
 }
 
 class _MusicPlayerState extends ConsumerState<MusicPlayer> {
-  late Box<SongModel> historyBox = Hive.box<SongModel>('history');
+  Box<SongModel> historyBox = Hive.box<SongModel>('history');
   bool _lyrics = false;
 
   @override
   void initState() {
     super.initState();
-    _addSongToHistory();
-  }
-
-  void _addSongToHistory() {
-    historyBox.add(widget.song);
+    final audioService = ref.read(audioServiceProvider.notifier);
+    audioService?.player.playerStateStream.listen((state) {
+      if (state.processingState == ProcessingState.completed) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            final nextSong = audioService.nextPlayback();
+            Navigator.pushReplacement(
+              context,
+              PlaybackRoute(
+                builder: (context) => MusicPlayer(song: nextSong),
+              ),
+            );
+          }
+        });
+      }
+    });
   }
 
   @override
@@ -43,21 +58,23 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
     final audioService = ref.watch(audioServiceProvider);
     final size = MediaQuery.of(context).size;
     String lyrics = '';
-
-    audioService?.player.playerStateStream.listen((state) {
-      if (state.processingState == ProcessingState.completed) {
-        bool shuffle = audioService.shuffle();
-        Navigator.of(context).pushReplacement(
-          CustomPageRoute(
-            page: MusicPlayer(
-              song: shuffle
-                  ? audioService.shufflePlayback()
-                  : audioService.nextPlayback(),
-            ),
-          ),
-        );
-      }
-    });
+    ref.watch(currentSongProvider);
+    if (!historyBox.values.any((song) => song.id == widget.song.id)) {
+      historyBox.add(
+        SongModel(
+          link: widget.song.link,
+          id: widget.song.id,
+          name: widget.song.name.split('(')[0],
+          duration: widget.song.duration,
+          imageUrl: widget.song.imageUrl,
+          artists: widget.song.artists,
+          index: widget.song.index,
+          shuffleMode: widget.song.shuffleMode,
+          playlistName: widget.song.playlistName,
+          year: widget.song.year,
+        ),
+      );
+    }
 
     return CupertinoPageScaffold(
       // backgroundColor: AppPallete.scaffoldDarkBackground,
@@ -173,7 +190,7 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
                                                       ClipboardData(
                                                           text: lyrics));
                                                 },
-                                                icon: Icon(
+                                                icon: const Icon(
                                                   Icons.copy_rounded,
                                                   color: AppPallete
                                                       .scaffoldBackgroundColor,
@@ -304,7 +321,199 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
                     },
                   ),
                   PlayerControls(
-                      audioService: audioService!, song: widget.song),
+                    audioService: audioService!,
+                    song: widget.song,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      CupertinoButton(
+                          child: Text(
+                            'Playing Next',
+                            style: TextStyle(
+                              color: AppPallete().accentColor,
+                            ),
+                          ),
+                          onPressed: () {
+                            showCupertinoModalPopup(
+                                context: context,
+                                builder: (context) => CupertinoPopupSurface(
+                                      child: SizedBox(
+                                        height: size.height * 0.5,
+                                        child: ListView.builder(
+                                          itemCount: widget
+                                              .song.playlistData!.idList.length,
+                                          itemBuilder: (context, index) {
+                                            final duration = Duration(
+                                                minutes: int.parse(widget.song
+                                                    .playlistData!.durationList
+                                                    .elementAt(index)));
+                                            return Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                          horizontal: 10)
+                                                      .copyWith(bottom: 5),
+                                              child: ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                child: CupertinoListTile(
+                                                  backgroundColor: AppPallete()
+                                                      .accentColor
+                                                      .withAlpha(75),
+                                                  onTap: () {
+                                                    final songToGo = SongModel(
+                                                      link: widget
+                                                          .song
+                                                          .playlistData!
+                                                          .linkList
+                                                          .elementAt(index),
+                                                      id: widget.song
+                                                          .playlistData!.idList
+                                                          .elementAt(index),
+                                                      name: widget
+                                                          .song
+                                                          .playlistData!
+                                                          .nameList
+                                                          .elementAt(index),
+                                                      duration: widget
+                                                          .song
+                                                          .playlistData!
+                                                          .durationList
+                                                          .elementAt(index),
+                                                      imageUrl: widget
+                                                          .song
+                                                          .playlistData!
+                                                          .imageUrlList
+                                                          .elementAt(index),
+                                                      artists: widget
+                                                          .song
+                                                          .playlistData!
+                                                          .artistsList
+                                                          .elementAt(index),
+                                                      playlistData: widget
+                                                          .song.playlistData,
+                                                      index: index,
+                                                      shuffleMode: settings
+                                                              .get('shuffle') ==
+                                                          1,
+                                                      playlistName: widget
+                                                          .song.playlistName,
+                                                      year: widget.song.year,
+                                                    );
+                                                    ref
+                                                        .watch(
+                                                            currentSongProvider
+                                                                .notifier)
+                                                        .state = songToGo;
+                                                    Navigator.pop(context);
+                                                    Navigator.of(context)
+                                                        .pushReplacement(
+                                                      CustomPageRoute(
+                                                        page: MusicPlayer(
+                                                          song: songToGo,
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      vertical: 10,
+                                                      horizontal: 30),
+                                                  leading: CachedNetworkImage(
+                                                    imageUrl: widget
+                                                        .song
+                                                        .playlistData!
+                                                        .imageUrlList
+                                                        .elementAt(index),
+                                                    errorWidget:
+                                                        (context, url, error) {
+                                                      return Image.asset(
+                                                          'assets/song_thumb.png');
+                                                    },
+                                                  ),
+                                                  title: Text(
+                                                    widget.song.playlistData!
+                                                        .nameList
+                                                        .elementAt(index),
+                                                    style: TextStyle(
+                                                        color: ref
+                                                                    .watch(currentSongProvider
+                                                                        .notifier)
+                                                                    .state!
+                                                                    .name ==
+                                                                widget
+                                                                    .song
+                                                                    .playlistData!
+                                                                    .nameList
+                                                                    .elementAt(
+                                                                        index)
+                                                            ? AppPallete()
+                                                                .accentColor
+                                                            : CupertinoColors
+                                                                .white),
+                                                    maxLines: 1,
+                                                  ),
+                                                  subtitle: Text(
+                                                    widget.song.playlistData!
+                                                        .artistsList
+                                                        .elementAt(index)
+                                                        .join(", "),
+                                                    style: TextStyle(
+                                                        color: ref
+                                                                    .watch(currentSongProvider
+                                                                        .notifier)
+                                                                    .state!
+                                                                    .name ==
+                                                                widget
+                                                                    .song
+                                                                    .playlistData!
+                                                                    .nameList
+                                                                    .elementAt(
+                                                                        index)
+                                                            ? AppPallete()
+                                                                .accentColor
+                                                            : CupertinoColors
+                                                                .white),
+                                                    maxLines: 1,
+                                                  ),
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    ));
+                          }),
+                      IconButton(
+                        onPressed: () {
+                          List metadata = [
+                            widget.song.name,
+                            widget.song.artists,
+                            widget.song.playlistName,
+                            widget.song.duration,
+                            widget.song.imageUrl,
+                            widget.song.index,
+                            widget.song.year,
+                          ];
+                          download(
+                              widget.song.link,
+                              '${widget.song.name.trimRight()}.m4a',
+                              metadata,
+                              context);
+                          setState(() {});
+                        },
+                        icon: Icon(
+                          File('storage/emulated/0/Music/Melodia/${widget.song.name.trimRight()}.m4a')
+                                  .existsSync()
+                              ? Icons.download_done_rounded
+                              : Icons.download_rounded,
+                          color: darkMode
+                              ? CupertinoColors.white
+                              : AppPallete().accentColor,
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -401,23 +610,17 @@ class _PlayerControlsState extends ConsumerState<PlayerControls> {
         ),
         IconButton(
           onPressed: () {
-            shuffleMode
-                ? Navigator.pushReplacement(
-                    context,
-                    PlaybackRoute(
-                      builder: (context) => MusicPlayer(
-                        song: widget.audioService.shufflePlayback(),
-                      ),
-                    ),
-                  )
-                : Navigator.pushReplacement(
-                    context,
-                    PlaybackRoute(
-                      builder: (context) => MusicPlayer(
-                        song: widget.audioService.nextPlayback(),
-                      ),
-                    ),
-                  );
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) {
+                final nextSong = widget.audioService.nextPlayback();
+                Navigator.pushReplacement(
+                  context,
+                  PlaybackRoute(
+                    builder: (context) => MusicPlayer(song: nextSong),
+                  ),
+                );
+              }
+            });
           },
           icon: Icon(
             CupertinoIcons.forward_end_fill,

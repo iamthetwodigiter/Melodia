@@ -50,6 +50,10 @@ dependencies:
   flutter_riverpod:
   riverpod_annotation:
   provider: ^6.1.2
+  flutter_phoenix: ^1.1.1
+  audiotagger: ^2.2.1
+  tuple: ^2.0.2
+  url_launcher: ^6.3.0
 
 dev_dependencies:
   flutter_test:
@@ -81,6 +85,9 @@ flutter:
   assets:
     - assets/logo.png
     - assets/user.png
+    - assets/chevron.png
+    - assets/playlist_art.png
+    - assets/song_thumb.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

@@ -46,6 +46,7 @@ class Songs {
   final String type;
   final String duration;
   final String label;
+  final String? year;
   final String url;
   final String image;
   final List<String> downloadUrl;
@@ -57,6 +58,7 @@ class Songs {
     required this.type,
     required this.duration,
     required this.label,
+    this.year = '',
     required this.url,
     required this.image,
     required this.downloadUrl,

@@ -26,13 +26,15 @@ class SongModelAdapter extends TypeAdapter<SongModel> {
       playlistData: fields[6] as Playlist?,
       index: fields[7] as int,
       shuffleMode: fields[8] as bool,
+      playlistName: fields[9] as String,
+      year: fields[10] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, SongModel obj) {
     writer
-      ..writeByte(9)
+      ..writeByte(11)
       ..writeByte(0)
       ..write(obj.link)
       ..writeByte(1)
@@ -50,7 +52,11 @@ class SongModelAdapter extends TypeAdapter<SongModel> {
       ..writeByte(7)
       ..write(obj.index)
       ..writeByte(8)
-      ..write(obj.shuffleMode);
+      ..write(obj.shuffleMode)
+      ..writeByte(9)
+      ..write(obj.playlistName)
+      ..writeByte(10)
+      ..write(obj.year);
   }
 
   @override

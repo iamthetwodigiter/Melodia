@@ -1,39 +1,49 @@
-import 'dart:io';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive/hive.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:melodia/album/model/api_calls.dart';
 import 'package:melodia/album/model/playlist_model.dart';
 import 'package:melodia/core/color_pallete.dart';
+import 'package:melodia/cupertino_popup_message.dart';
+import 'package:melodia/downloader.dart';
 import 'package:melodia/player/model/songs_model.dart';
 import 'package:melodia/player/view/mini_player.dart';
 import 'package:melodia/player/view/player_screen.dart';
 import 'package:melodia/player/widgets/custom_page_route.dart';
-import 'package:melodia/provider/dark_mode_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive/hive.dart';
+import 'package:melodia/playlist_screen.dart';
 import 'package:melodia/provider/songs_notifier.dart';
 
 class AlbumDetails extends ConsumerStatefulWidget {
   final String albumID;
   final String type;
 
-  const AlbumDetails({super.key, required this.albumID, required this.type});
+  const AlbumDetails({
+    super.key,
+    required this.albumID,
+    required this.type,
+  });
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _AlbumDetailsState();
+  ConsumerState<AlbumDetails> createState() => _AlbumDetailsState();
 }
 
 class _AlbumDetailsState extends ConsumerState<AlbumDetails> {
   late Playlist playlistData;
+  Box<Playlist> playlistBox = Hive.box<Playlist>('playlist');
+  // List<Playlist> playlist = [];
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final song = ref.watch(currentSongProvider);
-    ref.watch(darkModeProvider);
-    bool darkMode = Hive.box('settings').get('darkMode');
-    // final isMinimised = ref.watch(isMinimisedProvider);
+    bool darkMode = Hive.box('settings').get('darkMode') ?? false;
 
     List<String> idList = [];
     List<String> linkList = [];
@@ -43,25 +53,21 @@ class _AlbumDetailsState extends ConsumerState<AlbumDetails> {
     List<String> durationList = [];
 
     return CupertinoPageScaffold(
+      navigationBar: const CupertinoNavigationBar(
+        previousPageTitle: 'Home',
+        middle: Text(
+          'Playlist',
+        ),
+      ),
       child: Column(
         children: [
           SizedBox(
-            height: song != null ? size.height * 0.9 : size.height * 1,
+            height: song != null ? size.height * 0.9 - 60 : size.height * 0.9,
             child: CustomScrollView(
               scrollBehavior: const CupertinoScrollBehavior(),
               slivers: [
-                SliverToBoxAdapter(
-                  child: CupertinoNavigationBar(
-                    previousPageTitle: 'Home',
-                    middle: Text(
-                      'Playlist',
-                      style: TextStyle(color: AppPallete().accentColor),
-                    ),
-                  ),
-                ),
                 SliverFillRemaining(
-                  child: Container(
-                    margin: EdgeInsets.only(top: Platform.isAndroid ? 20 : 0),
+                  child: SizedBox(
                     width: double.infinity,
                     height: double.infinity,
                     child: FutureBuilder(
@@ -82,7 +88,7 @@ class _AlbumDetailsState extends ConsumerState<AlbumDetails> {
                           idList.add(songs.id);
                           linkList.add(songs.downloadUrl.last);
                           imageUrlList.add(songs.image);
-                          nameList.add(songs.name.replaceAll('&quot;', ''));
+                          nameList.add(songs.name.split('(')[0]);
                           artistsList.add(songs.artists);
                           durationList.add(songs.duration);
                         }
@@ -101,14 +107,13 @@ class _AlbumDetailsState extends ConsumerState<AlbumDetails> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   ClipRRect(
                                     borderRadius: BorderRadius.circular(10),
                                     child: CachedNetworkImage(
                                       imageUrl: data.image,
+                                      width: 150,
                                       height: 150,
                                       placeholder: (context, url) {
                                         return const Center(
@@ -117,23 +122,15 @@ class _AlbumDetailsState extends ConsumerState<AlbumDetails> {
                                       },
                                       errorWidget: (context, url, error) {
                                         return SizedBox(
-                                          height: 100,
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Icon(
-                                                Icons.error,
-                                                color: AppPallete().accentColor,
-                                              ),
-                                              const Text('Thumb load error'),
-                                            ],
-                                          ),
+                                          width: 150,
+                                          height: 150,
+                                          child: Image.asset(
+                                              'assets/playlist_art.png'),
                                         );
                                       },
                                     ),
                                   ),
-                                  const SizedBox(width: 20),
+                                  const SizedBox(width: 50),
                                   Flexible(
                                     child: Column(
                                       crossAxisAlignment:
@@ -169,8 +166,13 @@ class _AlbumDetailsState extends ConsumerState<AlbumDetails> {
                                             data.year.toString() != '0'
                                                 ? Text(
                                                     data.year.toString(),
-                                                    style: const TextStyle(
-                                                        fontSize: 12),
+                                                    style: TextStyle(
+                                                        fontSize: 12,
+                                                        color: darkMode
+                                                            ? AppPallete
+                                                                .subtitleDarkTextColor
+                                                            : AppPallete()
+                                                                .subtitleTextColor),
                                                   )
                                                 : Text(
                                                     '--__--',
@@ -191,6 +193,33 @@ class _AlbumDetailsState extends ConsumerState<AlbumDetails> {
                                                         .subtitleDarkTextColor
                                                     : AppPallete()
                                                         .subtitleTextColor,
+                                              ),
+                                            ),
+                                            TextButton(
+                                              style: const ButtonStyle(
+                                                padding:
+                                                    MaterialStatePropertyAll(
+                                                  EdgeInsets.zero,
+                                                ),
+                                              ),
+                                              onPressed: () {
+                                                playlistBox.put(
+                                                  data.name,
+                                                  Playlist(
+                                                    idList: idList,
+                                                    linkList: linkList,
+                                                    imageUrlList: imageUrlList,
+                                                    nameList: nameList,
+                                                    artistsList: artistsList,
+                                                    durationList: durationList,
+                                                  ),
+                                                );
+                                              },
+                                              child: Text(
+                                                'Add to Playlist',
+                                                style: TextStyle(
+                                                    color: AppPallete()
+                                                        .accentColor),
                                               ),
                                             ),
                                           ],
@@ -228,9 +257,9 @@ class _AlbumDetailsState extends ConsumerState<AlbumDetails> {
                                               fit: BoxFit.contain,
                                               image: CachedNetworkImageProvider(
                                                 data.artists
-                                                            .elementAt(index)
-                                                            .imageUrl !=
-                                                        ""
+                                                        .elementAt(index)
+                                                        .imageUrl
+                                                        .isNotEmpty
                                                     ? data.artists
                                                         .elementAt(index)
                                                         .imageUrl
@@ -294,6 +323,48 @@ class _AlbumDetailsState extends ConsumerState<AlbumDetails> {
                                       child: Row(
                                         children: [
                                           IconButton(
+                                            style: ButtonStyle(
+                                                padding:
+                                                    const MaterialStatePropertyAll(
+                                                  EdgeInsets.all(0),
+                                                ),
+                                                backgroundColor:
+                                                    MaterialStatePropertyAll(
+                                                        AppPallete()
+                                                            .accentColor)),
+                                            onPressed: () {
+                                              int count =
+                                                  playlistData.idList.length;
+                                              for (int i = 0; i < count; i++) {
+                                                List metadata = [
+                                                  playlistData.nameList
+                                                      .elementAt(i),
+                                                  playlistData.artistsList
+                                                      .elementAt(i),
+                                                  data.name,
+                                                  playlistData.durationList
+                                                      .elementAt(i),
+                                                  playlistData.imageUrlList
+                                                      .elementAt(i),
+                                                  i,
+                                                  data.songs.elementAt(i).year
+                                                ];
+                                                download(
+                                                    playlistData.linkList
+                                                        .elementAt(i),
+                                                    '${playlistData.nameList.elementAt(i).trimRight()}.m4a',
+                                                    metadata,
+                                                    context);
+                                              }
+                                            },
+                                            icon: Icon(
+                                              Icons.download_rounded,
+                                              color: darkMode
+                                                  ? Colors.black
+                                                  : Colors.white,
+                                            ),
+                                          ),
+                                          IconButton(
                                             onPressed: () {
                                               settings.put('shuffle', 1);
                                               final song = SongModel(
@@ -311,6 +382,8 @@ class _AlbumDetailsState extends ConsumerState<AlbumDetails> {
                                                 playlistData: playlistData,
                                                 index: 0,
                                                 shuffleMode: true,
+                                                playlistName: data.name,
+                                                year: data.songs.first.year,
                                               );
                                               ref
                                                   .read(currentSongProvider
@@ -349,10 +422,12 @@ class _AlbumDetailsState extends ConsumerState<AlbumDetails> {
                                                 playlistData: playlistData,
                                                 index: 0,
                                                 shuffleMode: false,
+                                                playlistName: data.name,
+                                                year: data.songs.first.year,
                                               );
 
                                               ref
-                                                  .watch(currentSongProvider
+                                                  .read(currentSongProvider
                                                       .notifier)
                                                   .state = song;
 
@@ -385,6 +460,11 @@ class _AlbumDetailsState extends ConsumerState<AlbumDetails> {
                                     padding: EdgeInsets.zero,
                                     itemCount: data.songsCount,
                                     itemBuilder: (context, index) {
+                                      final favorites =
+                                          playlistBox.get('Favorites');
+                                      bool songExists = favorites!.idList
+                                          .contains(
+                                              data.songs.elementAt(index).id);
                                       return Padding(
                                         padding:
                                             const EdgeInsets.only(bottom: 5.0),
@@ -417,10 +497,14 @@ class _AlbumDetailsState extends ConsumerState<AlbumDetails> {
                                                 playlistData: playlistData,
                                                 index: index,
                                                 shuffleMode: false,
+                                                playlistName: data.name,
+                                                year: data.songs
+                                                    .elementAt(index)
+                                                    .year,
                                               );
 
                                               ref
-                                                  .watch(currentSongProvider
+                                                  .read(currentSongProvider
                                                       .notifier)
                                                   .state = song;
 
@@ -452,31 +536,330 @@ class _AlbumDetailsState extends ConsumerState<AlbumDetails> {
                                                   (context, url, error) {
                                                 return SizedBox(
                                                   height: 50,
-                                                  child: Column(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      Icon(
-                                                        CupertinoIcons.nosign,
-                                                        color: AppPallete()
-                                                            .accentColor,
-                                                        size: 20,
-                                                      ),
-                                                    ],
+                                                  child: Image.asset(
+                                                    'assets/song_thumb.png',
+                                                    height: 50,
                                                   ),
                                                 );
                                               },
                                             ),
-                                            trailing: IconButton(
-                                              padding: EdgeInsets.zero,
-                                              onPressed: () {},
-                                              icon: Icon(
-                                                size: 20,
-                                                CupertinoIcons
-                                                    .ellipsis_vertical,
-                                                color: AppPallete().accentColor,
-                                              ),
+                                            trailing: Row(
+                                              children: [
+                                                IconButton(
+                                                  padding: EdgeInsets.zero,
+                                                  onPressed: () {
+                                                    if (!songExists) {
+                                                      final updatedPlaylist =
+                                                          Playlist(
+                                                        idList: List.from(
+                                                            favorites.idList)
+                                                          ..add(data.songs
+                                                              .elementAt(index)
+                                                              .id),
+                                                        linkList: List.from(
+                                                            favorites.linkList)
+                                                          ..add(data.songs
+                                                              .elementAt(index)
+                                                              .downloadUrl
+                                                              .last),
+                                                        imageUrlList: List.from(
+                                                            favorites
+                                                                .imageUrlList)
+                                                          ..add(data.songs
+                                                              .elementAt(index)
+                                                              .image),
+                                                        nameList: List.from(
+                                                            favorites.nameList)
+                                                          ..add(data.songs
+                                                              .elementAt(index)
+                                                              .name
+                                                              .split('(')[0]),
+                                                        artistsList: List.from(
+                                                            favorites
+                                                                .artistsList)
+                                                          ..add(data.songs
+                                                              .elementAt(index)
+                                                              .artists),
+                                                        durationList: List.from(
+                                                            favorites
+                                                                .durationList)
+                                                          ..add(data.songs
+                                                              .elementAt(index)
+                                                              .duration),
+                                                      );
+                                                      playlistBox.put(
+                                                          'Favorites',
+                                                          updatedPlaylist);
+                                                      showCupertinoCenterPopup(
+                                                          context,
+                                                          '${data.songs.elementAt(index).name.split('(')[0]} Added to Favorites',
+                                                          Icons
+                                                              .download_done_rounded);
+                                                    } else {
+                                                      final updatedPlaylist =
+                                                          Playlist(
+                                                        idList: List.from(
+                                                            favorites.idList)
+                                                          ..remove(data.songs
+                                                              .elementAt(index)
+                                                              .id),
+                                                        linkList: List.from(
+                                                            favorites.linkList)
+                                                          ..remove(data.songs
+                                                              .elementAt(index)
+                                                              .downloadUrl
+                                                              .last),
+                                                        imageUrlList: List.from(
+                                                            favorites
+                                                                .imageUrlList)
+                                                          ..remove(data.songs
+                                                              .elementAt(index)
+                                                              .image),
+                                                        nameList: List.from(
+                                                            favorites.nameList)
+                                                          ..remove(data.songs
+                                                              .elementAt(index)
+                                                              .name
+                                                              .split('(')[0]),
+                                                        artistsList: List.from(
+                                                            favorites
+                                                                .artistsList)
+                                                          ..remove(data.songs
+                                                              .elementAt(index)
+                                                              .artists),
+                                                        durationList: List.from(
+                                                            favorites
+                                                                .durationList)
+                                                          ..remove(data.songs
+                                                              .elementAt(index)
+                                                              .duration),
+                                                      );
+                                                      playlistBox.put(
+                                                          'Favorites',
+                                                          updatedPlaylist);
+                                                      showCupertinoCenterPopup(
+                                                          context,
+                                                          '${data.songs.elementAt(index).name.split('(')[0]} Removed from Favorites',
+                                                          Icons
+                                                              .download_done_rounded);
+                                                    }
+                                                    setState(() {});
+                                                  },
+                                                  icon: Icon(
+                                                    songExists
+                                                        ? CupertinoIcons
+                                                            .heart_fill
+                                                        : CupertinoIcons.heart,
+                                                    color: CupertinoColors
+                                                        .destructiveRed,
+                                                  ),
+                                                ),
+                                                IconButton(
+                                                  onPressed: () {
+                                                    showCupertinoModalPopup(
+                                                      context: context,
+                                                      builder: (BuildContext
+                                                          context) {
+                                                        if (playlistBox
+                                                                .length !=
+                                                            0) {
+                                                          return CupertinoActionSheet(
+                                                            actions: [
+                                                              CupertinoActionSheetAction(
+                                                                onPressed: () {
+                                                                  Navigator.pop(
+                                                                      context);
+                                                                  showCupertinoModalPopup(
+                                                                    context:
+                                                                        context,
+                                                                    builder:
+                                                                        (BuildContext
+                                                                            context) {
+                                                                      if (playlistBox
+                                                                              .length !=
+                                                                          0) {
+                                                                        final playlists = playlistBox
+                                                                            .keys
+                                                                            .toList();
+                                                                        return CupertinoActionSheet(
+                                                                          actions:
+                                                                              playlists.map((name) {
+                                                                            final currentPlaylist =
+                                                                                playlistBox.get(name);
+                                                                            if (currentPlaylist !=
+                                                                                null) {
+                                                                              return CupertinoActionSheetAction(
+                                                                                onPressed: () {
+                                                                                  bool songExists = currentPlaylist.idList.contains(data.songs.elementAt(index).id);
+
+                                                                                  if (!songExists) {
+                                                                                    final updatedPlaylist = Playlist(
+                                                                                      idList: List.from(currentPlaylist.idList)..add(data.songs.elementAt(index).id),
+                                                                                      linkList: List.from(currentPlaylist.linkList)..add(data.songs.elementAt(index).downloadUrl.last),
+                                                                                      imageUrlList: List.from(currentPlaylist.imageUrlList)..add(data.songs.elementAt(index).image),
+                                                                                      nameList: List.from(currentPlaylist.nameList)..add(data.songs.elementAt(index).name.split('(')[0]),
+                                                                                      artistsList: List.from(currentPlaylist.artistsList)..add(data.songs.elementAt(index).artists),
+                                                                                      durationList: List.from(currentPlaylist.durationList)..add(data.songs.elementAt(index).duration),
+                                                                                    );
+                                                                                    playlistBox.put(name, updatedPlaylist);
+                                                                                  }
+                                                                                  showCupertinoCenterPopup(context, '${data.songs.elementAt(index).name.split('(')[0]} Added to Playlist', Icons.download_done_rounded);
+                                                                                  Navigator.pop(context);
+                                                                                },
+                                                                                child: Text(name),
+                                                                              );
+                                                                            } else {
+                                                                              return CupertinoActionSheetAction(
+                                                                                onPressed: () {
+                                                                                  Navigator.pop(context);
+                                                                                },
+                                                                                child: const Text('Error: Playlist not found'),
+                                                                              );
+                                                                            }
+                                                                          }).toList(),
+                                                                          cancelButton:
+                                                                              CupertinoActionSheetAction(
+                                                                            onPressed:
+                                                                                () {
+                                                                              Navigator.of(context).pop();
+                                                                            },
+                                                                            isDestructiveAction:
+                                                                                true,
+                                                                            child:
+                                                                                const Text('Cancel'),
+                                                                          ),
+                                                                        );
+                                                                      } else {
+                                                                        return CupertinoActionSheet(
+                                                                          actions: [
+                                                                            CupertinoActionSheetAction(
+                                                                              onPressed: () {
+                                                                                Navigator.pop(context);
+                                                                              },
+                                                                              child: const Text('Create Playlist'),
+                                                                            ),
+                                                                          ],
+                                                                          cancelButton:
+                                                                              CupertinoActionSheetAction(
+                                                                            onPressed:
+                                                                                () {
+                                                                              Navigator.of(context).pop();
+                                                                            },
+                                                                            isDestructiveAction:
+                                                                                true,
+                                                                            child:
+                                                                                const Text('Cancel'),
+                                                                          ),
+                                                                        );
+                                                                      }
+                                                                    },
+                                                                  );
+                                                                },
+                                                                child: const Text(
+                                                                    'Add to Playlist'),
+                                                              ),
+                                                              CupertinoActionSheetAction(
+                                                                onPressed: () {
+                                                                  List
+                                                                      metadata =
+                                                                      [
+                                                                    data.songs
+                                                                        .elementAt(
+                                                                            index)
+                                                                        .name
+                                                                        .split(
+                                                                            "(")[0],
+                                                                    data.songs
+                                                                        .elementAt(
+                                                                            index)
+                                                                        .artists,
+                                                                    data.name,
+                                                                    data.songs
+                                                                        .elementAt(
+                                                                            index)
+                                                                        .duration,
+                                                                    data.songs
+                                                                        .elementAt(
+                                                                            index)
+                                                                        .image,
+                                                                    index,
+                                                                    data.songs.elementAt(index).year,
+                                                                  ];
+                                                                  download(
+                                                                      data.songs
+                                                                          .elementAt(
+                                                                              index)
+                                                                          .downloadUrl
+                                                                          .last,
+                                                                      '${data.songs.elementAt(index).name.trimRight().split('(')[0]}.m4a',
+                                                                      metadata,
+                                                                      context);
+                                                                  Navigator.pop(
+                                                                      context);
+                                                                },
+                                                                child:
+                                                                    const Text(
+                                                                  'Download',
+                                                                ),
+                                                              ),
+                                                            ],
+                                                            cancelButton:
+                                                                CupertinoActionSheetAction(
+                                                              onPressed: () {
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop();
+                                                              },
+                                                              isDestructiveAction:
+                                                                  true,
+                                                              child: const Text(
+                                                                  'Cancel'),
+                                                            ),
+                                                          );
+                                                        }
+                                                        return CupertinoActionSheet(
+                                                          actions: [
+                                                            CupertinoActionSheetAction(
+                                                              onPressed: () {
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pushReplacement(
+                                                                  CupertinoPageRoute(
+                                                                    builder:
+                                                                        (context) =>
+                                                                            const LibraryScreen(),
+                                                                  ),
+                                                                );
+                                                              },
+                                                              child: const Text(
+                                                                  'Please Create Playlist First'),
+                                                            ),
+                                                          ],
+                                                          cancelButton:
+                                                              CupertinoActionSheetAction(
+                                                            onPressed: () {
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop();
+                                                            },
+                                                            isDestructiveAction:
+                                                                true,
+                                                            child: const Text(
+                                                                'Cancel'),
+                                                          ),
+                                                        );
+                                                      },
+                                                    );
+                                                  },
+                                                  icon: Icon(
+                                                    CupertinoIcons
+                                                        .ellipsis_vertical,
+                                                    size: 20,
+                                                    color: AppPallete()
+                                                        .accentColor,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                             title: Text(
                                               data.songs
@@ -521,13 +904,12 @@ class _AlbumDetailsState extends ConsumerState<AlbumDetails> {
               ],
             ),
           ),
-          song != null
-              ? Container(
-                  padding: EdgeInsets.zero,
-                  height: size.height * 0.1,
-                  child: const MiniPlayer(),
-                )
-              : Container(),
+          if (song != null)
+            Container(
+              padding: EdgeInsets.zero,
+              height: size.height * 0.075,
+              child: const MiniPlayer(),
+            ),
         ],
       ),
     );
