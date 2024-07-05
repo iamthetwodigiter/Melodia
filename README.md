@@ -1,16 +1,23 @@
-# melodia
+# Melodia
 
-A new Flutter project.
+Music Streaming App created with Flutter 💙
 
-## Getting Started
+## Features
 
-This project is a starting point for a Flutter application.
+- Stream Music in [12, 48, 96, 160, 320] kbps qualities
+- Download Music in [12, 48, 96, 160, 320] kbps qualities
+- Add songs to user created playlists
+- Add complete playlist as a user playlist
+- View 10 next playing songs
+- Shuffle Mode
+- Repeat Mode
+- Dark mode [Changes with system dark mode too]
+- Appwide accent color
+- Search songs
+- Clear last playing history
+- Play suggested songs after the current playlist finishes [Can be toggled in settings, to play the current playlist in loop]
+- And many more, find yourself....
 
-A few resources to get you started if this is your first Flutter project:
+### The app follows Cupertino Style design [iOS style]
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### iOS build will be released soon too, but expect some features to be broken [Can't test all features personally as I don't have MacBook, but the basic features are working (Tested on my iPhone 12, iOS 17.5.1)]
