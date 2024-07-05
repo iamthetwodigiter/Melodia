@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,9 +8,7 @@ import 'package:melodia/landing_screen.dart';
 import 'package:melodia/player/model/songs_model.dart';
 import 'package:melodia/provider/dark_mode_provider.dart';
 import 'package:melodia/setup_screen.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:path_provider/path_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

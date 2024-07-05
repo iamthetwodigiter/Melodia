@@ -3,8 +3,6 @@ import 'dart:typed_data';
 import 'package:audiotagger/audiotagger.dart';
 import 'package:audiotagger/models/tag.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:melodia/core/color_pallete.dart';
 import 'package:melodia/offline_music_player.dart';

@@ -1,6 +1,4 @@
 import 'dart:io';
-
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -347,7 +345,7 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
                                             final duration = Duration(
                                                 minutes: int.parse(widget.song
                                                     .playlistData!.durationList
-                                                    .elementAt(index)));
+                                                    .elementAt(index),),);
                                             return Padding(
                                               padding:
                                                   const EdgeInsets.symmetric(
