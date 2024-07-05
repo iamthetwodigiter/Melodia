@@ -4,10 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:melodia/album/model/playlist_model.dart';
 import 'package:melodia/core/app_theme.dart';
-import 'package:melodia/landing_screen.dart';
+import 'package:melodia/core/landing_screen.dart';
 import 'package:melodia/player/model/songs_model.dart';
 import 'package:melodia/provider/dark_mode_provider.dart';
-import 'package:melodia/setup_screen.dart';
+import 'package:melodia/core/setup_screen.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 Future<void> main() async {

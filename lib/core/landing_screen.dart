@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:melodia/core/color_pallete.dart';
 import 'package:melodia/home/view/homepage.dart';
-import 'package:melodia/playlist_screen.dart';
+import 'package:melodia/library/view/playlist_screen.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 

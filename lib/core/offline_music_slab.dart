@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:melodia/core/color_pallete.dart';
-import 'package:melodia/offline_music_player.dart';
+import 'package:melodia/player/view/offline_music_player.dart';
 import 'package:melodia/player/model/offline_song_model.dart';
 import 'package:melodia/player/widgets/custom_page_route.dart';
 import 'package:melodia/provider/songs_notifier.dart';

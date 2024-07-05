@@ -8,7 +8,7 @@ import 'package:melodia/core/color_pallete.dart';
 import 'package:melodia/player/model/songs_model.dart';
 import 'package:melodia/player/view/player_screen.dart';
 import 'package:melodia/player/widgets/custom_page_route.dart';
-import 'package:melodia/playlist_screen.dart';
+import 'package:melodia/library/view/playlist_screen.dart';
 import 'package:melodia/provider/songs_notifier.dart';
 import 'package:melodia/search/model/api_calls.dart';
 import 'package:melodia/search/model/search_repository.dart';

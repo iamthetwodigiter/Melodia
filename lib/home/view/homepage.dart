@@ -6,13 +6,13 @@ import 'package:hive/hive.dart';
 import 'package:melodia/album/view/albums_details_page.dart';
 import 'package:melodia/core/color_pallete.dart';
 import 'package:melodia/home/model/api_calls.dart';
-import 'package:melodia/offline_music_slab.dart';
+import 'package:melodia/core/offline_music_slab.dart';
 import 'package:melodia/player/model/songs_model.dart';
 import 'package:melodia/player/view/mini_player.dart';
 import 'package:melodia/player/view/player_screen.dart';
 import 'package:melodia/player/widgets/custom_page_route.dart';
 import 'package:melodia/provider/songs_notifier.dart';
-import 'package:melodia/search_page.dart';
+import 'package:melodia/search/view/search_page.dart';
 import 'package:melodia/settings/view/settings_page.dart';
 
 class HomePage extends ConsumerStatefulWidget {

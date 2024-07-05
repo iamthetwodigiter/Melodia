@@ -4,15 +4,15 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:melodia/album/model/api_calls.dart';
 import 'package:melodia/album/model/playlist_model.dart';
 import 'package:melodia/core/color_pallete.dart';
-import 'package:melodia/cupertino_popup_message.dart';
-import 'package:melodia/downloader.dart';
+import 'package:melodia/core/cupertino_popup_message.dart';
+import 'package:melodia/download/model/downloader.dart';
 import 'package:melodia/player/model/songs_model.dart';
 import 'package:melodia/player/view/mini_player.dart';
 import 'package:melodia/player/view/player_screen.dart';
 import 'package:melodia/player/widgets/custom_page_route.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
-import 'package:melodia/playlist_screen.dart';
+import 'package:melodia/library/view/playlist_screen.dart';
 import 'package:melodia/provider/songs_notifier.dart';
 
 class AlbumDetails extends ConsumerStatefulWidget {

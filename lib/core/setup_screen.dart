@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:hive/hive.dart';
 import 'package:melodia/core/color_pallete.dart';
-import 'package:melodia/landing_screen.dart';
-import 'package:melodia/setup_extended.dart';
+import 'package:melodia/core/landing_screen.dart';
+import 'package:melodia/core/setup_extended.dart';
 
 class SetupScreen extends StatefulWidget {
   const SetupScreen({super.key});

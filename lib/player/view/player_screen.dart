@@ -8,7 +8,7 @@ import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:hive/hive.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:melodia/core/color_pallete.dart';
-import 'package:melodia/downloader.dart';
+import 'package:melodia/download/model/downloader.dart';
 import 'package:melodia/player/model/api_calls.dart';
 import 'package:melodia/player/model/songs_model.dart';
 import 'package:melodia/player/view/mini_player.dart';
