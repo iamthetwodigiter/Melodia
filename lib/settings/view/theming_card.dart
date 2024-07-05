@@ -31,77 +31,79 @@ class _ThemeSettingsState extends ConsumerState<ThemeSettings> {
                     : AppPallete().accentColor),
           ),
         ),
-        child: CustomScrollView(
-          slivers: [
-            SliverFillRemaining(
-                child: CupertinoListSection(
-              topMargin: 0,
-              backgroundColor: darkMode
-                  ? AppPallete.scaffoldDarkBackground
-                  : AppPallete.scaffoldBackgroundColor,
-              children: [
-                CupertinoListTile(
-                  backgroundColor: darkMode
-                      ? AppPallete.scaffoldDarkBackground
-                      : AppPallete.scaffoldBackgroundColor,
-                  padding: const EdgeInsets.all(15),
-                  leading: Icon(
-                    CupertinoIcons.moon_circle_fill,
-                    color: AppPallete().accentColor,
-                    size: 20,
-                  ),
-                  title: Text(
-                    'Dark Theme',
-                    style: TextStyle(color: AppPallete().accentColor),
-                  ),
-                  trailing: CupertinoSwitch(
-                    value: darkMode,
-                    activeColor: AppPallete().accentColor,
-                    onChanged: (bool value) {
-                      ref
-                          .watch(darkModeProvider.notifier)
-                          .setDarkMode(!darkMode);
-                      settings.put('darkMode', !darkMode);
-                      setState(() {
-                        value = !value;
-                      });
-                    },
-                  ),
-                ),
-                CupertinoListTile(
+        child: SafeArea(
+          child: CustomScrollView(
+            slivers: [
+              SliverFillRemaining(
+                  child: CupertinoListSection(
+                topMargin: 0,
+                backgroundColor: darkMode
+                    ? AppPallete.scaffoldDarkBackground
+                    : AppPallete.scaffoldBackgroundColor,
+                children: [
+                  CupertinoListTile(
                     backgroundColor: darkMode
                         ? AppPallete.scaffoldDarkBackground
                         : AppPallete.scaffoldBackgroundColor,
-                    onTap: () {
-                      showCupertinoModalPopup(
-                          context: context,
-                          builder: (BuildContext builder) {
-                            return const CupertinoPopupSurface(
-                              child: AccentColorModal(),
-                            );
-                          });
-                    },
                     padding: const EdgeInsets.all(15),
                     leading: Icon(
-                      Icons.color_lens,
+                      CupertinoIcons.moon_circle_fill,
                       color: AppPallete().accentColor,
                       size: 20,
                     ),
                     title: Text(
-                      'Accent Color',
+                      'Dark Theme',
                       style: TextStyle(color: AppPallete().accentColor),
                     ),
-                    subtitle: Text(
-                      'Please restart app after changing color',
-                      style: TextStyle(
-                          color: darkMode
-                              ? AppPallete.subtitleDarkTextColor
-                              : AppPallete().subtitleTextColor),
+                    trailing: CupertinoSwitch(
+                      value: darkMode,
+                      activeColor: AppPallete().accentColor,
+                      onChanged: (bool value) {
+                        ref
+                            .watch(darkModeProvider.notifier)
+                            .setDarkMode(!darkMode);
+                        settings.put('darkMode', !darkMode);
+                        setState(() {
+                          value = !value;
+                        });
+                      },
                     ),
-                    trailing: const CupertinoListTileChevron()),
-              ],
-            )),
-          ],
+                  ),
+                  CupertinoListTile(
+                      backgroundColor: darkMode
+                          ? AppPallete.scaffoldDarkBackground
+                          : AppPallete.scaffoldBackgroundColor,
+                      onTap: () {
+                        showCupertinoModalPopup(
+                            context: context,
+                            builder: (BuildContext builder) {
+                              return const CupertinoPopupSurface(
+                                child: AccentColorModal(),
+                              );
+                            });
+                      },
+                      padding: const EdgeInsets.all(15),
+                      leading: Icon(
+                        Icons.color_lens,
+                        color: AppPallete().accentColor,
+                        size: 20,
+                      ),
+                      title: Text(
+                        'Accent Color',
+                        style: TextStyle(color: AppPallete().accentColor),
+                      ),
+                      subtitle: Text(
+                        'Please restart app after changing color',
+                        style: TextStyle(
+                            color: darkMode
+                                ? AppPallete.subtitleDarkTextColor
+                                : AppPallete().subtitleTextColor),
+                      ),
+                      trailing: const CupertinoListTileChevron()),
+                ],
+              )),
+            ],
+          ),
         ));
   }
 }

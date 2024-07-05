@@ -1,12 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:melodia/album/model/albums_repository.dart';
+import 'package:melodia/constants/constants.dart';
 
-const albumUrl = "https://melodia-six.vercel.app/api/albums?id=";
-const playlistUrl = "https://melodia-six.vercel.app/api/playlists?id=";
 
 Future<Albums> fetchAlbumData(String type, String endpoint) async {
-  String baseUrl = (type == 'album') ? albumUrl + endpoint : '$playlistUrl$endpoint&limit=50';
+  String baseUrl = (type == 'album') ? Constants.albumUrl + endpoint : '${Constants.playlistUrl}$endpoint&limit=50';
   final response = await http.get(Uri.parse(baseUrl));
   final data = jsonDecode(response.body);
   if (data['success'] == true) {

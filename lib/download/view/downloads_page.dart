@@ -23,9 +23,9 @@ class DownloadsPage extends ConsumerStatefulWidget {
 class _DownloadsPageState extends ConsumerState<DownloadsPage> {
   Directory downloadsDir = Directory('storage/emulated/0/Music/Melodia');
   List<File> _files = [];
-  List<Uint8List?> _thumbList = [];
+  List<Uint8List?> thumbList = [];
   final tagger = Audiotagger();
-  List<Tag?> _tags = [];
+  List<Tag?> tags = [];
 
   @override
   void initState() {
@@ -73,15 +73,15 @@ class _DownloadsPageState extends ConsumerState<DownloadsPage> {
   void getArtwork(String filePath) async {
     Uint8List? artwork = await tagger.readArtwork(path: filePath);
     if (artwork == null) {
-      _thumbList.add(Uint8List(1));
+      thumbList.add(Uint8List(1));
     }
-    _thumbList.add(artwork);
+    thumbList.add(artwork);
     setState(() {});
   }
 
   void getMetadata(String filePath) async {
     Tag? tag = await tagger.readTags(path: filePath);
-    _tags.add(tag);
+    tags.add(tag);
     setState(() {});
   }
 
@@ -116,115 +116,121 @@ class _DownloadsPageState extends ConsumerState<DownloadsPage> {
           ),
         ),
       ),
-      child: Column(
-        children: [
-          Container(
-            height:
-                offlineSong == null ? size.height * 0.9 : size.height * 0.82,
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: CustomScrollView(
-              slivers: [
-                SliverToBoxAdapter(
-                  child: Container(
-                    padding: const EdgeInsets.all(10),
-                    child: Text(
-                      'Downloaded Songs',
-                      style: TextStyle(
-                        fontSize: 25,
-                        color: AppPallete().accentColor,
-                        fontWeight: FontWeight.bold,
+      child: SafeArea(
+        child: Column(
+          children: [
+            Container(
+              height:
+                  offlineSong == null ? size.height * 0.9 : size.height * 0.82,
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: CustomScrollView(
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      child: Text(
+                        'Downloaded Songs',
+                        style: TextStyle(
+                          fontSize: 25,
+                          color: AppPallete().accentColor,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                _files.isEmpty
-                    ? SliverToBoxAdapter(
-                        child: Container(
-                          height: size.height * 0.7,
-                          alignment: Alignment.center,
-                          child: Text(
-                            'No Downloads',
-                            style: TextStyle(
-                              fontSize: 25,
-                              fontWeight: FontWeight.bold,
-                              color: AppPallete().accentColor,
+                  _files.isEmpty
+                      ? SliverToBoxAdapter(
+                          child: Container(
+                            height: size.height * 0.7,
+                            alignment: Alignment.center,
+                            child: Text(
+                              'No Downloads',
+                              style: TextStyle(
+                                fontSize: 25,
+                                fontWeight: FontWeight.bold,
+                                color: AppPallete().accentColor,
+                              ),
                             ),
                           ),
-                        ),
-                      )
-                    : SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) {
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 5),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: CupertinoListTile(
-                                  onTap: () {
-                                    final offlineSong = OfflineSongModel(
-                                        songList: _files,
-                                        thumbList: _thumbList,
-                                        index: index,
-                                        tags: _tags);
-                                    ref
-                                        .watch(offlineSongProvider.notifier)
-                                        .state = offlineSong;
-                                    Navigator.of(context).push(
-                                      CustomPageRoute(
-                                        page: OfflineMusicPlayer(
-                                            song: offlineSong),
-                                      ),
-                                    );
-                                  },
-                                  backgroundColor:
-                                      AppPallete().accentColor.withAlpha(20),
-                                  padding: const EdgeInsets.all(20),
-                                  leading: Image.memory(
-                                    _thumbList[index]!,
-                                    height: 100,
-                                  ),
-                                  title: Text(
-                                    _files[index]
-                                        .path
-                                        .toString()
-                                        .replaceAll(
-                                            'storage/emulated/0/Music/Melodia/',
-                                            '')
-                                        .replaceAll('.m4a', ''),
-                                    style: TextStyle(
-                                        color: darkMode
-                                            ? CupertinoColors.white
-                                            : AppPallete().accentColor),
-                                  ),
-                                  trailing: IconButton(
-                                    onPressed: () {
-                                      _showAlertDialog(context, _files[index]);
-                                      setState(() {});
+                        )
+                      : SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) {
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 5),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: CupertinoListTile(
+                                    onTap: () {
+                                      final offlineSong = OfflineSongModel(
+                                          songList: _files,
+                                          thumbList: thumbList,
+                                          index: index,
+                                          tags: tags);
+                                      ref
+                                          .watch(offlineSongProvider.notifier)
+                                          .state = offlineSong;
+                                      Navigator.of(context).push(
+                                        CustomPageRoute(
+                                          page: OfflineMusicPlayer(
+                                              song: offlineSong),
+                                        ),
+                                      );
                                     },
-                                    icon: const Icon(
-                                      CupertinoIcons.delete_solid,
-                                      color: CupertinoColors.destructiveRed,
+                                    backgroundColor:
+                                        AppPallete().accentColor.withAlpha(20),
+                                    padding: const EdgeInsets.all(20),
+                                    leading: Image.memory(
+                                      thumbList[index]!,
+                                      height: 100,
+                                    ),
+                                    title: Text(
+                                      _files[index]
+                                          .path
+                                          .toString()
+                                          .replaceAll(
+                                              'storage/emulated/0/Music/Melodia/',
+                                              '')
+                                          .replaceAll('.m4a', ''),
+                                      style: TextStyle(
+                                          color: darkMode
+                                              ? CupertinoColors.white
+                                              : AppPallete().accentColor),
+                                    ),
+                                    subtitle: Text(
+                                      tags[index]!.artist!,
+                                      maxLines: 1,
+                                    ),
+                                    trailing: IconButton(
+                                      onPressed: () {
+                                        _showAlertDialog(context, _files[index]);
+                                        setState(() {});
+                                      },
+                                      icon: const Icon(
+                                        CupertinoIcons.delete_solid,
+                                        color: CupertinoColors.destructiveRed,
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            );
-                          },
-                          childCount: _files.length,
+                              );
+                            },
+                            childCount: _files.length,
+                          ),
                         ),
-                      ),
-              ],
+                ],
+              ),
             ),
-          ),
-          offlineSong != null
-              ? SizedBox(
-                  height: 65,
-                  child: OfflineMusicSlab(
-                    song: offlineSong,
-                  ),
-                )
-              : Container()
-        ],
+            offlineSong != null
+                ? SizedBox(
+                    height: 65,
+                    child: OfflineMusicSlab(
+                      song: offlineSong,
+                    ),
+                  )
+                : Container()
+          ],
+        ),
       ),
     );
   }

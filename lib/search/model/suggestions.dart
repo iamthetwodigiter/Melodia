@@ -1,12 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:melodia/constants/constants.dart';
 import 'package:melodia/search/model/search_repository.dart';
 
-// Assuming the 'suggestions' class is actually 'SongsResult' 
-// as per the structure in your search_repository.dart file
-
 Future<List<SongsResult>> getSuggestions(String songID) async {
-  final url = 'https://melodia-six.vercel.app/api/songs/$songID/suggestions?query=limit=50';
+  final url = '${Constants.suggeestionUrl}$songID/suggestions?query=limit=50';
   final response = await http.get(Uri.parse(url));
 
   if (response.statusCode == 200) {

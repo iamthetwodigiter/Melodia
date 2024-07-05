@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:melodia/constants/constants.dart';
 import 'package:melodia/search/model/search_repository.dart';
 
 Future<SearchResult> searchResult(String query) async {
   final response = await http.get(Uri.parse(
-      "https://melodia-six.vercel.app/api/search/songs?query=${query.replaceAll(" ", "+")}&limit=50"));
+      "${Constants.searchUrl}${query.replaceAll(" ", "+")}&limit=50"));
   final data = jsonDecode(response.body);
   List<SongsResult> songsResultList = [];
   if (data['success'] == true) {

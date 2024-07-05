@@ -15,6 +15,7 @@ class OfflineAudioPlayer extends ChangeNotifier {
   }
 
   void _initializePlayer() async {
+    
     int index = song.index;
     final audioSource = AudioSource.uri(
       Uri.file(song.songList.elementAt(index).path),

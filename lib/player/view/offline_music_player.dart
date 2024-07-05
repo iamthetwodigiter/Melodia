@@ -36,90 +36,92 @@ class _OfflineMusicPlayerState extends ConsumerState<OfflineMusicPlayer> {
     final thumb = widget.song.thumbList.elementAt(index);
     final tag = widget.song.tags.elementAt(index);
     return CupertinoPageScaffold(
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 20),
-        height: MediaQuery.of(context).size.height * 1,
-        width: double.infinity,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            IconButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              icon: Icon(
-                CupertinoIcons.chevron_down_circle_fill,
-                color: AppPallete().accentColor,
+      child: SafeArea(
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 20),
+          height: MediaQuery.of(context).size.height * 1,
+          width: double.infinity,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              IconButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: Icon(
+                  CupertinoIcons.chevron_down_circle_fill,
+                  color: AppPallete().accentColor,
+                ),
               ),
-            ),
-            thumb == null
-                ? Image.asset(
-                    'assets/song_thumb.png',
-                    height: 50,
-                  )
-                : ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Image.memory(
-                      thumb,
-                      height: 300,
+              thumb == null
+                  ? Image.asset(
+                      'assets/song_thumb.png',
+                      height: 50,
+                    )
+                  : ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Image.memory(
+                        thumb,
+                        height: 300,
+                      ),
+                    ),
+              Column(
+                children: [
+                  Text(
+                    name,
+                    style: TextStyle(
+                      color: AppPallete().accentColor,
+                      fontSize: 25,
                     ),
                   ),
-            Column(
-              children: [
-                Text(
-                  name,
-                  style: TextStyle(
-                    color: AppPallete().accentColor,
-                    fontSize: 25,
+                  Text(
+                    tag!.artist!,
+                    style: TextStyle(
+                      color: AppPallete().accentColor,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                ),
-                Text(
-                  tag!.artist!,
-                  style: TextStyle(
-                    color: AppPallete().accentColor,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-            StreamBuilder<DurationState>(
-              stream: offlineAudioPlayer?.player.positionStream.map((position) {
-                return DurationState(
-                  progress: position,
-                  buffered: offlineAudioPlayer.player.bufferedPosition,
-                  total: offlineAudioPlayer.player.duration ?? Duration.zero,
-                );
-              }),
-              builder: (context, snapshot) {
-                final durationState = snapshot.data;
-                final progress = durationState?.progress ?? Duration.zero;
-                final total = durationState?.total ?? Duration.zero;
-
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ProgressBar(
-                    progress: progress,
-                    buffered: durationState?.buffered ?? Duration.zero,
-                    total: total,
-                    onSeek: offlineAudioPlayer?.player.seek,
-                    baseBarColor: CupertinoColors.inactiveGray,
-                    progressBarColor: AppPallete().accentColor,
-                    // bufferedBarColor:
-                    //     CupertinoColors.activeBlue.withAlpha(150),
-                    thumbColor: AppPallete().accentColor,
-                    thumbRadius: 10,
-                    timeLabelTextStyle:
-                        TextStyle(color: AppPallete().secondaryColor),
-                    timeLabelPadding: 5,
-                  ),
-                );
-              },
-            ),
-            PlayerControls(
-              offlineAudioPlayer: offlineAudioPlayer!,
-              song: widget.song,
-            ),
-          ],
+                ],
+              ),
+              StreamBuilder<DurationState>(
+                stream: offlineAudioPlayer?.player.positionStream.map((position) {
+                  return DurationState(
+                    progress: position,
+                    buffered: offlineAudioPlayer.player.bufferedPosition,
+                    total: offlineAudioPlayer.player.duration ?? Duration.zero,
+                  );
+                }),
+                builder: (context, snapshot) {
+                  final durationState = snapshot.data;
+                  final progress = durationState?.progress ?? Duration.zero;
+                  final total = durationState?.total ?? Duration.zero;
+        
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ProgressBar(
+                      progress: progress,
+                      buffered: durationState?.buffered ?? Duration.zero,
+                      total: total,
+                      onSeek: offlineAudioPlayer?.player.seek,
+                      baseBarColor: CupertinoColors.inactiveGray,
+                      progressBarColor: AppPallete().accentColor,
+                      // bufferedBarColor:
+                      //     CupertinoColors.activeBlue.withAlpha(150),
+                      thumbColor: AppPallete().accentColor,
+                      thumbRadius: 10,
+                      timeLabelTextStyle:
+                          TextStyle(color: AppPallete().secondaryColor),
+                      timeLabelPadding: 5,
+                    ),
+                  );
+                },
+              ),
+              PlayerControls(
+                offlineAudioPlayer: offlineAudioPlayer!,
+                song: widget.song,
+              ),
+            ],
+          ),
         ),
       ),
     );
