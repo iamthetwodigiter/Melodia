@@ -53,10 +53,13 @@ class _AlbumDetailsState extends ConsumerState<AlbumDetails> {
     List<String> durationList = [];
 
     return CupertinoPageScaffold(
-      navigationBar: const CupertinoNavigationBar(
+      navigationBar: CupertinoNavigationBar(
         previousPageTitle: 'Home',
         middle: Text(
           'Playlist',
+          style: TextStyle(
+            color: darkMode ? Colors.white : AppPallete().accentColor,
+          ),
         ),
       ),
       child: Column(
@@ -783,7 +786,10 @@ class _AlbumDetailsState extends ConsumerState<AlbumDetails> {
                                                                             index)
                                                                         .image,
                                                                     index,
-                                                                    data.songs.elementAt(index).year,
+                                                                    data.songs
+                                                                        .elementAt(
+                                                                            index)
+                                                                        .year,
                                                                   ];
                                                                   download(
                                                                       data.songs

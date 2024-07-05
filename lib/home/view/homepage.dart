@@ -60,11 +60,12 @@ class _HomePageState extends ConsumerState<HomePage> {
           ),
           color: AppPallete().accentColor,
         ),
-        middle: const Text(
+        middle: Text(
           'Melodia',
           style: TextStyle(
-            fontSize: 25,
-          ),
+              fontSize: 25,
+              color:
+                  darkMode ? CupertinoColors.white : AppPallete().accentColor),
         ),
         leading: Image.asset('assets/logo.png'),
       ),

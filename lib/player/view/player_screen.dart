@@ -11,6 +11,7 @@ import 'package:melodia/core/color_pallete.dart';
 import 'package:melodia/downloader.dart';
 import 'package:melodia/player/model/api_calls.dart';
 import 'package:melodia/player/model/songs_model.dart';
+import 'package:melodia/player/view/mini_player.dart';
 import 'package:melodia/provider/audio_player.dart';
 import 'package:melodia/player/widgets/custom_page_route.dart';
 import 'package:melodia/provider/songs_notifier.dart';
@@ -36,9 +37,9 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
     final audioService = ref.read(audioServiceProvider.notifier);
     audioService?.player.playerStateStream.listen((state) {
       if (state.processingState == ProcessingState.completed) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
           if (mounted) {
-            final nextSong = audioService.nextPlayback();
+            final nextSong = await audioService.nextPlayback();
             Navigator.pushReplacement(
               context,
               PlaybackRoute(
@@ -84,7 +85,6 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
             IconButton(
               onPressed: () {
                 ref.read(currentSongProvider.notifier).state = widget.song;
-                ref.read(isMinimisedProvider.notifier).state = true;
                 Navigator.pop(context);
               },
               icon: Icon(
@@ -273,6 +273,7 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
                           fontWeight: FontWeight.bold,
                           color: AppPallete().accentColor,
                         ),
+                        maxLines: 1,
                       ),
                       const SizedBox(height: 7),
                       Text(
@@ -281,6 +282,7 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
                           fontSize: 15,
                           color: AppPallete().accentColor.withAlpha(200),
                         ),
+                        maxLines: 1,
                         textAlign: TextAlign.center,
                       ),
                     ],
@@ -343,9 +345,12 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
                                               .song.playlistData!.idList.length,
                                           itemBuilder: (context, index) {
                                             final duration = Duration(
-                                                minutes: int.parse(widget.song
-                                                    .playlistData!.durationList
-                                                    .elementAt(index),),);
+                                              minutes: int.parse(
+                                                widget.song.playlistData!
+                                                    .durationList
+                                                    .elementAt(index),
+                                              ),
+                                            );
                                             return Padding(
                                               padding:
                                                   const EdgeInsets.symmetric(
@@ -580,14 +585,18 @@ class _PlayerControlsState extends ConsumerState<PlayerControls> {
         ),
         IconButton(
           onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              PlaybackRoute(
-                builder: (context) => MusicPlayer(
-                  song: widget.audioService.previousPlayback(),
-                ),
-              ),
-            );
+            WidgetsBinding.instance.addPostFrameCallback((_) async {
+              if (mounted) {
+                final previousSong =
+                    await widget.audioService.previousPlayback();
+                Navigator.pushReplacement(
+                  context,
+                  PlaybackRoute(
+                    builder: (context) => MusicPlayer(song: previousSong),
+                  ),
+                );
+              }
+            });
           },
           icon: Icon(CupertinoIcons.backward_end_fill,
               size: 30, color: AppPallete().secondaryColor),
@@ -608,9 +617,9 @@ class _PlayerControlsState extends ConsumerState<PlayerControls> {
         ),
         IconButton(
           onPressed: () {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
+            WidgetsBinding.instance.addPostFrameCallback((_) async {
               if (mounted) {
-                final nextSong = widget.audioService.nextPlayback();
+                final nextSong = await widget.audioService.nextPlayback();
                 Navigator.pushReplacement(
                   context,
                   PlaybackRoute(

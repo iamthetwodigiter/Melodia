@@ -73,7 +73,13 @@ class _OfflineMusicPlayerState extends ConsumerState<OfflineMusicPlayer> {
                     fontSize: 25,
                   ),
                 ),
-                Text(tag!.artist!),
+                Text(
+                  tag!.artist!,
+                  style: TextStyle(
+                    color: AppPallete().accentColor,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
               ],
             ),
             StreamBuilder<DurationState>(

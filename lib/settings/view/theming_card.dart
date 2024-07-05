@@ -21,10 +21,14 @@ class _ThemeSettingsState extends ConsumerState<ThemeSettings> {
     ref.watch(darkModeProvider);
     bool darkMode = settings.get('darkMode');
     return CupertinoPageScaffold(
-        navigationBar: const CupertinoNavigationBar(
+        navigationBar: CupertinoNavigationBar(
           previousPageTitle: 'Settings',
           middle: Text(
             'Theme',
+            style: TextStyle(
+                color: darkMode
+                    ? CupertinoColors.white
+                    : AppPallete().accentColor),
           ),
         ),
         child: CustomScrollView(

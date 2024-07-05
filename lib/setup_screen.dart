@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:hive/hive.dart';
+import 'package:melodia/core/color_pallete.dart';
 import 'package:melodia/landing_screen.dart';
 import 'package:melodia/setup_extended.dart';
 
@@ -68,7 +69,7 @@ class _SetupScreenState extends State<SetupScreen> {
               height: 75,
               width: double.infinity,
               decoration: BoxDecoration(
-                color: CupertinoColors.darkBackgroundGray,
+                color:darkMode ? CupertinoColors.darkBackgroundGray : CupertinoColors.lightBackgroundGray,
                 borderRadius: BorderRadius.circular(40),
               ),
               child: Row(

@@ -54,7 +54,7 @@ Future<void> main() async {
     settings.put('darkMode',
         WidgetsBinding.instance.window.platformBrightness == Brightness.dark);
     settings.put('accent_color', [255, 0, 122, 255]);
-   
+    settings.put('suggestions', false);
     settings.put('currentSong', null);
     settings.put('download_path', 'storage/emulated/0/Music/Melodia');
     settings.put('setup', true);

@@ -171,7 +171,7 @@ class _SearchResultsState extends ConsumerState<SearchResults> {
                                           playlistData: updatedPlaylist,
                                           shuffleMode: false,
                                           playlistName: songs.elementAt(index).album,
-                                          year: songs.elementAt(index).id,
+                                          year: songs.elementAt(index).year,
                                         );
 
                                         ref

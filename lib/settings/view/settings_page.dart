@@ -66,6 +66,7 @@ class _SettingsState extends ConsumerState<Settings> {
     String downloadQuality = settings.get('download_quality');
     String streamingQuality = settings.get('streaming_quality');
     int shuffle = settings.get('shuffle');
+    bool suggestion = settings.get('suggestions');
     String cache = settings.get('cache_songs');
     bool switchValue = (shuffle == 0) ? false : true;
     ref.watch(darkModeProvider);
@@ -73,25 +74,28 @@ class _SettingsState extends ConsumerState<Settings> {
     Directory cacheDir = Directory(
         '/data/user/0/com.thetwodigiter.melodia/cache/just_audio_cache/');
 
-    final Uri _url = Uri.parse('https://www.github.com/iamthetwodigiter');
+    final Uri url = Uri.parse('https://www.github.com/iamthetwodigiter');
 
-    Future<void> _launchUrl() async {
-      if (!await launchUrl(_url)) {
-        throw 'Could not launch $_url';
+    Future<void> launchtheurl() async {
+      if (!await launchUrl(url)) {
+        throw 'Could not launch $url';
       }
     }
 
     return CupertinoPageScaffold(
-      navigationBar: const CupertinoNavigationBar(
-        previousPageTitle: 'Home',
+      navigationBar: CupertinoNavigationBar(
+        previousPageTitle: 'Back',
         middle: Text(
           'Settings',
+          style: TextStyle(
+              color:
+                  darkMode ? CupertinoColors.white : AppPallete().accentColor),
         ),
       ),
       child: Column(
         children: [
           SizedBox(
-            height: MediaQuery.of(context).size.height * 0.85,
+            height: MediaQuery.of(context).size.height * 0.84,
             child: CustomScrollView(
               slivers: [
                 SliverFillRemaining(
@@ -138,16 +142,17 @@ class _SettingsState extends ConsumerState<Settings> {
                           onTap: () {
                             _showDialog(
                               CupertinoPicker(
+                                backgroundColor: darkMode
+                                    ? AppPallete.scaffoldDarkBackground
+                                    : AppPallete.scaffoldBackgroundColor,
                                 magnification: 1.22,
                                 squeeze: 1.2,
                                 useMagnifier: true,
                                 itemExtent: 32,
-                                // This sets the initial item.
                                 scrollController: FixedExtentScrollController(
                                   initialItem:
                                       qualityList.indexOf(downloadQuality),
                                 ),
-                                // This is called when selected item is changed.
                                 onSelectedItemChanged: (int selectedItem) {
                                   settings.put('download_quality',
                                       qualityList[selectedItem]);
@@ -155,12 +160,21 @@ class _SettingsState extends ConsumerState<Settings> {
                                     downloadQuality = qualityList[selectedItem];
                                   });
                                 },
-                                children: List<Widget>.generate(
-                                    qualityList.length, (int index) {
-                                  return Center(
-                                      child:
-                                          Text('${qualityList[index]} kbps'));
-                                }),
+                                children: List.generate(
+                                  qualityList.length,
+                                  (int index) {
+                                    return Center(
+                                      child: Text(
+                                        '${qualityList[index]} kbps',
+                                        style: TextStyle(
+                                          color: darkMode
+                                              ? CupertinoColors.white
+                                              : AppPallete().accentColor,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
                               ),
                             );
                           },
@@ -195,6 +209,9 @@ class _SettingsState extends ConsumerState<Settings> {
                           onTap: () {
                             _showDialog(
                               CupertinoPicker(
+                                backgroundColor: darkMode
+                                    ? AppPallete.scaffoldDarkBackground
+                                    : AppPallete.scaffoldBackgroundColor,
                                 magnification: 1.22,
                                 squeeze: 1.2,
                                 useMagnifier: true,
@@ -214,11 +231,20 @@ class _SettingsState extends ConsumerState<Settings> {
                                   });
                                 },
                                 children: List<Widget>.generate(
-                                    qualityList.length, (int index) {
-                                  return Center(
-                                      child:
-                                          Text('${qualityList[index]} kbps'));
-                                }),
+                                  qualityList.length,
+                                  (int index) {
+                                    return Center(
+                                      child: Text(
+                                        '${qualityList[index]} kbps',
+                                        style: TextStyle(
+                                          color: darkMode
+                                              ? CupertinoColors.white
+                                              : AppPallete().accentColor,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
                               ),
                             );
                           },
@@ -266,6 +292,38 @@ class _SettingsState extends ConsumerState<Settings> {
                               settings.put('shuffle', shuffle == 0 ? 1 : 0);
                               setState(() {
                                 switchValue = !switchValue;
+                              });
+                            },
+                          ),
+                        ),
+                        CupertinoListTile(
+                          backgroundColor: darkMode
+                              ? AppPallete.scaffoldDarkBackground
+                              : AppPallete.scaffoldBackgroundColor,
+                          padding: const EdgeInsets.all(15),
+                          leading: Icon(
+                            CupertinoIcons.music_note_2,
+                            color: AppPallete().accentColor,
+                            size: 15,
+                          ),
+                          title: Text(
+                            'Play Suggestions?',
+                            style: TextStyle(color: AppPallete().accentColor),
+                          ),
+                          subtitle: Text(
+                            'Play suggested songs at the end of Playlist',
+                            style: TextStyle(
+                                color: darkMode
+                                    ? AppPallete.subtitleDarkTextColor
+                                    : AppPallete().subtitleTextColor),
+                          ),
+                          trailing: CupertinoSwitch(
+                            value: suggestion,
+                            activeColor: AppPallete().accentColor,
+                            onChanged: (bool value) {
+                              settings.put('suggestions', !suggestion);
+                              setState(() {
+                                suggestion = !suggestion;
                               });
                             },
                           ),
@@ -381,11 +439,19 @@ class _SettingsState extends ConsumerState<Settings> {
                 textAlign: TextAlign.center,
                 text: TextSpan(
                   children: [
-                    const TextSpan(
+                    TextSpan(
                       text: 'Melodia v1.0.0',
+                      style: TextStyle(
+                          color: darkMode
+                              ? CupertinoColors.white
+                              : AppPallete().accentColor),
                     ),
-                    const TextSpan(
+                    TextSpan(
                       text: ' \nCreated with ',
+                      style: TextStyle(
+                          color: darkMode
+                              ? CupertinoColors.white
+                              : AppPallete().accentColor),
                     ),
                     const WidgetSpan(
                       child: Icon(
@@ -393,8 +459,12 @@ class _SettingsState extends ConsumerState<Settings> {
                         color: CupertinoColors.destructiveRed,
                       ),
                     ),
-                    const TextSpan(
+                    TextSpan(
                       text: ' by ',
+                      style: TextStyle(
+                          color: darkMode
+                              ? CupertinoColors.white
+                              : AppPallete().accentColor),
                     ),
                     TextSpan(
                       text: 'thetwodigiter',
@@ -404,12 +474,13 @@ class _SettingsState extends ConsumerState<Settings> {
                       ),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () async {
-                          _launchUrl();
+                          launchtheurl();
                         },
                     ),
                   ],
                 ),
               ),
+              const SizedBox(height: 10),
             ],
           )
         ],

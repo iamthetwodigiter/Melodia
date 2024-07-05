@@ -10,6 +10,7 @@ import 'package:melodia/player/view/mini_player.dart';
 import 'package:melodia/playlist_items_page.dart';
 import 'package:melodia/provider/dark_mode_provider.dart';
 import 'package:melodia/provider/songs_notifier.dart';
+import 'package:melodia/settings/view/settings_page.dart';
 
 class LibraryScreen extends ConsumerStatefulWidget {
   const LibraryScreen({super.key});
@@ -46,14 +47,29 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> {
 
     return CupertinoPageScaffold(
         // backgroundColor: darkMode ? AppPallete.scaffoldDarkBackground : AppPallete.scaffoldBackgroundColor,
-        navigationBar: const CupertinoNavigationBar(
+        navigationBar: CupertinoNavigationBar(
           previousPageTitle: 'Playlist',
+          leading: Image.asset('assets/logo.png'),
           middle: Text(
             'Library',
             style: TextStyle(
               fontSize: 30,
+              color:
+                  darkMode ? CupertinoColors.white : AppPallete().accentColor,
             ),
           ),
+          trailing: IconButton(
+          onPressed: () => Navigator.of(context).push(
+            CupertinoPageRoute(
+              builder: (context) => const Settings(),
+            ),
+          ),
+          icon: const Icon(
+            CupertinoIcons.settings_solid,
+            size: 20,
+          ),
+          color: AppPallete().accentColor,
+        ),
         ),
         child: SingleChildScrollView(
           child: Column(
@@ -173,13 +189,13 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> {
                                   ),
                                 );
                               },
-                              child: const CupertinoListTile(
+                              child: CupertinoListTile(
                                   padding: EdgeInsets.zero,
-                                  leading: Icon(
+                                  leading: const Icon(
                                     Icons.download_rounded,
                                     color: CupertinoColors.destructiveRed,
                                   ),
-                                  title: Text(
+                                  title: const Text(
                                     'Downloads',
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
@@ -187,7 +203,13 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> {
                                       fontSize: 20,
                                     ),
                                   ),
-                                  subtitle: Text('Offline Songs')),
+                                  subtitle: Text(
+                                    'Offline Songs',
+                                    style: TextStyle(
+                                        color: darkMode
+                                            ? CupertinoColors.white
+                                            : AppPallete().accentColor),
+                                  )),
                             ),
                           ),
                         ),
@@ -275,7 +297,14 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> {
                                                   ),
                                                   // subtitle: Text('Melodia Playlist'),
                                                   subtitle: Text(
-                                                      '${playlistBox.values.elementAt(index).idList.length} Songs'),
+                                                    '${playlistBox.values.elementAt(index).idList.length} Songs',
+                                                    style: TextStyle(
+                                                        color: darkMode
+                                                            ? CupertinoColors
+                                                                .white
+                                                            : AppPallete()
+                                                                .accentColor),
+                                                  ),
                                                   trailing: playlistBox.keys
                                                               .elementAt(
                                                                   index) ==
