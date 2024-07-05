@@ -28,13 +28,14 @@ class SongModelAdapter extends TypeAdapter<SongModel> {
       shuffleMode: fields[8] as bool,
       playlistName: fields[9] as String,
       year: fields[10] as String?,
+      isUserCreated: fields[11] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, SongModel obj) {
     writer
-      ..writeByte(11)
+      ..writeByte(12)
       ..writeByte(0)
       ..write(obj.link)
       ..writeByte(1)
@@ -56,7 +57,9 @@ class SongModelAdapter extends TypeAdapter<SongModel> {
       ..writeByte(9)
       ..write(obj.playlistName)
       ..writeByte(10)
-      ..write(obj.year);
+      ..write(obj.year)
+      ..writeByte(11)
+      ..write(obj.isUserCreated);
   }
 
   @override

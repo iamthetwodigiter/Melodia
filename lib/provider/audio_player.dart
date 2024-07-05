@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
@@ -50,18 +49,18 @@ class AudioService extends ChangeNotifier {
     try {
       final updatedPlaylist = await fetchAndCreatePlaylist(songx.id);
       song = SongModel(
-        link: updatedPlaylist.linkList.first,
-        id: updatedPlaylist.idList.first,
-        name: updatedPlaylist.nameList.first.split('(')[0],
-        imageUrl: updatedPlaylist.imageUrlList.first,
-        duration: updatedPlaylist.durationList.first,
-        artists: updatedPlaylist.artistsList.first,
-        index: 0,
-        playlistData: updatedPlaylist,
-        shuffleMode: false,
-        playlistName: 'Random',
-        year: '2024',
-      );
+          link: updatedPlaylist.linkList.first,
+          id: updatedPlaylist.idList.first,
+          name: updatedPlaylist.nameList.first.split('(')[0],
+          imageUrl: updatedPlaylist.imageUrlList.first,
+          duration: updatedPlaylist.durationList.first,
+          artists: updatedPlaylist.artistsList.first,
+          index: 0,
+          playlistData: updatedPlaylist,
+          shuffleMode: false,
+          playlistName: 'Random',
+          year: '2024',
+          isUserCreated: false);
     } catch (e) {
       rethrow;
     }
@@ -131,12 +130,12 @@ class AudioService extends ChangeNotifier {
     int index = shuffle()
         ? Random().nextInt(songsCount())
         : (song.index + 1) % songsCount();
-    
+
     SongModel songmodel = _getSongModelAtIndex(index);
     song = songmodel;
     bool suggestions = Hive.box('settings').get('suggestions');
     if (index == songsCount() - 1) {
-      if (!suggestions) {
+      if (!suggestions || song.isUserCreated) {
         index = 0;
       } else {
         await getSuggestedSongs(songmodel);
@@ -153,18 +152,19 @@ class AudioService extends ChangeNotifier {
 
   SongModel _getSongModelAtIndex(int index) {
     return SongModel(
-      link: song.playlistData!.linkList.elementAt(index),
-      id: song.playlistData!.idList.elementAt(index),
-      name: song.playlistData!.nameList.elementAt(index).split('(')[0],
-      imageUrl: song.playlistData!.imageUrlList.elementAt(index),
-      duration: song.playlistData!.durationList.elementAt(index),
-      artists: song.playlistData!.artistsList.elementAt(index),
-      playlistData: song.playlistData,
-      index: index,
-      shuffleMode: shuffle(),
-      playlistName: song.playlistName,
-      year: song.year,
-    );
+        link: song.playlistData!.linkList.elementAt(index),
+        id: song.playlistData!.idList.elementAt(index),
+        name: song.playlistData!.nameList.elementAt(index).split('(')[0],
+        imageUrl: song.playlistData!.imageUrlList.elementAt(index),
+        duration: song.playlistData!.durationList.elementAt(index),
+        artists: song.playlistData!.artistsList.elementAt(index),
+        playlistData: song.playlistData,
+        index: index,
+        shuffleMode: shuffle(),
+        playlistName: song.playlistName,
+        year: song.year,
+        isUserCreated:
+            Hive.box<Playlist>('playlist').containsKey(song.playlistName));
   }
 
   @override

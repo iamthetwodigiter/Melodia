@@ -7,11 +7,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:hive/hive.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:melodia/album/model/playlist_model.dart';
 import 'package:melodia/core/color_pallete.dart';
 import 'package:melodia/download/model/downloader.dart';
 import 'package:melodia/player/model/api_calls.dart';
 import 'package:melodia/player/model/songs_model.dart';
-import 'package:melodia/player/view/mini_player.dart';
 import 'package:melodia/provider/audio_player.dart';
 import 'package:melodia/player/widgets/custom_page_route.dart';
 import 'package:melodia/provider/songs_notifier.dart';
@@ -61,17 +61,18 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
     if (!historyBox.values.any((song) => song.id == widget.song.id)) {
       historyBox.add(
         SongModel(
-          link: widget.song.link,
-          id: widget.song.id,
-          name: widget.song.name.split('(')[0],
-          duration: widget.song.duration,
-          imageUrl: widget.song.imageUrl,
-          artists: widget.song.artists,
-          index: widget.song.index,
-          shuffleMode: widget.song.shuffleMode,
-          playlistName: widget.song.playlistName,
-          year: widget.song.year,
-        ),
+            link: widget.song.link,
+            id: widget.song.id,
+            name: widget.song.name.split('(')[0],
+            duration: widget.song.duration,
+            imageUrl: widget.song.imageUrl,
+            artists: widget.song.artists,
+            index: widget.song.index,
+            shuffleMode: widget.song.shuffleMode,
+            playlistName: widget.song.playlistName,
+            year: widget.song.year,
+            isUserCreated:
+                Hive.box<Playlist>('playlist').containsKey(widget.song.playlistName)),
       );
     }
 
@@ -365,44 +366,42 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
                                                       .withAlpha(75),
                                                   onTap: () {
                                                     final songToGo = SongModel(
-                                                      link: widget
-                                                          .song
-                                                          .playlistData!
-                                                          .linkList
-                                                          .elementAt(index),
-                                                      id: widget.song
-                                                          .playlistData!.idList
-                                                          .elementAt(index),
-                                                      name: widget
-                                                          .song
-                                                          .playlistData!
-                                                          .nameList
-                                                          .elementAt(index),
-                                                      duration: widget
-                                                          .song
-                                                          .playlistData!
-                                                          .durationList
-                                                          .elementAt(index),
-                                                      imageUrl: widget
-                                                          .song
-                                                          .playlistData!
-                                                          .imageUrlList
-                                                          .elementAt(index),
-                                                      artists: widget
-                                                          .song
-                                                          .playlistData!
-                                                          .artistsList
-                                                          .elementAt(index),
-                                                      playlistData: widget
-                                                          .song.playlistData,
-                                                      index: index,
-                                                      shuffleMode: settings
-                                                              .get('shuffle') ==
-                                                          1,
-                                                      playlistName: widget
-                                                          .song.playlistName,
-                                                      year: widget.song.year,
-                                                    );
+                                                        link: widget
+                                                            .song
+                                                            .playlistData!
+                                                            .linkList
+                                                            .elementAt(index),
+                                                        id: widget
+                                                            .song
+                                                            .playlistData!
+                                                            .idList
+                                                            .elementAt(index),
+                                                        name: widget
+                                                            .song
+                                                            .playlistData!
+                                                            .nameList
+                                                            .elementAt(index),
+                                                        duration: widget
+                                                            .song
+                                                            .playlistData!
+                                                            .durationList
+                                                            .elementAt(index),
+                                                        imageUrl: widget
+                                                            .song
+                                                            .playlistData!
+                                                            .imageUrlList
+                                                            .elementAt(index),
+                                                        artists: widget
+                                                            .song
+                                                            .playlistData!
+                                                            .artistsList
+                                                            .elementAt(index),
+                                                        playlistData: widget.song.playlistData,
+                                                        index: index,
+                                                        shuffleMode: settings.get('shuffle') == 1,
+                                                        playlistName: widget.song.playlistName,
+                                                        year: widget.song.year,
+                                                        isUserCreated: Hive.box<Playlist>('playlist').containsKey(widget.song.playlistName));
                                                     ref
                                                         .watch(
                                                             currentSongProvider
@@ -439,21 +438,12 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
                                                         .nameList
                                                         .elementAt(index),
                                                     style: TextStyle(
-                                                        color: ref
-                                                                    .watch(currentSongProvider
-                                                                        .notifier)
-                                                                    .state!
-                                                                    .name ==
-                                                                widget
-                                                                    .song
-                                                                    .playlistData!
-                                                                    .nameList
-                                                                    .elementAt(
-                                                                        index)
-                                                            ? AppPallete()
-                                                                .accentColor
-                                                            : CupertinoColors
-                                                                .white),
+                                                      color: darkMode
+                                                          ? CupertinoColors
+                                                              .white
+                                                          : AppPallete()
+                                                              .accentColor,
+                                                    ),
                                                     maxLines: 1,
                                                   ),
                                                   subtitle: Text(
@@ -462,21 +452,11 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
                                                         .elementAt(index)
                                                         .join(", "),
                                                     style: TextStyle(
-                                                        color: ref
-                                                                    .watch(currentSongProvider
-                                                                        .notifier)
-                                                                    .state!
-                                                                    .name ==
-                                                                widget
-                                                                    .song
-                                                                    .playlistData!
-                                                                    .nameList
-                                                                    .elementAt(
-                                                                        index)
-                                                            ? AppPallete()
-                                                                .accentColor
-                                                            : CupertinoColors
-                                                                .white),
+                                                        color: darkMode
+                                                            ? CupertinoColors
+                                                                .white
+                                                            : AppPallete()
+                                                                .accentColor),
                                                     maxLines: 1,
                                                   ),
                                                 ),
@@ -510,9 +490,7 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
                                   .existsSync()
                               ? Icons.download_done_rounded
                               : Icons.download_rounded,
-                          color: darkMode
-                              ? CupertinoColors.white
-                              : AppPallete().accentColor,
+                          color: AppPallete().accentColor,
                         ),
                       ),
                     ],

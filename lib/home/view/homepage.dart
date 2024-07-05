@@ -62,10 +62,7 @@ class _HomePageState extends ConsumerState<HomePage> {
         ),
         middle: Text(
           'Melodia',
-          style: TextStyle(
-              fontSize: 25,
-              color:
-                  darkMode ? CupertinoColors.white : AppPallete().accentColor),
+          style: TextStyle(fontSize: 25, color: AppPallete().accentColor),
         ),
         leading: Image.asset('assets/logo.png'),
       ),

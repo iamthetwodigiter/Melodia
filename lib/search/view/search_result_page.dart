@@ -172,6 +172,7 @@ class _SearchResultsState extends ConsumerState<SearchResults> {
                                           shuffleMode: false,
                                           playlistName: songs.elementAt(index).album,
                                           year: songs.elementAt(index).year,
+                                          isUserCreated: false
                                         );
 
                                         ref

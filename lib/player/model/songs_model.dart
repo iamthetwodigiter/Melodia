@@ -27,6 +27,8 @@ class SongModel extends HiveObject {
   final String playlistName;
   @HiveField(10)
   final String? year;
+  @HiveField(11)
+  final bool isUserCreated;
 
   SongModel({
     required this.link,
@@ -40,6 +42,7 @@ class SongModel extends HiveObject {
     required this.shuffleMode,
     required this.playlistName,
     this.year = '',
+    required this.isUserCreated,
   });
 }
 

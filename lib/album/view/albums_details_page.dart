@@ -371,23 +371,25 @@ class _AlbumDetailsState extends ConsumerState<AlbumDetails> {
                                             onPressed: () {
                                               settings.put('shuffle', 1);
                                               final song = SongModel(
-                                                link: data.songs.first
-                                                    .downloadUrl.last,
-                                                id: data.songs.first.id,
-                                                name: data.songs.first.name
-                                                    .split('(')[0],
-                                                imageUrl:
-                                                    data.songs.first.image,
-                                                duration:
-                                                    data.songs.first.duration,
-                                                artists:
-                                                    data.songs.first.artists,
-                                                playlistData: playlistData,
-                                                index: 0,
-                                                shuffleMode: true,
-                                                playlistName: data.name,
-                                                year: data.songs.first.year,
-                                              );
+                                                  link: data.songs.first
+                                                      .downloadUrl.last,
+                                                  id: data.songs.first.id,
+                                                  name: data.songs.first.name
+                                                      .split('(')[0],
+                                                  imageUrl:
+                                                      data.songs.first.image,
+                                                  duration:
+                                                      data.songs.first.duration,
+                                                  artists:
+                                                      data.songs.first.artists,
+                                                  playlistData: playlistData,
+                                                  index: 0,
+                                                  shuffleMode: true,
+                                                  playlistName: data.name,
+                                                  year: data.songs.first.year,
+                                                  isUserCreated: Hive.box(
+                                                          'playlist')
+                                                      .containsKey(data.name));
                                               ref
                                                   .read(currentSongProvider
                                                       .notifier)
@@ -411,23 +413,25 @@ class _AlbumDetailsState extends ConsumerState<AlbumDetails> {
                                             padding: EdgeInsets.zero,
                                             onPressed: () {
                                               final song = SongModel(
-                                                link: data.songs.first
-                                                    .downloadUrl.last,
-                                                id: data.songs.first.id,
-                                                name: data.songs.first.name
-                                                    .split('(')[0],
-                                                imageUrl:
-                                                    data.songs.first.image,
-                                                duration:
-                                                    data.songs.first.duration,
-                                                artists:
-                                                    data.songs.first.artists,
-                                                playlistData: playlistData,
-                                                index: 0,
-                                                shuffleMode: false,
-                                                playlistName: data.name,
-                                                year: data.songs.first.year,
-                                              );
+                                                  link: data.songs.first
+                                                      .downloadUrl.last,
+                                                  id: data.songs.first.id,
+                                                  name: data.songs.first.name
+                                                      .split('(')[0],
+                                                  imageUrl:
+                                                      data.songs.first.image,
+                                                  duration:
+                                                      data.songs.first.duration,
+                                                  artists:
+                                                      data.songs.first.artists,
+                                                  playlistData: playlistData,
+                                                  index: 0,
+                                                  shuffleMode: false,
+                                                  playlistName: data.name,
+                                                  year: data.songs.first.year,
+                                                  isUserCreated: Hive.box(
+                                                          'playlist')
+                                                      .containsKey(data.name));
 
                                               ref
                                                   .read(currentSongProvider
@@ -477,34 +481,36 @@ class _AlbumDetailsState extends ConsumerState<AlbumDetails> {
                                           child: CupertinoListTile(
                                             onTap: () {
                                               final song = SongModel(
-                                                link: data.songs
-                                                    .elementAt(index)
-                                                    .downloadUrl
-                                                    .last,
-                                                id: data.songs
-                                                    .elementAt(index)
-                                                    .id,
-                                                name: data.songs
-                                                    .elementAt(index)
-                                                    .name
-                                                    .split('(')[0],
-                                                imageUrl: data.songs
-                                                    .elementAt(index)
-                                                    .image,
-                                                duration: data.songs
-                                                    .elementAt(index)
-                                                    .duration,
-                                                artists: data.songs
-                                                    .elementAt(index)
-                                                    .artists,
-                                                playlistData: playlistData,
-                                                index: index,
-                                                shuffleMode: false,
-                                                playlistName: data.name,
-                                                year: data.songs
-                                                    .elementAt(index)
-                                                    .year,
-                                              );
+                                                  link: data.songs
+                                                      .elementAt(index)
+                                                      .downloadUrl
+                                                      .last,
+                                                  id: data.songs
+                                                      .elementAt(index)
+                                                      .id,
+                                                  name: data.songs
+                                                      .elementAt(index)
+                                                      .name
+                                                      .split('(')[0],
+                                                  imageUrl: data.songs
+                                                      .elementAt(index)
+                                                      .image,
+                                                  duration: data.songs
+                                                      .elementAt(index)
+                                                      .duration,
+                                                  artists: data.songs
+                                                      .elementAt(index)
+                                                      .artists,
+                                                  playlistData: playlistData,
+                                                  index: index,
+                                                  shuffleMode: false,
+                                                  playlistName: data.name,
+                                                  year: data.songs
+                                                      .elementAt(index)
+                                                      .year,
+                                                  isUserCreated: Hive.box(
+                                                          'playlist')
+                                                      .containsKey(data.name));
 
                                               ref
                                                   .read(currentSongProvider

@@ -44,7 +44,7 @@ class _PlaylistItemsPageState extends ConsumerState<PlaylistItemsPage> {
     bool darkMode = Hive.box('settings').get('darkMode');
     final song = ref.watch(currentSongProvider);
     ref.watch(currentSongProvider);
-    Box<Playlist> playlistBox = Hive.box('playlist');
+    Box<Playlist> playlistBox = Hive.box<Playlist>('playlist');
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
@@ -131,7 +131,8 @@ class _PlaylistItemsPageState extends ConsumerState<PlaylistItemsPage> {
                                       playlistData: widget.playlistData,
                                       index: 0,
                                       shuffleMode: false,
-                                      playlistName: widget.name
+                                      playlistName: widget.name,
+                                      isUserCreated: true
                                     );
                                     ref
                                         .read(currentSongProvider.notifier)
@@ -198,7 +199,8 @@ class _PlaylistItemsPageState extends ConsumerState<PlaylistItemsPage> {
                                       index: index,
                                       playlistData: widget.playlistData,
                                       shuffleMode: false,
-                                      playlistName: widget.name
+                                      playlistName: widget.name,
+                                      isUserCreated: true
                                     );
                                     ref
                                         .read(currentSongProvider.notifier)
