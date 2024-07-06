@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -30,6 +31,46 @@ class MusicPlayer extends ConsumerStatefulWidget {
 class _MusicPlayerState extends ConsumerState<MusicPlayer> {
   Box<SongModel> historyBox = Hive.box<SongModel>('history');
   bool _lyrics = false;
+  Timer? _sleepTimer;
+  Timer? _countdownTimer;
+
+  void startSleepTimer(Duration duration) {
+    _sleepTimer?.cancel();
+    _countdownTimer?.cancel();
+    ref.read(remainingTimeProvider.notifier).state = duration;
+    _sleepTimer = Timer(duration, () {
+      final audioService = ref.read(audioServiceProvider.notifier);
+      audioService?.pause();
+    });
+    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      final remainingTime = ref.read(remainingTimeProvider);
+      if (remainingTime.inSeconds > 0) {
+        ref.read(remainingTimeProvider.notifier).state =
+            remainingTime - const Duration(seconds: 1);
+      } else {
+        timer.cancel();
+      }
+    });
+  }
+
+  void showDialog(Widget child) {
+    showCupertinoModalPopup<void>(
+      context: context,
+      builder: (BuildContext context) => Container(
+        height: 300,
+        padding: const EdgeInsets.only(top: 6.0),
+        margin: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        color: CupertinoColors.systemBackground.resolveFrom(context),
+        child: SafeArea(
+          top: false,
+          child: child,
+        ),
+      ),
+    );
+    setState(() {});
+  }
 
   @override
   void initState() {
@@ -53,6 +94,13 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
   }
 
   @override
+  void dispose() {
+    _sleepTimer?.cancel();
+    _countdownTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final audioService = ref.watch(audioServiceProvider);
     final size = MediaQuery.of(context).size;
@@ -61,18 +109,19 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
     if (!historyBox.values.any((song) => song.id == widget.song.id)) {
       historyBox.add(
         SongModel(
-            link: widget.song.link,
-            id: widget.song.id,
-            name: widget.song.name.split('(')[0],
-            duration: widget.song.duration,
-            imageUrl: widget.song.imageUrl,
-            artists: widget.song.artists,
-            index: widget.song.index,
-            shuffleMode: widget.song.shuffleMode,
-            playlistName: widget.song.playlistName,
-            year: widget.song.year,
-            isUserCreated:
-                Hive.box<Playlist>('playlist').containsKey(widget.song.playlistName)),
+          link: widget.song.link,
+          id: widget.song.id,
+          name: widget.song.name.split('(')[0],
+          duration: widget.song.duration,
+          imageUrl: widget.song.imageUrl,
+          artists: widget.song.artists,
+          index: widget.song.index,
+          shuffleMode: widget.song.shuffleMode,
+          playlistName: widget.song.playlistName,
+          year: widget.song.year,
+          isUserCreated: Hive.box<Playlist>('playlist')
+              .containsKey(widget.song.playlistName),
+        ),
       );
     }
 
@@ -120,9 +169,8 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
                                               children: [
                                                 Container(
                                                   width: double.infinity,
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
-                                                          vertical: 10),
+                                                  padding: const EdgeInsets
+                                                      .symmetric(vertical: 10),
                                                   height: 300,
                                                   decoration: BoxDecoration(
                                                     color: CupertinoColors
@@ -136,21 +184,26 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
                                                         return NotificationListener<
                                                             ScrollMetricsNotification>(
                                                           child: FutureBuilder(
-                                                            future: searchLyrics(
-                                                                widget.song.id),
+                                                            future:
+                                                                searchLyrics(
+                                                                    widget.song
+                                                                        .id),
                                                             builder: (context,
                                                                 snapshot) {
                                                               if (snapshot
                                                                   .hasData) {
-                                                                lyrics = snapshot
-                                                                    .data!;
+                                                                lyrics =
+                                                                    snapshot
+                                                                        .data!;
                                                                 return Text(
-                                                                  snapshot.data!,
+                                                                  snapshot
+                                                                      .data!,
                                                                   style:
                                                                       TextStyle(
                                                                     color: AppPallete()
                                                                         .accentColor,
-                                                                    fontSize: 20,
+                                                                    fontSize:
+                                                                        20,
                                                                     fontWeight:
                                                                         FontWeight
                                                                             .bold,
@@ -172,7 +225,8 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
                                                               }
                                                               return Text(
                                                                 'No Lyrics Found!',
-                                                                style: TextStyle(
+                                                                style:
+                                                                    TextStyle(
                                                                   color: AppPallete()
                                                                       .secondaryColor,
                                                                 ),
@@ -202,7 +256,8 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
                                         ),
                                         ElevatedButton(
                                           style: ElevatedButton.styleFrom(
-                                              backgroundColor: Colors.transparent,
+                                              backgroundColor:
+                                                  Colors.transparent,
                                               elevation: 0),
                                           onPressed: () {
                                             setState(() {
@@ -212,7 +267,8 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
                                           child: Text(
                                             'Hide Lyrics',
                                             style: TextStyle(
-                                                color: AppPallete().accentColor),
+                                                color:
+                                                    AppPallete().accentColor),
                                           ),
                                         ),
                                       ],
@@ -290,7 +346,8 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
                       ],
                     ),
                     StreamBuilder<DurationState>(
-                      stream: audioService?.player.positionStream.map((position) {
+                      stream:
+                          audioService?.player.positionStream.map((position) {
                         return DurationState(
                           progress: position,
                           buffered: audioService.player.bufferedPosition,
@@ -299,9 +356,10 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
                       }),
                       builder: (context, snapshot) {
                         final durationState = snapshot.data;
-                        final progress = durationState?.progress ?? Duration.zero;
+                        final progress =
+                            durationState?.progress ?? Duration.zero;
                         final total = durationState?.total ?? Duration.zero;
-        
+
                         return Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: ProgressBar(
@@ -343,8 +401,8 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
                                         child: SizedBox(
                                           height: size.height * 0.5,
                                           child: ListView.builder(
-                                            itemCount: widget
-                                                .song.playlistData!.idList.length,
+                                            itemCount: widget.song.playlistData!
+                                                .idList.length,
                                             itemBuilder: (context, index) {
                                               Duration(
                                                 minutes: int.parse(
@@ -362,9 +420,10 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
                                                   borderRadius:
                                                       BorderRadius.circular(10),
                                                   child: CupertinoListTile(
-                                                    backgroundColor: AppPallete()
-                                                        .accentColor
-                                                        .withAlpha(75),
+                                                    backgroundColor:
+                                                        AppPallete()
+                                                            .accentColor
+                                                            .withAlpha(75),
                                                     onTap: () {
                                                       final songToGo = SongModel(
                                                           link: widget
@@ -372,10 +431,7 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
                                                               .playlistData!
                                                               .linkList
                                                               .elementAt(index),
-                                                          id: widget
-                                                              .song
-                                                              .playlistData!
-                                                              .idList
+                                                          id: widget.song.playlistData!.idList
                                                               .elementAt(index),
                                                           name: widget
                                                               .song
@@ -428,8 +484,8 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
                                                           .playlistData!
                                                           .imageUrlList
                                                           .elementAt(index),
-                                                      errorWidget:
-                                                          (context, url, error) {
+                                                      errorWidget: (context,
+                                                          url, error) {
                                                         return Image.asset(
                                                             'assets/song_thumb.png');
                                                       },
@@ -468,31 +524,69 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
                                         ),
                                       ));
                             }),
-                        IconButton(
-                          onPressed: () {
-                            List metadata = [
-                              widget.song.name,
-                              widget.song.artists,
-                              widget.song.playlistName,
-                              widget.song.duration,
-                              widget.song.imageUrl,
-                              widget.song.index,
-                              widget.song.year,
-                            ];
-                            download(
-                                widget.song.link,
-                                '${widget.song.name.trimRight()}.m4a',
-                                metadata,
-                                context);
-                            setState(() {});
-                          },
-                          icon: Icon(
-                            File('storage/emulated/0/Music/Melodia/${widget.song.name.trimRight()}.m4a')
-                                    .existsSync()
-                                ? Icons.download_done_rounded
-                                : Icons.download_rounded,
-                            color: AppPallete().accentColor,
-                          ),
+                        Row(
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                List metadata = [
+                                  widget.song.name,
+                                  widget.song.artists,
+                                  widget.song.playlistName,
+                                  widget.song.duration,
+                                  widget.song.imageUrl,
+                                  widget.song.index,
+                                  widget.song.year,
+                                ];
+                                download(
+                                    widget.song.link,
+                                    '${widget.song.name.trimRight()}.m4a',
+                                    metadata,
+                                    context);
+                                setState(() {});
+                              },
+                              icon: Icon(
+                                File('storage/emulated/0/Music/Melodia/${widget.song.name.trimRight()}.m4a')
+                                        .existsSync()
+                                    ? Icons.download_done_rounded
+                                    : Icons.download_rounded,
+                                color: AppPallete().accentColor,
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                showDialog(
+                                  Column(
+                                    children: [
+                                      CupertinoTimerPicker(
+                                        initialTimerDuration:
+                                            ref.watch(remainingTimeProvider),
+                                        onTimerDurationChanged: (value) {
+                                          ref
+                                              .read(sleepTimerProvider.notifier)
+                                              .state = value;
+                                        },
+                                      ),
+                                      CupertinoButton(
+                                        // padding: EdgeInsets.zero,
+                                        color: AppPallete().accentColor,
+                                        child: const Text("Start Timer"),
+                                        onPressed: () {
+                                          final duration =
+                                              ref.read(sleepTimerProvider);
+                                          startSleepTimer(duration);
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                              child: Icon(
+                                CupertinoIcons.clock_solid,
+                                color: AppPallete().accentColor,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),

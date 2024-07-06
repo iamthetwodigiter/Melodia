@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +25,60 @@ class OfflineMusicPlayer extends ConsumerStatefulWidget {
 }
 
 class _OfflineMusicPlayerState extends ConsumerState<OfflineMusicPlayer> {
+  Timer? _sleepTimer;
+  Timer? _countdownTimer;
+
+  void startSleepTimer(Duration duration) {
+    _sleepTimer?.cancel();
+    _countdownTimer?.cancel();
+    ref.read(remainingTimeProvider.notifier).state = duration;
+    _sleepTimer = Timer(duration, () {
+      final offlineAudioService =
+          ref.read(offlineAudioServiceProvider.notifier);
+      offlineAudioService?.pause();
+    });
+    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      final remainingTime = ref.read(remainingTimeProvider);
+      if (remainingTime.inSeconds > 0) {
+        ref.read(remainingTimeProvider.notifier).state =
+            remainingTime - const Duration(seconds: 1);
+      } else {
+        timer.cancel();
+      }
+    });
+  }
+
+  void showDialog(Widget child) {
+    showCupertinoModalPopup<void>(
+      context: context,
+      builder: (BuildContext context) => Container(
+        height: 300,
+        padding: const EdgeInsets.only(top: 6.0),
+        margin: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        color: CupertinoColors.systemBackground.resolveFrom(context),
+        child: SafeArea(
+          top: false,
+          child: child,
+        ),
+      ),
+    );
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _sleepTimer?.cancel();
+    _countdownTimer?.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final offlineAudioPlayer = ref.watch(offlineAudioServiceProvider);
@@ -84,7 +140,8 @@ class _OfflineMusicPlayerState extends ConsumerState<OfflineMusicPlayer> {
                 ],
               ),
               StreamBuilder<DurationState>(
-                stream: offlineAudioPlayer?.player.positionStream.map((position) {
+                stream:
+                    offlineAudioPlayer?.player.positionStream.map((position) {
                   return DurationState(
                     progress: position,
                     buffered: offlineAudioPlayer.player.bufferedPosition,
@@ -95,7 +152,7 @@ class _OfflineMusicPlayerState extends ConsumerState<OfflineMusicPlayer> {
                   final durationState = snapshot.data;
                   final progress = durationState?.progress ?? Duration.zero;
                   final total = durationState?.total ?? Duration.zero;
-        
+
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ProgressBar(
@@ -119,6 +176,44 @@ class _OfflineMusicPlayerState extends ConsumerState<OfflineMusicPlayer> {
               PlayerControls(
                 offlineAudioPlayer: offlineAudioPlayer!,
                 song: widget.song,
+              ),
+              TextButton(
+                onPressed: () => showDialog(
+                  Column(
+                    children: [
+                      CupertinoTimerPicker(
+                        initialTimerDuration: ref.watch(remainingTimeProvider),
+                        onTimerDurationChanged: (value) {
+                          ref.read(sleepTimerProvider.notifier).state = value;
+                        },
+                      ),
+                      CupertinoButton(
+                          color: AppPallete().accentColor,
+                          child: const Text("Start Timer"),
+                          onPressed: () {
+                            final duration = ref.read(sleepTimerProvider);
+                            startSleepTimer(duration);
+                            Navigator.of(context).pop();
+                          })
+                    ],
+                  ),
+                ),
+                child: SizedBox(
+                  width: 110,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Sleep Timer',
+                        style: TextStyle(color: AppPallete().accentColor),
+                      ),
+                      Icon(
+                        CupertinoIcons.clock_solid,
+                        color: AppPallete().accentColor,
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),
@@ -244,12 +339,11 @@ class _PlayerControlsState extends ConsumerState<PlayerControls> {
             );
           },
           icon: Icon(
-              _repeatMode == 2
-                  ? CupertinoIcons.repeat_1
-                  : CupertinoIcons.repeat,
-              color: _repeatMode == 0
-                  ? AppPallete().secondaryColor
-                  : CupertinoColors.activeBlue),
+            _repeatMode == 2 ? CupertinoIcons.repeat_1 : CupertinoIcons.repeat,
+            color: _repeatMode == 0
+                ? AppPallete().secondaryColor
+                : CupertinoColors.activeBlue,
+          ),
         ),
       ],
     );

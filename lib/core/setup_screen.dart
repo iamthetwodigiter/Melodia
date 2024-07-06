@@ -16,6 +16,8 @@ class _SetupScreenState extends State<SetupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+
     return CupertinoPageScaffold(
       child: Container(
         decoration: BoxDecoration(
@@ -64,53 +66,57 @@ class _SetupScreenState extends State<SetupScreen> {
               ],
             ),
             const SizedBox(height: 30),
-            Container(
-              height: 75,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color:darkMode ? CupertinoColors.darkBackgroundGray : CupertinoColors.lightBackgroundGray,
-                borderRadius: BorderRadius.circular(40),
-              ),
-              child: Row(
-                children: [
-                  const SizedBox(width: 10),
-                  GestureDetector(
-                    onPanUpdate: (details) {
-                      setState(() {
-                        _iconPosition += details.delta.dx;
-                        _textOpacity =
-                            (1 - (_iconPosition / 275)).clamp(0.0, 1.0);
-                      });
-                      if (_iconPosition >= 275) {
-                        Navigator.pushReplacement(
-                          context,
-                          CupertinoPageRoute(
-                              builder: (context) => const LandingScreen()),
-                        );
-                        Hive.box('settings').put('setup', false);
-                        
-                      }
-                    },
-                    child: Container(
-                        transform:
-                            Matrix4.translationValues(_iconPosition, 0, 0),
-                        padding: const EdgeInsets.all(17.5),
-                        decoration: const BoxDecoration(
-                          color: CupertinoColors.activeBlue,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Image.asset(
-                          'assets/chevron.png',
-                          height: 20,
-                          color: CupertinoColors.white,
-                        )),
-                  ),
-                  const SizedBox(width: 30),
-                  Opacity(
-                    opacity: _textOpacity,
-                    child: const Text('Swipe to Get Started'),
-                  ),
-                ],
+            Center(
+              child: Container(
+                height: 75,
+                width: size.width * 1,
+                decoration: BoxDecoration(
+                  color: darkMode
+                      ? CupertinoColors.darkBackgroundGray
+                      : CupertinoColors.lightBackgroundGray,
+                  borderRadius: BorderRadius.circular(40),
+                ),
+                child: Row(
+                  children: [
+                    const SizedBox(width: 10),
+                    GestureDetector(
+                      onPanUpdate: (details) {
+                        setState(() {
+                          _iconPosition += details.delta.dx;
+                          _textOpacity = (1 - (_iconPosition / size.width * 0.8))
+                              .clamp(0.0, 1.0);
+                        });
+                        if (_iconPosition >= size.width * 0.8) {
+                          Navigator.pushReplacement(
+                            context,
+                            CupertinoPageRoute(
+                              builder: (context) => const LandingScreen(),
+                            ),
+                          );
+                          Hive.box('settings').put('setup', false);
+                        }
+                      },
+                      child: Container(
+                          transform:
+                              Matrix4.translationValues(_iconPosition, 0, 0),
+                          padding: const EdgeInsets.all(17.5),
+                          decoration: const BoxDecoration(
+                            color: CupertinoColors.activeBlue,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Image.asset(
+                            'assets/chevron.png',
+                            height: 20,
+                            color: CupertinoColors.white,
+                          )),
+                    ),
+                    const SizedBox(width: 30),
+                    Opacity(
+                      opacity: _textOpacity,
+                      child: const Text('Swipe to Get Started'),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],

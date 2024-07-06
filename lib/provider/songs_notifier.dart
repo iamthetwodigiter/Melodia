@@ -31,3 +31,6 @@ final offlineAudioServiceProvider = ChangeNotifierProvider((ref) {
 });
 
 final isMinimisedProvider = StateProvider<bool>((ref) => false);
+
+final sleepTimerProvider = StateProvider<Duration>((ref) => Duration.zero);
+final remainingTimeProvider = StateProvider<Duration>((ref) => Duration.zero);

@@ -204,10 +204,10 @@ class _HomePageState extends ConsumerState<HomePage> {
                                   radius: 20.0,
                                   color: CupertinoColors.activeBlue),
                             ),
-                            error: (error, stack) => const SizedBox(
+                            error: (error, stack) => SizedBox(
                               height: 100,
                               child: Center(
-                                child: Text('Error occured!!'),
+                                child: Text('Error occured!!', style: TextStyle(color: AppPallete().accentColor),),
                               ),
                             ),
                           );
@@ -397,10 +397,10 @@ class _HomePageState extends ConsumerState<HomePage> {
                                   radius: 20.0,
                                   color: CupertinoColors.activeBlue),
                             ),
-                            error: (error, stack) => const SizedBox(
+                            error: (error, stack) => SizedBox(
                               height: 100,
                               child: Center(
-                                child: Text('Error occured!!'),
+                                child: Text('Error occured!!', style: TextStyle(color: AppPallete().accentColor),),
                               ),
                             ),
                           );
@@ -495,10 +495,10 @@ class _HomePageState extends ConsumerState<HomePage> {
                                   radius: 20.0,
                                   color: CupertinoColors.activeBlue),
                             ),
-                            error: (error, stack) => const SizedBox(
+                            error: (error, stack) => SizedBox(
                               height: 100,
                               child: Center(
-                                child: Text('Error occured!!'),
+                                child: Text('Error occured!!', style: TextStyle(color: AppPallete().accentColor),),
                               ),
                             ),
                           );

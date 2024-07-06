@@ -199,11 +199,17 @@ class _DownloadsPageState extends ConsumerState<DownloadsPage> {
                                     ),
                                     subtitle: Text(
                                       tags[index]!.artist!,
+                                      style: TextStyle(
+                                        color: darkMode
+                                            ? CupertinoColors.white
+                                            : AppPallete().accentColor,
+                                      ),
                                       maxLines: 1,
                                     ),
                                     trailing: IconButton(
                                       onPressed: () {
-                                        _showAlertDialog(context, _files[index]);
+                                        _showAlertDialog(
+                                            context, _files[index]);
                                         setState(() {});
                                       },
                                       icon: const Icon(
