@@ -44,3 +44,6 @@ app.*.map.json
 
 # User defined
 /lib/constants/
+firebase.json
+/lib/firebase_options.dart
+/android/app/google-services.json
