@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:melodia/core/color_pallete.dart';
 import 'package:melodia/player/view/offline_music_player.dart';
-import 'package:melodia/core/offline_music_slab.dart';
+import 'package:melodia/player/view/offline_music_slab.dart';
 import 'package:melodia/player/model/offline_song_model.dart';
 import 'package:melodia/player/widgets/custom_page_route.dart';
 import 'package:melodia/provider/files_provider.dart';
@@ -70,6 +70,37 @@ class _DownloadsPageState extends ConsumerState<DownloadsPage> {
     );
   }
 
+  void deleteAll(BuildContext context) {
+    showCupertinoModalPopup<void>(
+      context: context,
+      builder: (BuildContext context) => CupertinoAlertDialog(
+        title: const Text('Confirm Delete'),
+        content: const Text('Are you sure to delete all the downloaded songs?'),
+        actions: <CupertinoDialogAction>[
+          CupertinoDialogAction(
+            isDefaultAction: true,
+            onPressed: () {
+              Navigator.pop(context);
+              setState(() {});
+            },
+            child: const Text('No'),
+          ),
+          CupertinoDialogAction(
+            isDestructiveAction: true,
+            onPressed: () {
+              Directory('storage/emulated/0/Music/Melodia')
+                  .deleteSync(recursive: true);
+                  ref.watch(filesProvider.notifier).state = [];
+              Navigator.of(context).pop();
+              setState(() {});
+            },
+            child: const Text('Yes'),
+          ),
+        ],
+      ),
+    );
+  }
+
   void getArtwork(String filePath) async {
     Uint8List? artwork = await tagger.readArtwork(path: filePath);
     if (artwork == null) {
@@ -117,125 +148,159 @@ class _DownloadsPageState extends ConsumerState<DownloadsPage> {
         ),
       ),
       child: SafeArea(
-        child: Column(
-          children: [
-            Container(
-              height:
-                  offlineSong == null ? size.height * 0.9 : size.height * 0.82,
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: CustomScrollView(
-                slivers: [
-                  SliverToBoxAdapter(
-                    child: Container(
-                      padding: const EdgeInsets.all(10),
-                      child: Text(
-                        'Downloaded Songs',
-                        style: TextStyle(
-                          fontSize: 25,
-                          color: AppPallete().accentColor,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                  _files.isEmpty
-                      ? SliverToBoxAdapter(
-                          child: Container(
-                            height: size.height * 0.7,
-                            alignment: Alignment.center,
-                            child: Text(
-                              'No Downloads',
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Container(
+                height: offlineSong == null
+                    ? size.height * 0.9
+                    : size.height * 0.9 - 68,
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: CustomScrollView(
+                  slivers: [
+                    SliverToBoxAdapter(
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Downloaded Songs',
                               style: TextStyle(
                                 fontSize: 25,
+                                color: AppPallete().accentColor,
                                 fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                deleteAll(context);
+                                setState(() {});
+                              },
+                              icon: Icon(
+                                CupertinoIcons.delete_solid,
                                 color: AppPallete().accentColor,
                               ),
                             ),
-                          ),
-                        )
-                      : SliverList(
-                          delegate: SliverChildBuilderDelegate(
-                            (context, index) {
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: 5),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: CupertinoListTile(
-                                    onTap: () {
-                                      final offlineSong = OfflineSongModel(
+                          ],
+                        ),
+                      ),
+                    ),
+                    _files.isEmpty
+                        ? SliverToBoxAdapter(
+                            child: Container(
+                              height: size.height * 0.7,
+                              alignment: Alignment.center,
+                              child: Text(
+                                'No Downloads',
+                                style: TextStyle(
+                                  fontSize: 25,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppPallete().accentColor,
+                                ),
+                              ),
+                            ),
+                          )
+                        : SliverList(
+                            delegate: SliverChildBuilderDelegate(
+                              (context, index) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 5),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: CupertinoListTile(
+                                      onTap: () {
+                                        ref
+                                            .watch(currentSongProvider.notifier)
+                                            .state = null;
+                                        ref
+                                            .watch(isMinimisedProvider.notifier)
+                                            .state = false;
+                                        final offlineSong = OfflineSongModel(
                                           songList: _files,
                                           thumbList: thumbList,
                                           index: index,
-                                          tags: tags);
-                                      ref
-                                          .watch(offlineSongProvider.notifier)
-                                          .state = offlineSong;
-                                      Navigator.of(context).push(
-                                        CustomPageRoute(
-                                          page: OfflineMusicPlayer(
-                                              song: offlineSong),
-                                        ),
-                                      );
-                                    },
-                                    backgroundColor:
-                                        AppPallete().accentColor.withAlpha(20),
-                                    padding: const EdgeInsets.all(20),
-                                    leading: Image.memory(
-                                      thumbList[index]!,
-                                      height: 100,
-                                    ),
-                                    title: Text(
-                                      _files[index]
-                                          .path
-                                          .toString()
-                                          .replaceAll(
-                                              'storage/emulated/0/Music/Melodia/',
-                                              '')
-                                          .replaceAll('.m4a', ''),
-                                      style: TextStyle(
+                                          tags: tags,
+                                        );
+                                        ref
+                                            .watch(offlineSongProvider.notifier)
+                                            .state = offlineSong;
+                                        Navigator.of(context).push(
+                                          CustomPageRoute(
+                                            page: OfflineMusicPlayer(
+                                              song: offlineSong,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      backgroundColor: AppPallete()
+                                          .accentColor
+                                          .withAlpha(20),
+                                      padding: const EdgeInsets.all(20),
+                                      leading: Image.memory(
+                                        thumbList[index]!,
+                                        height: 100,
+                                        errorBuilder:
+                                            (context, error, stackTrace) {
+                                          return Image.asset(
+                                            'assets/song_thumb.png',
+                                            height: 150,
+                                          );
+                                        },
+                                      ),
+                                      title: Text(
+                                        _files[index]
+                                            .path
+                                            .toString()
+                                            .replaceAll(
+                                                'storage/emulated/0/Music/Melodia/',
+                                                '')
+                                            .replaceAll('.m4a', ''),
+                                        style: TextStyle(
+                                            color: darkMode
+                                                ? CupertinoColors.white
+                                                : AppPallete().accentColor),
+                                      ),
+                                      subtitle: Text(
+                                        tags[index]!.artist!,
+                                        style: TextStyle(
                                           color: darkMode
                                               ? CupertinoColors.white
-                                              : AppPallete().accentColor),
-                                    ),
-                                    subtitle: Text(
-                                      tags[index]!.artist!,
-                                      style: TextStyle(
-                                        color: darkMode
-                                            ? CupertinoColors.white
-                                            : AppPallete().accentColor,
+                                              : AppPallete().accentColor,
+                                        ),
+                                        maxLines: 1,
                                       ),
-                                      maxLines: 1,
-                                    ),
-                                    trailing: IconButton(
-                                      onPressed: () {
-                                        _showAlertDialog(
-                                            context, _files[index]);
-                                        setState(() {});
-                                      },
-                                      icon: const Icon(
-                                        CupertinoIcons.delete_solid,
-                                        color: CupertinoColors.destructiveRed,
+                                      trailing: IconButton(
+                                        onPressed: () {
+                                          _showAlertDialog(
+                                              context, _files[index]);
+                                          setState(() {});
+                                        },
+                                        icon: const Icon(
+                                          CupertinoIcons.delete_solid,
+                                          color: CupertinoColors.destructiveRed,
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              );
-                            },
-                            childCount: _files.length,
+                                );
+                              },
+                              childCount: _files.length,
+                            ),
                           ),
-                        ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            offlineSong != null
-                ? SizedBox(
-                    height: 65,
-                    child: OfflineMusicSlab(
-                      song: offlineSong,
-                    ),
-                  )
-                : Container()
-          ],
+              offlineSong != null
+                  ? SizedBox(
+                      height: 65,
+                      child: OfflineMusicSlab(
+                        song: offlineSong,
+                      ),
+                    )
+                  : Container()
+            ],
+          ),
         ),
       ),
     );

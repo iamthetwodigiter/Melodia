@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -70,6 +69,26 @@ class _OfflineMusicPlayerState extends ConsumerState<OfflineMusicPlayer> {
   @override
   void initState() {
     super.initState();
+    final audioService = ref.read(offlineAudioServiceProvider.notifier);
+    audioService?.player.playerStateStream.listen(
+      (state) {
+        if (state.processingState == ProcessingState.completed) {
+          WidgetsBinding.instance.addPostFrameCallback(
+            (_) async {
+              if (mounted) {
+                final nextSong = audioService.nextPlayback();
+                Navigator.pushReplacement(
+                  context,
+                  PlaybackRoute(
+                    builder: (context) => OfflineMusicPlayer(song: nextSong),
+                  ),
+                );
+              }
+            },
+          );
+        }
+      },
+    );
   }
 
   @override
@@ -91,131 +110,164 @@ class _OfflineMusicPlayerState extends ConsumerState<OfflineMusicPlayer> {
         .replaceAll(".m4a", "");
     final thumb = widget.song.thumbList.elementAt(index);
     final tag = widget.song.tags.elementAt(index);
+    final size = MediaQuery.of(context).size;
     return CupertinoPageScaffold(
       child: SafeArea(
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 20),
-          height: MediaQuery.of(context).size.height * 1,
-          width: double.infinity,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                icon: Icon(
-                  CupertinoIcons.chevron_down_circle_fill,
-                  color: AppPallete().accentColor,
-                ),
-              ),
-              thumb == null
-                  ? Image.asset(
-                      'assets/song_thumb.png',
-                      height: 50,
-                    )
-                  : ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Image.memory(
-                        thumb,
-                        height: 300,
-                      ),
-                    ),
-              Column(
+        child: SingleChildScrollView(
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 20),
+            height: size.height,
+            width: double.infinity,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    name,
-                    style: TextStyle(
-                      color: AppPallete().accentColor,
-                      fontSize: 25,
+                  SizedBox(
+                    height: size.height * 0.5,
+                    child: Column(
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          icon: Icon(
+                            CupertinoIcons.chevron_down_circle_fill,
+                            color: AppPallete().accentColor,
+                          ),
+                        ),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Image.memory(
+                            thumb!,
+                            height: size.height * 0.4,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Image.asset(
+                                'assets/song_thumb.png',
+                                height: 150,
+                              );
+                            },
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  Text(
-                    tag!.artist!,
-                    style: TextStyle(
-                      color: AppPallete().accentColor,
+                  SizedBox(height: size.height * 0.1),
+                  SizedBox(
+                    height: size.height * 0.4,
+                    child: Column(
+                      children: [
+                        Column(
+                          children: [
+                            Text(
+                              name,
+                              style: TextStyle(
+                                color: AppPallete().accentColor,
+                                fontSize: 25,
+                              ),
+                            ),
+                            Text(
+                              tag!.artist!,
+                              style: TextStyle(
+                                color: AppPallete().accentColor,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                        StreamBuilder<DurationState>(
+                          stream: offlineAudioPlayer?.player.positionStream
+                              .map((position) {
+                            return DurationState(
+                              progress: position,
+                              buffered:
+                                  offlineAudioPlayer.player.bufferedPosition,
+                              total: offlineAudioPlayer.player.duration ??
+                                  Duration.zero,
+                            );
+                          }),
+                          builder: (context, snapshot) {
+                            final durationState = snapshot.data;
+                            final progress =
+                                durationState?.progress ?? Duration.zero;
+                            final total = durationState?.total ?? Duration.zero;
+
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8),
+                              child: ProgressBar(
+                                progress: progress,
+                                buffered:
+                                    durationState?.buffered ?? Duration.zero,
+                                total: total,
+                                onSeek: offlineAudioPlayer?.player.seek,
+                                baseBarColor: CupertinoColors.inactiveGray,
+                                progressBarColor: AppPallete().accentColor,
+                                // bufferedBarColor:
+                                //     CupertinoColors.activeBlue.withAlpha(150),
+                                thumbColor: AppPallete().accentColor,
+                                thumbRadius: 10,
+                                timeLabelTextStyle: TextStyle(
+                                    color: AppPallete().secondaryColor),
+                                timeLabelPadding: 5,
+                              ),
+                            );
+                          },
+                        ),
+                        PlayerControls(
+                          offlineAudioPlayer: offlineAudioPlayer!,
+                          song: widget.song,
+                        ),
+                        // Spacer(),
+                        TextButton(
+                          onPressed: () => showDialog(
+                            Column(
+                              children: [
+                                CupertinoTimerPicker(
+                                  initialTimerDuration:
+                                      ref.watch(remainingTimeProvider),
+                                  onTimerDurationChanged: (value) {
+                                    ref
+                                        .read(sleepTimerProvider.notifier)
+                                        .state = value;
+                                  },
+                                ),
+                                CupertinoButton(
+                                  color: AppPallete().accentColor,
+                                  child: const Text("Start Timer"),
+                                  onPressed: () {
+                                    final duration =
+                                        ref.read(sleepTimerProvider);
+                                    startSleepTimer(duration);
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                          child: SizedBox(
+                            width: 110,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Sleep Timer',
+                                  style: TextStyle(
+                                      color: AppPallete().accentColor),
+                                ),
+                                Icon(
+                                  CupertinoIcons.clock_solid,
+                                  color: AppPallete().accentColor,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    textAlign: TextAlign.center,
                   ),
                 ],
               ),
-              StreamBuilder<DurationState>(
-                stream:
-                    offlineAudioPlayer?.player.positionStream.map((position) {
-                  return DurationState(
-                    progress: position,
-                    buffered: offlineAudioPlayer.player.bufferedPosition,
-                    total: offlineAudioPlayer.player.duration ?? Duration.zero,
-                  );
-                }),
-                builder: (context, snapshot) {
-                  final durationState = snapshot.data;
-                  final progress = durationState?.progress ?? Duration.zero;
-                  final total = durationState?.total ?? Duration.zero;
-
-                  return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ProgressBar(
-                      progress: progress,
-                      buffered: durationState?.buffered ?? Duration.zero,
-                      total: total,
-                      onSeek: offlineAudioPlayer?.player.seek,
-                      baseBarColor: CupertinoColors.inactiveGray,
-                      progressBarColor: AppPallete().accentColor,
-                      // bufferedBarColor:
-                      //     CupertinoColors.activeBlue.withAlpha(150),
-                      thumbColor: AppPallete().accentColor,
-                      thumbRadius: 10,
-                      timeLabelTextStyle:
-                          TextStyle(color: AppPallete().secondaryColor),
-                      timeLabelPadding: 5,
-                    ),
-                  );
-                },
-              ),
-              PlayerControls(
-                offlineAudioPlayer: offlineAudioPlayer!,
-                song: widget.song,
-              ),
-              TextButton(
-                onPressed: () => showDialog(
-                  Column(
-                    children: [
-                      CupertinoTimerPicker(
-                        initialTimerDuration: ref.watch(remainingTimeProvider),
-                        onTimerDurationChanged: (value) {
-                          ref.read(sleepTimerProvider.notifier).state = value;
-                        },
-                      ),
-                      CupertinoButton(
-                          color: AppPallete().accentColor,
-                          child: const Text("Start Timer"),
-                          onPressed: () {
-                            final duration = ref.read(sleepTimerProvider);
-                            startSleepTimer(duration);
-                            Navigator.of(context).pop();
-                          })
-                    ],
-                  ),
-                ),
-                child: SizedBox(
-                  width: 110,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Sleep Timer',
-                        style: TextStyle(color: AppPallete().accentColor),
-                      ),
-                      Icon(
-                        CupertinoIcons.clock_solid,
-                        color: AppPallete().accentColor,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -291,7 +343,7 @@ class _PlayerControlsState extends ConsumerState<PlayerControls> {
             );
           },
           icon: Icon(CupertinoIcons.backward_end_fill,
-              size: 30, color: AppPallete().secondaryColor),
+              size: 25, color: AppPallete().secondaryColor),
         ),
         IconButton(
           onPressed: () {
@@ -304,7 +356,7 @@ class _PlayerControlsState extends ConsumerState<PlayerControls> {
               !isPlaying
                   ? CupertinoIcons.play_circle_fill
                   : CupertinoIcons.pause_circle_fill,
-              size: 60,
+              size: 50,
               color: AppPallete().secondaryColor),
         ),
         IconButton(
@@ -323,7 +375,7 @@ class _PlayerControlsState extends ConsumerState<PlayerControls> {
           },
           icon: Icon(
             CupertinoIcons.forward_end_fill,
-            size: 30,
+            size: 25,
             color: AppPallete().secondaryColor,
           ),
         ),

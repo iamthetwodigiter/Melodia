@@ -17,6 +17,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:workmanager/workmanager.dart';
 import 'package:http/http.dart' as http;
+import 'dart:async';
 
 void callbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
@@ -44,7 +45,8 @@ Future<bool> checkForUpdates() async {
       }
     }
   } catch (e) {
-    print('Error checking GitHub releases: $e');
+    // print('Error checking GitHub releases: $e');
+    throw Exception(e);
   }
 
   return false;

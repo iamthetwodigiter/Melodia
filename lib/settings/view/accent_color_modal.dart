@@ -86,6 +86,7 @@ class AccentColorModal extends StatelessWidget {
                   color2: CupertinoColors.systemYellow.withAlpha(200),
                   color3: CupertinoColors.systemYellow.withAlpha(150),
                 ),
+                const SizedBox(height: 15),
               ],
             ),
           ),

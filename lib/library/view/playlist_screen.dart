@@ -5,7 +5,7 @@ import 'package:hive/hive.dart';
 import 'package:melodia/album/model/playlist_model.dart';
 import 'package:melodia/core/color_pallete.dart';
 import 'package:melodia/download/view/downloads_page.dart';
-import 'package:melodia/core/offline_music_slab.dart';
+import 'package:melodia/player/view/offline_music_slab.dart';
 import 'package:melodia/player/view/mini_player.dart';
 import 'package:melodia/library/view/playlist_items_page.dart';
 import 'package:melodia/provider/dark_mode_provider.dart';
@@ -80,7 +80,7 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> {
                   child: SizedBox(
                     height: song == null && offlineSong == null
                         ? size.height * 0.852
-                        : (size.height * 0.875) - 85,
+                        : (size.height) * 0.852 - 65,
                     child: SingleChildScrollView(
                       child: Column(
                         children: [
@@ -359,12 +359,12 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> {
                     ? Container(
                         color: Colors.transparent,
                         padding: EdgeInsets.zero,
-                        height: size.height * 0.075,
+                        height: 60,
                         child: const MiniPlayer(),
                       )
                     : offlineSong != null
                         ? SizedBox(
-                            height: 65,
+                            height: 60,
                             child: OfflineMusicSlab(
                               song: ref.watch(offlineSongProvider)!,
                             ),

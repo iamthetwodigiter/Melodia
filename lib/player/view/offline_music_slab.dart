@@ -30,8 +30,10 @@ class _OfflineMusicSlabState extends ConsumerState<OfflineMusicSlab> {
     bool isPlaying = ref.watch(offlineAudioServiceProvider)!.player.playing;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(10),
+      child: Container(
+        decoration: BoxDecoration(
+            border: Border.all(color: AppPallete().accentColor, width: 0.5),
+            borderRadius: BorderRadius.circular(10)),
         child: CupertinoListTile(
           onTap: () {
             Navigator.push(
@@ -45,9 +47,14 @@ class _OfflineMusicSlabState extends ConsumerState<OfflineMusicSlab> {
           },
           backgroundColor: AppPallete().accentColor.withAlpha(20),
           padding: const EdgeInsets.all(10),
-          leading: thumb == null
-              ? Image.asset('assets/song_thumb.png')
-              : Image.memory(thumb),
+          leading: Image.memory(
+            thumb!,
+            errorBuilder: (context, error, stackTrace) {
+              return Image.asset(
+                'assets/song_thumb.png',
+              );
+            },
+          ),
           title: Text(
             name,
             style: TextStyle(

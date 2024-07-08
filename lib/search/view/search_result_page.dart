@@ -73,11 +73,16 @@ class _SearchResultsState extends ConsumerState<SearchResults> {
       child: SafeArea(
         child: CustomScrollView(
           slivers: [
-            const SliverToBoxAdapter(
+            SliverToBoxAdapter(
               child: CupertinoNavigationBar(
                 previousPageTitle: 'Search',
                 middle: Text(
                   'Search Results',
+                  style: TextStyle(
+                    color: darkMode
+                        ? CupertinoColors.white
+                        : AppPallete().accentColor,
+                  ),
                 ),
               ),
             ),
@@ -105,7 +110,8 @@ class _SearchResultsState extends ConsumerState<SearchResults> {
                             Navigator.pushReplacement(
                               context,
                               CupertinoPageRoute(
-                                builder: (context) => SearchResults(query: value),
+                                builder: (context) =>
+                                    SearchResults(query: value),
                               ),
                             );
                           }
@@ -117,13 +123,13 @@ class _SearchResultsState extends ConsumerState<SearchResults> {
                         future: searchResult(widget.query),
                         builder: (context, AsyncSnapshot snapshot) {
                           if (snapshot.hasError) {
-                            return Center(child: Text(snapshot.error.toString()));
+                            return const Center(child: Text('Error occured!'));
                           } else if (snapshot.connectionState ==
                               ConnectionState.waiting) {
                             return const Center(
                                 child: CupertinoActivityIndicator());
                           }
-        
+
                           final List<SongsResult> songs = snapshot.data!.songs;
                           return SizedBox(
                             height: size.height * 0.8,
@@ -139,6 +145,9 @@ class _SearchResultsState extends ConsumerState<SearchResults> {
                                     borderRadius: BorderRadius.circular(10),
                                     child: CupertinoListTile(
                                       onTap: () async {
+                                        ref
+                                            .watch(offlineSongProvider.notifier)
+                                            .state = null;
                                         // Show a loading indicator while fetching data
                                         showCupertinoDialog(
                                           context: context,
@@ -146,41 +155,46 @@ class _SearchResultsState extends ConsumerState<SearchResults> {
                                             child: CupertinoActivityIndicator(),
                                           ),
                                         );
-        
+
                                         try {
                                           final updatedPlaylist =
                                               await fetchAndCreatePlaylist(
                                                   songs.elementAt(index).id);
-        
+
                                           final song = SongModel(
-                                            link: songs
-                                                .elementAt(index)
-                                                .downloadUrls
-                                                .last,
-                                            id: songs.elementAt(index).id,
-                                            name: songs
-                                                .elementAt(index)
-                                                .title
-                                                .split('(')[0],
-                                            imageUrl:
-                                                songs.elementAt(index).imageUrl,
-                                            duration:
-                                                songs.elementAt(index).duration,
-                                            artists:
-                                                songs.elementAt(index).artist,
-                                            index: index,
-                                            playlistData: updatedPlaylist,
-                                            shuffleMode: false,
-                                            playlistName: songs.elementAt(index).album,
-                                            year: songs.elementAt(index).year,
-                                            isUserCreated: false
-                                          );
-        
+                                              link: songs
+                                                  .elementAt(index)
+                                                  .downloadUrls
+                                                  .last,
+                                              id: songs.elementAt(index).id,
+                                              name: songs
+                                                  .elementAt(index)
+                                                  .title
+                                                  .split('(')[0],
+                                              imageUrl: songs
+                                                  .elementAt(index)
+                                                  .imageUrl,
+                                              duration: songs
+                                                  .elementAt(index)
+                                                  .duration,
+                                              artists:
+                                                  songs.elementAt(index).artist,
+                                              index: index,
+                                              playlistData: updatedPlaylist,
+                                              shuffleMode: false,
+                                              playlistName:
+                                                  songs.elementAt(index).album,
+                                              year: songs.elementAt(index).year,
+                                              isUserCreated: false);
+
                                           ref
-                                              .read(currentSongProvider.notifier)
+                                              .read(
+                                                  currentSongProvider.notifier)
                                               .state = song;
-                                          ref.watch(audioServiceProvider)!.play();
-        
+                                          ref
+                                              .watch(audioServiceProvider)!
+                                              .play();
+
                                           // Close the loading indicator and then navigate
                                           Navigator.of(context).pop();
                                           Navigator.of(context).push(
@@ -193,11 +207,13 @@ class _SearchResultsState extends ConsumerState<SearchResults> {
                                               .pop(); // Close the loading indicator in case of error
                                         }
                                       },
-                                      backgroundColor:
-                                          AppPallete().accentColor.withAlpha(20),
+                                      backgroundColor: AppPallete()
+                                          .accentColor
+                                          .withAlpha(20),
                                       padding: const EdgeInsets.all(15),
                                       leading: CachedNetworkImage(
-                                        imageUrl: songs.elementAt(index).imageUrl,
+                                        imageUrl:
+                                            songs.elementAt(index).imageUrl,
                                         height: 50,
                                         placeholder: (context, url) {
                                           return const SizedBox(width: 60);
@@ -221,7 +237,10 @@ class _SearchResultsState extends ConsumerState<SearchResults> {
                                         ),
                                       ),
                                       subtitle: Text(
-                                        songs.elementAt(index).artist.join(", "),
+                                        songs
+                                            .elementAt(index)
+                                            .artist
+                                            .join(", "),
                                         style: TextStyle(
                                           color: darkMode
                                               ? AppPallete.subtitleDarkTextColor
@@ -234,12 +253,13 @@ class _SearchResultsState extends ConsumerState<SearchResults> {
                                             padding: EdgeInsets.zero,
                                             onPressed: () {
                                               if (!songExists) {
-                                                final updatedPlaylist = Playlist(
-                                                  idList:
-                                                      List.from(favorites.idList)
-                                                        ..add(songs
-                                                            .elementAt(index)
-                                                            .id),
+                                                final updatedPlaylist =
+                                                    Playlist(
+                                                  idList: List.from(
+                                                      favorites.idList)
+                                                    ..add(songs
+                                                        .elementAt(index)
+                                                        .id),
                                                   linkList: List.from(
                                                       favorites.linkList)
                                                     ..add(songs
@@ -268,15 +288,16 @@ class _SearchResultsState extends ConsumerState<SearchResults> {
                                                         .elementAt(index)
                                                         .duration),
                                                 );
-                                                playlistBox.put(
-                                                    'Favorites', updatedPlaylist);
+                                                playlistBox.put('Favorites',
+                                                    updatedPlaylist);
                                               } else {
-                                                final updatedPlaylist = Playlist(
-                                                  idList:
-                                                      List.from(favorites.idList)
-                                                        ..remove(songs
-                                                            .elementAt(index)
-                                                            .id),
+                                                final updatedPlaylist =
+                                                    Playlist(
+                                                  idList: List.from(
+                                                      favorites.idList)
+                                                    ..remove(songs
+                                                        .elementAt(index)
+                                                        .id),
                                                   linkList: List.from(
                                                       favorites.linkList)
                                                     ..remove(songs
@@ -305,8 +326,8 @@ class _SearchResultsState extends ConsumerState<SearchResults> {
                                                         .elementAt(index)
                                                         .duration),
                                                 );
-                                                playlistBox.put(
-                                                    'Favorites', updatedPlaylist);
+                                                playlistBox.put('Favorites',
+                                                    updatedPlaylist);
                                               }
                                               setState(() {});
                                             },
@@ -314,15 +335,16 @@ class _SearchResultsState extends ConsumerState<SearchResults> {
                                               songExists
                                                   ? CupertinoIcons.heart_fill
                                                   : CupertinoIcons.heart,
-                                              color:
-                                                  CupertinoColors.destructiveRed,
+                                              color: CupertinoColors
+                                                  .destructiveRed,
                                             ),
                                           ),
                                           IconButton(
                                             onPressed: () {
                                               showCupertinoModalPopup(
                                                 context: context,
-                                                builder: (BuildContext context) {
+                                                builder:
+                                                    (BuildContext context) {
                                                   if (playlistBox.length != 0) {
                                                     return CupertinoActionSheet(
                                                       actions: [
@@ -343,9 +365,9 @@ class _SearchResultsState extends ConsumerState<SearchResults> {
                                                                           .keys
                                                                           .toList();
                                                                   return CupertinoActionSheet(
-                                                                    actions: playlists
-                                                                        .map(
-                                                                            (name) {
+                                                                    actions:
+                                                                        playlists
+                                                                            .map((name) {
                                                                       final currentPlaylist =
                                                                           playlistBox
                                                                               .get(name);
@@ -357,10 +379,9 @@ class _SearchResultsState extends ConsumerState<SearchResults> {
                                                                             bool
                                                                                 songExists =
                                                                                 currentPlaylist.idList.contains(songs.elementAt(index).id);
-        
+
                                                                             if (!songExists) {
-                                                                              final updatedPlaylist =
-                                                                                  Playlist(
+                                                                              final updatedPlaylist = Playlist(
                                                                                 idList: List.from(currentPlaylist.idList)..add(songs.elementAt(index).id),
                                                                                 linkList: List.from(currentPlaylist.linkList)..add(songs.elementAt(index).downloadUrls.last),
                                                                                 imageUrlList: List.from(currentPlaylist.imageUrlList)..add(songs.elementAt(index).imageUrl),
@@ -368,25 +389,22 @@ class _SearchResultsState extends ConsumerState<SearchResults> {
                                                                                 artistsList: List.from(currentPlaylist.artistsList)..add(songs.elementAt(index).artist),
                                                                                 durationList: List.from(currentPlaylist.durationList)..add(songs.elementAt(index).duration),
                                                                               );
-                                                                              playlistBox.put(name,
-                                                                                  updatedPlaylist);
+                                                                              playlistBox.put(name, updatedPlaylist);
                                                                             }
-        
-                                                                            Navigator.pop(
-                                                                                context);
+
+                                                                            Navigator.pop(context);
                                                                           },
-                                                                          child: Text(
-                                                                              name),
+                                                                          child:
+                                                                              Text(name),
                                                                         );
                                                                       } else {
                                                                         return CupertinoActionSheetAction(
                                                                           onPressed:
                                                                               () {
-                                                                            Navigator.pop(
-                                                                                context);
+                                                                            Navigator.pop(context);
                                                                           },
-                                                                          child: const Text(
-                                                                              'Error: Playlist not found'),
+                                                                          child:
+                                                                              const Text('Error: Playlist not found'),
                                                                         );
                                                                       }
                                                                     }).toList(),
@@ -394,8 +412,7 @@ class _SearchResultsState extends ConsumerState<SearchResults> {
                                                                         CupertinoActionSheetAction(
                                                                       onPressed:
                                                                           () {
-                                                                        Navigator.of(
-                                                                                context)
+                                                                        Navigator.of(context)
                                                                             .pop();
                                                                       },
                                                                       isDestructiveAction:
@@ -421,8 +438,7 @@ class _SearchResultsState extends ConsumerState<SearchResults> {
                                                                         CupertinoActionSheetAction(
                                                                       onPressed:
                                                                           () {
-                                                                        Navigator.of(
-                                                                                context)
+                                                                        Navigator.of(context)
                                                                             .pop();
                                                                       },
                                                                       isDestructiveAction:
@@ -449,9 +465,10 @@ class _SearchResultsState extends ConsumerState<SearchResults> {
                                                           Navigator.of(context)
                                                               .pop();
                                                         },
-                                                        isDestructiveAction: true,
-                                                        child:
-                                                            const Text('Cancel'),
+                                                        isDestructiveAction:
+                                                            true,
+                                                        child: const Text(
+                                                            'Cancel'),
                                                       ),
                                                     );
                                                   }
@@ -478,7 +495,8 @@ class _SearchResultsState extends ConsumerState<SearchResults> {
                                                             .pop();
                                                       },
                                                       isDestructiveAction: true,
-                                                      child: const Text('Cancel'),
+                                                      child:
+                                                          const Text('Cancel'),
                                                     ),
                                                   );
                                                 },

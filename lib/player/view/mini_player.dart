@@ -16,131 +16,94 @@ class MiniPlayer extends ConsumerStatefulWidget {
 
 class _MiniPlayerState extends ConsumerState<MiniPlayer> {
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final song = ref.watch(currentSongProvider);
     bool isPlaying = ref.watch(audioServiceProvider.notifier)!.player.playing;
     final audioService = ref.watch(audioServiceProvider);
-    final size = MediaQuery.of(context).size;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Container(
+        decoration: BoxDecoration(
+            border: Border.all(color: AppPallete().accentColor, width: 0.5),
+            borderRadius: BorderRadius.circular(10)),
+        child: CupertinoListTile(
+          onTap: () {
+            ref.read(isMinimisedProvider.notifier).state = false;
 
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 10),
-      padding: EdgeInsets.zero.copyWith(left: 10),
-      decoration: BoxDecoration(
-        color: AppPallete().accentColor.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppPallete().accentColor, width: 0.15),
-      ),
-      child: TextButton(
-        style: const ButtonStyle(
-          padding: MaterialStatePropertyAll(EdgeInsets.zero),
-        ),
-        onPressed: () {
-          ref.read(isMinimisedProvider.notifier).state = false;
-          
-          Navigator.of(context).push(
-            CustomPageRoute(
-              page: MusicPlayer(song: song),
-            ),
-            
-          );
-        },
-        child: SizedBox(
-          height: 75,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: size.width * 0.6),
-                child: Row(
+            Navigator.of(context).push(
+              CustomPageRoute(
+                page: MusicPlayer(song: song),
+              ),
+            );
+          },
+          leading: CachedNetworkImage(
+            imageUrl: song!.imageUrl,
+            height: 60,
+            placeholder: (context, url) {
+              return const SizedBox(width: 60);
+            },
+            errorWidget: (context, url, error) {
+              return SizedBox(
+                width: 60,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(5),
-                      child: CachedNetworkImage(
-                        imageUrl: song!.imageUrl,
-                        height: 60,
-                        placeholder: (context, url) {
-                          return const SizedBox(width: 60);
-                        },
-                        errorWidget: (context, url, error) {
-                          return SizedBox(
-                            width: 60,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  CupertinoIcons.nosign,
-                                  color: AppPallete().accentColor,
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Flexible(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            song.name,
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: AppPallete().accentColor,
-                            ),
-                            softWrap: true,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          Text(
-                            song.artists.join(", "),
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: AppPallete().accentColor,
-                            ),
-                            softWrap: true,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ),
+                    Icon(
+                      CupertinoIcons.nosign,
+                      color: AppPallete().accentColor,
                     ),
                   ],
                 ),
+              );
+            },
+          ),
+          backgroundColor: AppPallete().accentColor.withAlpha(20),
+          padding: const EdgeInsets.all(10),
+          title: Text(
+            song.name,
+            style: TextStyle(
+              color: AppPallete().accentColor,
+            ),
+            maxLines: 1,
+          ),
+          subtitle: Text(
+            song.artists.join(", "),
+            style: TextStyle(
+              color: AppPallete().accentColor,
+            ),
+            maxLines: 1,
+          ),
+          trailing: Row(
+            children: [
+              IconButton(
+                padding: EdgeInsets.zero,
+                onPressed: () {
+                  if (isPlaying) {
+                    audioService!.pause();
+                  } else {
+                    audioService!.play();
+                  }
+                },
+                icon: Icon(
+                  isPlaying
+                      ? CupertinoIcons.pause_fill
+                      : CupertinoIcons.play_fill,
+                  color: AppPallete().accentColor,
+                ),
               ),
-              ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: size.width * 0.3),
-                child: Row(
-                  children: [
-                    IconButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: () {
-                        if (isPlaying) {
-                          audioService!.pause();
-                        } else {
-                          audioService!.play();
-                        }
-                      },
-                      icon: Icon(
-                        isPlaying
-                            ? CupertinoIcons.pause_fill
-                            : CupertinoIcons.play_fill,
-                        color: AppPallete().accentColor,
-                        size: 25,
-                      ),
-                    ),
-                    IconButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: () {
-                        ref.read(currentSongProvider.notifier).state = null;
-                      },
-                      icon: Icon(
-                        Icons.close,
-                        color: AppPallete().accentColor,
-                      ),
-                    ),
-                  ],
+              IconButton(
+                padding: EdgeInsets.zero,
+                onPressed: () {
+                  ref.read(currentSongProvider.notifier).state = null;
+                },
+                icon: Icon(
+                  CupertinoIcons.multiply,
+                  color: AppPallete().accentColor,
                 ),
               ),
             ],

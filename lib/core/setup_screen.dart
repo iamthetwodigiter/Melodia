@@ -83,10 +83,10 @@ class _SetupScreenState extends State<SetupScreen> {
                       onPanUpdate: (details) {
                         setState(() {
                           _iconPosition += details.delta.dx;
-                          _textOpacity = (1 - (_iconPosition / size.width * 0.75))
+                          _textOpacity = (1 - (_iconPosition / size.width * 0.68))
                               .clamp(0.0, 1.0);
                         });
-                        if (_iconPosition >= size.width * 0.75) {
+                        if (_iconPosition >= size.width * 0.68) {
                           Navigator.pushReplacement(
                             context,
                             CupertinoPageRoute(

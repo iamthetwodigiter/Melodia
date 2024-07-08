@@ -24,12 +24,15 @@ Future<void> sendNotificationToUsers(String message) async {
     );
 
     if (response.statusCode == 200) {
-      print('Notification sent successfully');
+      // print('Notification sent successfully');
+      throw Exception('Notification sent');
     } else {
-      print('Failed to send notification. Status code: ${response.statusCode}');
-      print('Response body: ${response.body}');
+      // print('Failed to send notification. Status code: ${response.statusCode}');
+      // print('Response body: ${response.body}');
+      throw Exception(response.body);
     }
   } catch (e) {
-    print('Error sending notification: $e');
+    // print('Error sending notification: $e');
+    throw Exception(e);
   }
 }
