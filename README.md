@@ -2,6 +2,8 @@
 
 Music Streaming App created with Flutter 💙
 
+![GitHub All Releases](https://img.shields.io/github/downloads/iamthetwodigiter/melodia/total?label=Downloads&logo=GitHub)
+
 ## Features
 
 - Stream Music in [12, 48, 96, 160, 320] kbps qualities
