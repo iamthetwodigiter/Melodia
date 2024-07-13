@@ -142,7 +142,6 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
     }
 
     return CupertinoPageScaffold(
-      // backgroundColor: AppPallete.scaffoldDarkBackground,
       child: SafeArea(
         child: Container(
           height: size.height,
@@ -154,6 +153,7 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
                 IconButton(
                   onPressed: () {
                     ref.read(currentSongProvider.notifier).state = widget.song;
+                    ref.read(downloadDoneProvider.notifier).state = false;
                     Navigator.pop(context);
                   },
                   icon: Icon(
@@ -284,8 +284,8 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
                                           child: Text(
                                             'Hide Lyrics',
                                             style: TextStyle(
-                                                color:
-                                                    AppPallete().accentColor),
+                                              color: AppPallete().accentColor,
+                                            ),
                                           ),
                                         ),
                                       ],
@@ -386,7 +386,7 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
                                   durationState?.progress ?? Duration.zero;
                               final total =
                                   durationState?.total ?? Duration.zero;
-          
+
                               return Padding(
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 10),
@@ -523,7 +523,8 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
                                                           errorWidget: (context,
                                                               url, error) {
                                                             return Image.asset(
-                                                                'assets/song_thumb.png');
+                                                              'assets/song_thumb.png',
+                                                            );
                                                           },
                                                         ),
                                                         title: Text(
@@ -569,6 +570,8 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
                                 children: [
                                   IconButton(
                                     onPressed: () {
+                                      final file = File(
+                                          'storage/emulated/0/Music/Melodia/${widget.song.name.trimRight()}.m4a');
                                       List metadata = [
                                         widget.song.name,
                                         widget.song.artists,
@@ -578,13 +581,19 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
                                         widget.song.index,
                                         widget.song.year,
                                       ];
-                                      download(
-                                        widget.song.link,
-                                        '${widget.song.name.trimRight()}.m4a',
-                                        metadata,
-                                        context,
-                                        updateProgress,
-                                      );
+                                      file.existsSync()
+                                          ? {
+                                              file.delete(),
+                                              showCupertinoCenterPopup(context, '${widget.song.name} deleted', Icons.download_done_rounded),
+                                              ref.read(downloadDoneProvider.notifier).state = false
+                                            }
+                                          : download(
+                                              widget.song.link,
+                                              '${widget.song.name.trimRight()}.m4a',
+                                              metadata,
+                                              context,
+                                              onProgress: updateProgress,
+                                            );
                                       setState(() {});
                                     },
                                     icon: Stack(
@@ -593,8 +602,10 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
                                         Icon(
                                           File('storage/emulated/0/Music/Melodia/${widget.song.name.trimRight()}.m4a')
                                                       .existsSync() ||
-                                                  ref.watch(
-                                                      downloadDoneProvider)
+                                                  ref
+                                                      .read(downloadDoneProvider
+                                                          .notifier)
+                                                      .state
                                               ? Icons.download_done_rounded
                                               : Icons.download_rounded,
                                           color: AppPallete().accentColor,

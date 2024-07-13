@@ -21,16 +21,16 @@ class DownloadsPage extends ConsumerStatefulWidget {
 }
 
 class _DownloadsPageState extends ConsumerState<DownloadsPage> {
-  Directory downloadsDir = Directory('storage/emulated/0/Music/Melodia');
   List<File> _files = [];
   List<Uint8List?> thumbList = [];
   final tagger = Audiotagger();
   List<Tag?> tags = [];
+  int index = 0;
 
   @override
   void initState() {
     super.initState();
-    _listFiles();
+    _listFiles(index);
     for (var items in _files) {
       getArtwork(items.path);
       getMetadata(items.path);
@@ -75,7 +75,7 @@ class _DownloadsPageState extends ConsumerState<DownloadsPage> {
       context: context,
       builder: (BuildContext context) => CupertinoAlertDialog(
         title: const Text('Confirm Delete'),
-        content: const Text('Are you sure to delete all the downloaded songs?'),
+        content: const Text('Are you sure to delete all the songs?'),
         actions: <CupertinoDialogAction>[
           CupertinoDialogAction(
             isDefaultAction: true,
@@ -88,9 +88,11 @@ class _DownloadsPageState extends ConsumerState<DownloadsPage> {
           CupertinoDialogAction(
             isDestructiveAction: true,
             onPressed: () {
+              index == 0 ?
               Directory('storage/emulated/0/Music/Melodia')
+                  .deleteSync(recursive: true) : Directory('storage/emulated/0/Music')
                   .deleteSync(recursive: true);
-                  ref.watch(filesProvider.notifier).state = [];
+              ref.watch(filesProvider.notifier).state = [];
               Navigator.of(context).pop();
               setState(() {});
             },
@@ -116,7 +118,10 @@ class _DownloadsPageState extends ConsumerState<DownloadsPage> {
     setState(() {});
   }
 
-  void _listFiles() async {
+  void _listFiles(int index) async {
+    Directory downloadsDir = index == 0
+        ? Directory('storage/emulated/0/Music/Melodia')
+        : Directory('storage/emulated/0/Music');
     final List<FileSystemEntity> entities = downloadsDir.listSync().toList();
     _files = entities.whereType<File>().toList();
     setState(() {});
@@ -140,12 +145,31 @@ class _DownloadsPageState extends ConsumerState<DownloadsPage> {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         previousPageTitle: 'Library',
-        middle: Text(
-          'Downloads',
-          style: TextStyle(
-            color: darkMode ? CupertinoColors.white : AppPallete().accentColor,
-          ),
-        ),
+        middle: CupertinoSlidingSegmentedControl(
+          children: <String, Text>{
+              'Downloads': Text(
+                'Downloads',
+                style: TextStyle(
+                  color: AppPallete().accentColor,
+                ),
+              ),
+              'All': Text(
+                'All',
+                style: TextStyle(
+                  color: AppPallete().accentColor,
+                ),
+              ),
+            },
+            onValueChanged: (value) {
+              setState(() {
+                index = value == 'Downloads' ? 0 : 1;
+              });
+              _listFiles(index);
+              for (var items in _files) {
+                getArtwork(items.path);
+                getMetadata(items.path);
+              }
+            }),
       ),
       child: SafeArea(
         child: SingleChildScrollView(
@@ -164,8 +188,8 @@ class _DownloadsPageState extends ConsumerState<DownloadsPage> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              'Downloaded Songs',
+                            Text(index == 0 ?
+                              'Melodia Downloads' : 'All Songs',
                               style: TextStyle(
                                 fontSize: 25,
                                 color: AppPallete().accentColor,
@@ -236,7 +260,7 @@ class _DownloadsPageState extends ConsumerState<DownloadsPage> {
                                       backgroundColor: AppPallete()
                                           .accentColor
                                           .withAlpha(20),
-                                      padding: const EdgeInsets.all(20),
+                                      padding: const EdgeInsets.all(10),
                                       leading: Image.memory(
                                         thumbList[index]!,
                                         height: 100,
@@ -253,13 +277,15 @@ class _DownloadsPageState extends ConsumerState<DownloadsPage> {
                                             .path
                                             .toString()
                                             .replaceAll(
-                                                'storage/emulated/0/Music/Melodia/',
-                                                '')
+                                                'storage/emulated/0/Music/', '')
+                                            .replaceAll('Melodia/', '')
                                             .replaceAll('.m4a', ''),
                                         style: TextStyle(
-                                            color: darkMode
-                                                ? CupertinoColors.white
-                                                : AppPallete().accentColor),
+                                          color: darkMode
+                                              ? CupertinoColors.white
+                                              : AppPallete().accentColor,
+                                        ),
+                                        maxLines: 1,
                                       ),
                                       subtitle: Text(
                                         tags[index]!.artist!,

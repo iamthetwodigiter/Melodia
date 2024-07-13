@@ -52,14 +52,6 @@ class _AlbumDetailsState extends ConsumerState<AlbumDetails> {
     List<List<String>> artistsList = [];
     List<String> durationList = [];
 
-    double downloadProgress = 0.0;
-
-    void updateProgress(double progress) {
-      setState(() {
-        downloadProgress = progress;
-      });
-    }
-
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         previousPageTitle: 'Home',
@@ -359,36 +351,22 @@ class _AlbumDetailsState extends ConsumerState<AlbumDetails> {
                                               //     ),
                                               //   ),
                                               //   onPressed: () {
-                                              //     int count = playlistData
-                                              //         .idList.length;
-                                              //     for (int i = 0;
-                                              //         i < count;
-                                              //         i++) {
-                                              //           print(playlistData.nameList.elementAt(i));
-                                              //       List metadata = [
-                                              //         playlistData.nameList
-                                              //             .elementAt(i),
-                                              //         playlistData.artistsList
-                                              //             .elementAt(i),
-                                              //         data.name,
-                                              //         playlistData.durationList
-                                              //             .elementAt(i),
-                                              //         playlistData.imageUrlList
-                                              //             .elementAt(i),
-                                              //         i,
-                                              //         data.songs
-                                              //             .elementAt(i)
-                                              //             .year
-                                              //       ];
-                                              //       download(
-                                              //         playlistData.linkList
-                                              //             .elementAt(i),
-                                              //         '${playlistData.nameList.elementAt(i).trimRight()}.m4a',
+                                              //     List metadata = [
+                                              //       playlistData.nameList,
+                                              //       playlistData.artistsList,
+                                              //       data.name,
+                                              //       playlistData.durationList,
+                                              //       playlistData.imageUrlList,
+                                              //       0,
+                                              //       data.songs
+                                              //     ];
+                                              //     download(
+                                              //         playlistData.linkList,
+                                              //         playlistData.nameList,
                                               //         metadata,
                                               //         context,
                                               //         updateProgress,
-                                              //       );
-                                              //     }
+                                              //         isPlaylist: true);
                                               //   },
                                               //   icon: Icon(
                                               //     Icons.download_rounded,
@@ -882,7 +860,6 @@ class _AlbumDetailsState extends ConsumerState<AlbumDetails> {
                                                                         '${data.songs.elementAt(index).name.trimRight().split('(')[0]}.m4a',
                                                                         metadata,
                                                                         context,
-                                                                        updateProgress,
                                                                       );
                                                                       Navigator.pop(
                                                                           context);

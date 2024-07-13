@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,7 +6,6 @@ import 'package:melodia/album/model/playlist_model.dart';
 import 'package:melodia/constants/constants.dart';
 import 'package:melodia/core/app_theme.dart';
 import 'package:melodia/core/landing_screen.dart';
-import 'package:melodia/notifications/notification.dart';
 import 'package:melodia/player/model/songs_model.dart';
 import 'package:melodia/provider/dark_mode_provider.dart';
 import 'package:melodia/core/setup_screen.dart';
@@ -15,42 +13,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:melodia/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
-import 'package:workmanager/workmanager.dart';
-import 'package:http/http.dart' as http;
 import 'dart:async';
-
-void callbackDispatcher() {
-  Workmanager().executeTask((task, inputData) async {
-    bool isNewUpdateAvailable = await checkForUpdates();
-
-    if (isNewUpdateAvailable) {
-      await sendNotificationToUsers('New update available! Check it out.');
-    }
-
-    return Future.value(true);
-  });
-}
-
-Future<bool> checkForUpdates() async {
-  const githubRepoApiUrl =
-      'https://api.github.com/repos/iamthetwodigiter/melodia/releases/latest';
-
-  try {
-    final response = await http.get(Uri.parse(githubRepoApiUrl));
-    if (response.statusCode == 200) {
-      var jsonResponse = jsonDecode(response.body);
-      String latestVersion = jsonResponse['tag_name'];
-      if (latestVersion != Constants.appVersion) {
-        return true;
-      }
-    }
-  } catch (e) {
-    // print('Error checking GitHub releases: $e');
-    throw Exception(e);
-  }
-
-  return false;
-}
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -58,12 +21,6 @@ Future<void> main() async {
 
   OneSignal.initialize(Constants.oneSignalAppID);
   OneSignal.Notifications.requestPermission(true);
-  Workmanager().initialize(callbackDispatcher);
-  Workmanager().registerPeriodicTask(
-    'checkForUpdatesTask',
-    'checkForUpdates',
-    frequency: const Duration(hours: 24),
-  );
 
   await JustAudioBackground.init(
     androidNotificationChannelId: 'com.thetwodigiter.melodia.bgplayback',

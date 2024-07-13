@@ -30,8 +30,9 @@ void setTags(String filePath, List metadata, String imagePath) async {
   );
 }
 
-Future download(String url, String savePath, List metadata,
-    BuildContext context, Function(double) onProgress) async {
+Future download(
+    String url, String savePath, List metadata, BuildContext context,
+    {Function(double)? onProgress}) async {
   try {
     if (Platform.isAndroid) {
       if (await Permission.storage.request().isDenied) {
@@ -47,7 +48,7 @@ Future download(String url, String savePath, List metadata,
       onReceiveProgress: (received, total) {
         if (total != -1) {
           double progress = received / total;
-          onProgress(progress);
+          if (onProgress != null) onProgress(progress);
         }
       },
       options: Options(
@@ -84,7 +85,7 @@ Future download(String url, String savePath, List metadata,
 
     setTags('storage/emulated/0/Music/Melodia/$savePath', metadata,
         'storage/emulated/0/Android/data/com.thetwodigiter.melodia/files/${savePath.replaceAll('.m4a', '.png').replaceAll(" ", "_")}');
-
+    
     showCupertinoCenterPopup(
         context,
         '${savePath.replaceAll('m4a', '')} Downloaded',
