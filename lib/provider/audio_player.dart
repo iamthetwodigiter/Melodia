@@ -69,6 +69,9 @@ class AudioService extends ChangeNotifier {
   Future<void> _initializePlayer() async {
     Box settings = await Hive.openBox('settings');
     streamingQuality = settings.get('streaming_quality');
+    if(song.playlistData == null) {
+      await getSuggestedSongs(song);
+    }
     final audioSource = AudioSource.uri(
       Uri.parse(song.link.replaceAll('320', streamingQuality)),
       tag: MediaItem(

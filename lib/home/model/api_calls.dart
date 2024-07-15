@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
+import 'package:melodia/album/model/playlist_model.dart';
 import 'package:melodia/home/model/homepage_repository.dart';
+import 'package:melodia/search/model/suggestions.dart';
 
 const baseUrl = 'https://www.jiosaavn.com/';
 const String endpoint = "__call=content.getHomepageData";
@@ -167,3 +169,32 @@ final otherPlaylistsProvider =
   }
   return [];
 });
+
+Future<Playlist> fetchAndCreatePlaylist(String songId) async {
+    final suggestionResults = await getSuggestions(songId);
+
+    List<String> idList = [];
+    List<String> linkList = [];
+    List<String> imageUrlList = [];
+    List<String> nameList = [];
+    List<List<String>> artistList = [];
+    List<String> durationList = [];
+
+    for (var item in suggestionResults) {
+      idList.add(item.id);
+      linkList.add(item.downloadUrls.last);
+      imageUrlList.add(item.imageUrl);
+      nameList.add(item.title);
+      artistList.add(item.artist);
+      durationList.add(item.duration);
+    }
+
+    return Playlist(
+      idList: idList,
+      linkList: linkList,
+      imageUrlList: imageUrlList,
+      nameList: nameList,
+      artistsList: artistList,
+      durationList: durationList,
+    );
+  }

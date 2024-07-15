@@ -25,12 +25,13 @@ class _DownloadsPageState extends ConsumerState<DownloadsPage> {
   List<Uint8List?> thumbList = [];
   final tagger = Audiotagger();
   List<Tag?> tags = [];
-  int index = 0;
+  Set<String> artworkFilePaths = {};
+  Set<String> metadataFilePaths = {};
 
   @override
   void initState() {
     super.initState();
-    _listFiles(index);
+    _listFiles();
     for (var items in _files) {
       getArtwork(items.path);
       getMetadata(items.path);
@@ -88,10 +89,7 @@ class _DownloadsPageState extends ConsumerState<DownloadsPage> {
           CupertinoDialogAction(
             isDestructiveAction: true,
             onPressed: () {
-              index == 0 ?
-              Directory('storage/emulated/0/Music/Melodia')
-                  .deleteSync(recursive: true) : Directory('storage/emulated/0/Music')
-                  .deleteSync(recursive: true);
+              Directory('storage/emulated/0/Music').deleteSync(recursive: true);
               ref.watch(filesProvider.notifier).state = [];
               Navigator.of(context).pop();
               setState(() {});
@@ -104,26 +102,38 @@ class _DownloadsPageState extends ConsumerState<DownloadsPage> {
   }
 
   void getArtwork(String filePath) async {
-    Uint8List? artwork = await tagger.readArtwork(path: filePath);
-    if (artwork == null) {
-      thumbList.add(Uint8List(1));
+    if (!artworkFilePaths.contains(filePath)) {
+      Uint8List? artwork = await tagger.readArtwork(path: filePath);
+      if (artwork == null) {
+        thumbList.add(Uint8List(1));
+      } else {
+        thumbList.add(artwork);
+      }
+      artworkFilePaths.add(filePath);
+      setState(() {});
     }
-    thumbList.add(artwork);
-    setState(() {});
   }
 
   void getMetadata(String filePath) async {
-    Tag? tag = await tagger.readTags(path: filePath);
-    tags.add(tag);
-    setState(() {});
+    if (!metadataFilePaths.contains(filePath)) {
+      Tag? tag = await tagger.readTags(path: filePath);
+      tags.add(tag);
+      metadataFilePaths.add(filePath);
+      setState(() {});
+    }
   }
 
-  void _listFiles(int index) async {
-    Directory downloadsDir = index == 0
-        ? Directory('storage/emulated/0/Music/Melodia')
-        : Directory('storage/emulated/0/Music');
+  void _listFiles() async {
+    Directory downloadsDir = Directory('storage/emulated/0/Music');
     final List<FileSystemEntity> entities = downloadsDir.listSync().toList();
-    _files = entities.whereType<File>().toList();
+    Set<String> existingFilePaths = _files.map((file) => file.path).toSet();
+    for (FileSystemEntity entity in entities) {
+      if (entity is File && !existingFilePaths.contains(entity.path)) {
+        _files.add(entity);
+        existingFilePaths.add(entity.path);
+      }
+    }
+
     setState(() {});
   }
 
@@ -145,31 +155,12 @@ class _DownloadsPageState extends ConsumerState<DownloadsPage> {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         previousPageTitle: 'Library',
-        middle: CupertinoSlidingSegmentedControl(
-          children: <String, Text>{
-              'Downloads': Text(
-                'Downloads',
-                style: TextStyle(
-                  color: AppPallete().accentColor,
-                ),
-              ),
-              'All': Text(
-                'All',
-                style: TextStyle(
-                  color: AppPallete().accentColor,
-                ),
-              ),
-            },
-            onValueChanged: (value) {
-              setState(() {
-                index = value == 'Downloads' ? 0 : 1;
-              });
-              _listFiles(index);
-              for (var items in _files) {
-                getArtwork(items.path);
-                getMetadata(items.path);
-              }
-            }),
+        middle: Text(
+          'Downloads',
+          style: TextStyle(
+            color: AppPallete().accentColor,
+          ),
+        ),
       ),
       child: SafeArea(
         child: SingleChildScrollView(
@@ -188,8 +179,8 @@ class _DownloadsPageState extends ConsumerState<DownloadsPage> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(index == 0 ?
-                              'Melodia Downloads' : 'All Songs',
+                            Text(
+                              'All Songs',
                               style: TextStyle(
                                 fontSize: 25,
                                 color: AppPallete().accentColor,

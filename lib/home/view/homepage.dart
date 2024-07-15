@@ -73,7 +73,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               SizedBox(
                 height: song == null && offlineSong == null
                     ? size.height * 0.845
-                    : size.height*0.845 - 60,
+                    : size.height * 0.845 - 60,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20)
                       .copyWith(top: 10),
@@ -263,21 +263,58 @@ class _HomePageState extends ConsumerState<HomePage> {
                                           padding: MaterialStateProperty.all(
                                               EdgeInsets.zero),
                                         ),
-                                        onPressed: () {
+                                        onPressed: () async {
                                           ref
                                               .watch(
                                                   offlineSongProvider.notifier)
                                               .state = null;
-                                          ref
-                                              .read(
-                                                  currentSongProvider.notifier)
-                                              .state = song;
-                                          Navigator.push(
-                                            context,
-                                            CustomPageRoute(
-                                              page: MusicPlayer(song: song),
+                                          // Show a loading indicator while fetching data
+                                          showCupertinoDialog(
+                                            context: context,
+                                            builder: (context) => const Center(
+                                              child:
+                                                  CupertinoActivityIndicator(),
                                             ),
                                           );
+
+                                          try {
+                                            final updatedPlaylist =
+                                                await fetchAndCreatePlaylist(
+                                                    song.id);
+
+                                            final updatedSong = SongModel(
+                                                link: song.link,
+                                                id: song.id,
+                                                name: song.name.split('(')[0],
+                                                imageUrl: song.imageUrl,
+                                                duration: song.duration,
+                                                artists: song.artists,
+                                                index: index,
+                                                playlistData: updatedPlaylist,
+                                                shuffleMode: false,
+                                                playlistName: song.playlistName,
+                                                year: song.year,
+                                                isUserCreated: false);
+
+                                            ref
+                                                .read(currentSongProvider
+                                                    .notifier)
+                                                .state = updatedSong;
+                                            ref
+                                                .watch(audioServiceProvider)!
+                                                .play();
+
+                                            // Close the loading indicator and then navigate
+                                            Navigator.of(context).pop();
+                                            Navigator.of(context).push(
+                                              CustomPageRoute(
+                                                page: MusicPlayer(song: updatedSong),
+                                              ),
+                                            );
+                                          } catch (e) {
+                                            Navigator.of(context)
+                                                .pop(); // Close the loading indicator in case of error
+                                          }
                                         },
                                         child: ClipRRect(
                                           borderRadius:
