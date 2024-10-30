@@ -18,7 +18,7 @@ class NewAlbums {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'title': title,
+      'title': title.replaceAll("/", "_"),
       'image': image,
       'language': language,
       'year': year,

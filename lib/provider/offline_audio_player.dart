@@ -21,7 +21,7 @@ class OfflineAudioPlayer extends ChangeNotifier {
       Uri.file(song.songList.elementAt(index).path),
       tag: MediaItem(
         id: song.tags.elementAt(index)!.title!,
-        title: song.tags.elementAt(index)!.title!,
+        title: song.tags.elementAt(index)!.title!.replaceAll("/", "_"),
         album: song.tags.elementAt(index)!.artist,
         // artUri: Uri.file(
         //   song.path

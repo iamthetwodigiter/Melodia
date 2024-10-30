@@ -11,7 +11,7 @@ Future<Albums> fetchAlbumData(String type, String endpoint) async {
   if (data['success'] == true) {
     final albumData = data['data'];
     final id = albumData['id'];
-    final name = albumData['name'].split('(')[0];
+    final name = albumData['name'].split('(')[0].replaceAll("/", "_");
     final description = albumData['description'];
     final type = albumData['type'];
     int? year = albumData['year'];

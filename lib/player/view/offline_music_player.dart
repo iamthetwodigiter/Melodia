@@ -107,7 +107,7 @@ class _OfflineMusicPlayerState extends ConsumerState<OfflineMusicPlayer> {
         .path
         .toString()
         .replaceAll("storage/emulated/0/Music/", "").replaceAll('Melodia/', '')
-        .replaceAll(".m4a", "");
+        .replaceAll(".m4a", "").replaceAll("/", "_");
     final thumb = widget.song.thumbList.elementAt(index);
     final tag = widget.song.tags.elementAt(index);
     final size = MediaQuery.of(context).size;

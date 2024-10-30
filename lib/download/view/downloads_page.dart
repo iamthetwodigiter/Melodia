@@ -21,7 +21,7 @@ class DownloadsPage extends ConsumerStatefulWidget {
 }
 
 class _DownloadsPageState extends ConsumerState<DownloadsPage> {
-  List<File> _files = [];
+  List<File> files = [];
   List<Uint8List?> thumbList = [];
   final tagger = Audiotagger();
   List<Tag?> tags = [];
@@ -32,7 +32,7 @@ class _DownloadsPageState extends ConsumerState<DownloadsPage> {
   void initState() {
     super.initState();
     _listFiles();
-    for (var items in _files) {
+    for (var items in files) {
       getArtwork(items.path);
       getMetadata(items.path);
     }
@@ -124,12 +124,12 @@ class _DownloadsPageState extends ConsumerState<DownloadsPage> {
   }
 
   void _listFiles() async {
-    Directory downloadsDir = Directory('storage/emulated/0/Music');
+    Directory downloadsDir = Directory('storage/emulated/0/Music/Melodia/');
     final List<FileSystemEntity> entities = downloadsDir.listSync().toList();
-    Set<String> existingFilePaths = _files.map((file) => file.path).toSet();
+    Set<String> existingFilePaths = files.map((file) => file.path).toSet();
     for (FileSystemEntity entity in entities) {
       if (entity is File && !existingFilePaths.contains(entity.path)) {
-        _files.add(entity);
+        files.add(entity);
         existingFilePaths.add(entity.path);
       }
     }
@@ -149,7 +149,7 @@ class _DownloadsPageState extends ConsumerState<DownloadsPage> {
     ref.watch(filesProvider);
     Future.delayed(
       const Duration(milliseconds: 100),
-      () => ref.read(filesProvider.notifier).state = _files,
+      () => ref.read(filesProvider.notifier).state = files,
     );
 
     return CupertinoPageScaffold(
@@ -201,7 +201,7 @@ class _DownloadsPageState extends ConsumerState<DownloadsPage> {
                         ),
                       ),
                     ),
-                    _files.isEmpty
+                    files.isEmpty
                         ? SliverToBoxAdapter(
                             child: Container(
                               height: size.height * 0.7,
@@ -232,7 +232,7 @@ class _DownloadsPageState extends ConsumerState<DownloadsPage> {
                                             .watch(isMinimisedProvider.notifier)
                                             .state = false;
                                         final offlineSong = OfflineSongModel(
-                                          songList: _files,
+                                          songList: files,
                                           thumbList: thumbList,
                                           index: index,
                                           tags: tags,
@@ -264,13 +264,13 @@ class _DownloadsPageState extends ConsumerState<DownloadsPage> {
                                         },
                                       ),
                                       title: Text(
-                                        _files[index]
+                                        files[index]
                                             .path
                                             .toString()
                                             .replaceAll(
                                                 'storage/emulated/0/Music/', '')
                                             .replaceAll('Melodia/', '')
-                                            .replaceAll('.m4a', ''),
+                                            .replaceAll('.m4a', '').replaceAll("/", "_"),
                                         style: TextStyle(
                                           color: darkMode
                                               ? CupertinoColors.white
@@ -290,7 +290,7 @@ class _DownloadsPageState extends ConsumerState<DownloadsPage> {
                                       trailing: IconButton(
                                         onPressed: () {
                                           _showAlertDialog(
-                                              context, _files[index]);
+                                              context, files[index]);
                                           setState(() {});
                                         },
                                         icon: const Icon(
@@ -302,7 +302,7 @@ class _DownloadsPageState extends ConsumerState<DownloadsPage> {
                                   ),
                                 );
                               },
-                              childCount: _files.length,
+                              childCount: files.length,
                             ),
                           ),
                   ],

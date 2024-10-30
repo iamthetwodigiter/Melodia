@@ -30,7 +30,7 @@ class AudioService extends ChangeNotifier {
       idList.add(item.id);
       linkList.add(item.downloadUrls.last);
       imageUrlList.add(item.imageUrl);
-      nameList.add(item.title);
+      nameList.add(item.title.replaceAll("/", "_"));
       artistList.add(item.artist);
       durationList.add(item.duration);
     }

@@ -13,7 +13,7 @@ Future<SearchResult> searchResult(String query) async {
       final songsResult = data['data']['results'];
       for (var items in songsResult) {
         final id = items['id'];
-        final title = items['name'].replaceAll('&quot;', '');
+        final title = items['name'].replaceAll('&quot;', '').replaceAll("/", "_");
         final duration = items['duration'].toString();
 
         var imageUrl = items['image'].last['url'];

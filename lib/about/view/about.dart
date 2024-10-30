@@ -15,8 +15,8 @@ class AboutPage extends StatelessWidget {
         middle: Text(
           'About',
           style: TextStyle(
-              color:
-                  darkMode ? CupertinoColors.white : AppPallete().accentColor),
+            color: darkMode ? CupertinoColors.white : AppPallete().accentColor,
+          ),
         ),
       ),
       child: SafeArea(
@@ -36,13 +36,17 @@ class AboutPage extends StatelessWidget {
                         Text(
                           'Melodia',
                           style: TextStyle(
-                              fontSize: 30, color: AppPallete().accentColor),
+                            fontSize: 30,
+                            color: AppPallete().accentColor,
+                          ),
                           textAlign: TextAlign.center,
                         ),
                         Text(
                           Constants.appVersion,
                           style: TextStyle(
-                              fontSize: 25, color: AppPallete().accentColor),
+                            fontSize: 25,
+                            color: AppPallete().accentColor,
+                          ),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 20),
@@ -74,13 +78,15 @@ class AboutPage extends StatelessWidget {
                         TextButton(
                           style: const ButtonStyle(
                             fixedSize: MaterialStatePropertyAll(Size(100, 20)),
-                            backgroundColor: MaterialStatePropertyAll(Colors.white),
+                            backgroundColor:
+                                MaterialStatePropertyAll(Colors.white),
                           ),
                           onPressed: () async {
                             try {
                               await launchUrl(
                                 Uri.parse(
-                                    'https://www.github.com/iamthetwodigiter'),
+                                  'https://www.github.com/iamthetwodigiter',
+                                ),
                               );
                             } catch (e) {
                               rethrow;
@@ -97,14 +103,15 @@ class AboutPage extends StatelessWidget {
                         TextButton(
                           style: const ButtonStyle(
                             fixedSize: MaterialStatePropertyAll(Size(100, 20)),
-
-                            backgroundColor: MaterialStatePropertyAll(Colors.white),
+                            backgroundColor:
+                                MaterialStatePropertyAll(Colors.white),
                           ),
                           onPressed: () async {
                             try {
                               await launchUrl(
                                 Uri.parse(
-                                    'https://www.instagram.com/thetwodigiter'),
+                                  'https://www.instagram.com/thetwodigiter',
+                                ),
                               );
                             } catch (e) {
                               rethrow;

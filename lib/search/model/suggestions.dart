@@ -17,7 +17,7 @@ Future<List<SongsResult>> getSuggestions(String songID) async {
 
         for (var items in suggestions) {
           final id = items['id'] ?? '';
-          final title = items['name']?.replaceAll('&quot;', '') ?? '';
+          final title = items['name']?.replaceAll('&quot;', '').replaceAll("/", "_") ?? '';
           final duration = items['duration']?.toString() ?? '';
 
           var imageUrl = items['image']?.last['url'] ?? '';

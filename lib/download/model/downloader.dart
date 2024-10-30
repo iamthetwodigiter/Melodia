@@ -61,7 +61,7 @@ Future download(
     );
 
     File file =
-        File('storage/emulated/0/Music/Melodia/${savePath.trimRight()}');
+        File('storage/emulated/0/Music/Melodia/${savePath.trimRight().replaceAll("/", "_")}');
     var song = file.openSync(mode: FileMode.write);
     song.writeFromSync(songresponse.data);
     await song.close();
@@ -78,13 +78,13 @@ Future download(
     );
 
     File imagefile = File(
-        'storage/emulated/0/Android/data/com.thetwodigiter.melodia/files/${savePath.replaceAll('.m4a', '.png').replaceAll(" ", "_").trimRight()}');
+        'storage/emulated/0/Android/data/com.thetwodigiter.melodia/files/${savePath.replaceAll('.m4a', '.png').replaceAll(" ", "_").replaceAll("/", "_").trimRight()}');
     var image = imagefile.openSync(mode: FileMode.write);
     image.writeFromSync(imageresponse.data);
     await image.close();
 
-    setTags('storage/emulated/0/Music/Melodia/$savePath', metadata,
-        'storage/emulated/0/Android/data/com.thetwodigiter.melodia/files/${savePath.replaceAll('.m4a', '.png').replaceAll(" ", "_")}');
+    setTags('storage/emulated/0/Music/Melodia/${savePath.replaceAll("/", "_")}', metadata,
+        'storage/emulated/0/Android/data/com.thetwodigiter.melodia/files/${savePath.replaceAll('.m4a', '.png').replaceAll("/", "_").replaceAll(" ", "_")}');
     
     showCupertinoCenterPopup(
         context,

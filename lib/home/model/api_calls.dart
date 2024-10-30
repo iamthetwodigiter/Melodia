@@ -114,7 +114,7 @@ final newAlbumsProvider = FutureProvider<List<NewAlbums>>((ref) async {
     return data
         .map<NewAlbums>((item) => NewAlbums(
               id: item['albumid'],
-              title: item['title'],
+              title: item['title'].replaceAll("/", "_"),
               image: item['image'],
               language: item['language'],
               year: item['year'],
