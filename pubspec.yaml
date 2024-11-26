@@ -1,7 +1,7 @@
 name: melodia
-description: "A new Flutter project."
+description: "A minimal music player"
 publish_to: 'none'
-version: 1.0.0+1
+version: 4.0.0
 
 environment:
   sdk: ^3.5.4
