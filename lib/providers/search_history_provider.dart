@@ -20,6 +20,7 @@ class SearchHistoryNotifier extends StateNotifier<List<String>> {
   }
 
   void addSearchHistory(String query) {
+    removeExtra();
     if (!state.contains(query)) {
       _searchHistoryBox.add(query);
       state = [...state, query];
@@ -31,6 +32,16 @@ class SearchHistoryNotifier extends StateNotifier<List<String>> {
     if (index != -1) {
       _searchHistoryBox.deleteAt(index);
       state = state.where((item) => item != query).toList();
+    }
+  }
+
+  void removeExtra() {
+    if (state.length >= 3) {
+      state = state.sublist(0, 2).toList();
+      _searchHistoryBox.clear();
+      for (var item in state) {
+        _searchHistoryBox.add(item);
+      }
     }
   }
 }

@@ -57,8 +57,9 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   void _addSearchToHistory(String query) {
+    final searchHistory = ref.watch(searchHistoryProvider.notifier);
     if (query.trim().isNotEmpty) {
-      ref.read(searchHistoryProvider.notifier).addSearchHistory(query);
+      searchHistory.addSearchHistory(query);
     }
   }
 
