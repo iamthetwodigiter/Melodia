@@ -37,6 +37,8 @@ Minimal Music Streaming/ Downloader/ Player App created with Flutter 💙
   <img alt="search" src="https://github.com/iamthetwodigiter/Melodia/blob/revamp/screens/search.png?raw=true" width="200" style="display: inline-block;">
 </div>
 
+**For more visit website [here](https://melodiahub.netlify.app)**
+<br>
 **The app works for iPhones too, but background playback feature is broken and I don't have macbook to test the feature**
 
 # **HAPPY LISTENING 😉**
