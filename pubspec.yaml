@@ -1,7 +1,7 @@
 name: melodia
 description: "A minimal music player"
 publish_to: 'none'
-version: 4.0.0
+version: 4.1.0
 
 environment:
   sdk: ^3.5.4
