@@ -1,5 +1,6 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:melodia/models/artists_model.dart';
+import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 part 'songs_model.g.dart';
 
@@ -91,11 +92,11 @@ class Songs {
     };
   }
 
-  factory Songs.fromMap(Map<String, dynamic> map) {
+  factory Songs.fromMap(Map<String, dynamic> map, {Video? video}) {
     return Songs(
       id: map['id'] as String,
-      title: map['name'].replaceAll("&quot;", "\"")
-          .replaceAll("&amp;", "&") as String,
+      title: map['name'].replaceAll("&quot;", "\"").replaceAll("&amp;", "&")
+          as String,
       type: map['type'] as String,
       year: map['year'] as String,
       duration: map['duration'] as int,

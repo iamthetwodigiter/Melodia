@@ -49,10 +49,7 @@ class AudioPlayerNotifier extends StateNotifier<AudioPlayerState> {
 
     durationStateStream.listen((updatedState) {
       state = updatedState;
-    });
-    // if (ref.watch(offlineAudioPlayerProvider).isPlaying) {
-    //   ref.read(offlineAudioPlayerProvider.notifier).stop();
-    // }
+    }); 
   }
 
   Stream<AudioPlayerState> get durationStateStream =>

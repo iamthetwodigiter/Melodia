@@ -25,6 +25,7 @@ dependencies:
   audiotagger: ^2.2.1
   onesignal_flutter: ^5.2.7
   url_launcher: ^6.3.1
+  youtube_explode_dart: ^2.3.6
 
 dev_dependencies:
   flutter_test:

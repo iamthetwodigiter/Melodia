@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:melodia/providers/settings_provider.dart';
@@ -17,6 +18,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     final settings = ref.watch(settingsProvider);
     final notifier = ref.read(settingsProvider.notifier);
     final qualities = [48, 96, 160, 320];
+    final youtubeQualities = [48, 128];
 
     void showAccentColorDialog() {
       List<Color> colors = [
@@ -250,6 +252,60 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               ),
             ),
             ListTile(
+              leading: const Icon(Icons.audiotrack),
+              iconColor: AppTheme.accentColor(ref),
+              title: const Text("YouTube Download"),
+              titleTextStyle: TextStyle(
+                color: AppTheme.accentColor(ref),
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+              subtitle: const Text("Select YouTube Download Quality"),
+              trailing: DropdownButton<int>(
+                value: settings.ytDownloadQuality,
+                icon: const Icon(Icons.arrow_drop_down),
+                dropdownColor: const Color.fromARGB(255, 39, 39, 39),
+                onChanged: (int? newValue) {
+                  if (newValue != null) {
+                    notifier.updateYTDownloadQuality(newValue);
+                  }
+                },
+                items: youtubeQualities.map((int quality) {
+                  return DropdownMenuItem<int>(
+                    value: quality,
+                    child: Text('$quality kbps'),
+                  );
+                }).toList(),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.audiotrack),
+              iconColor: AppTheme.accentColor(ref),
+              title: const Text("YouTube Streaming"),
+              titleTextStyle: TextStyle(
+                color: AppTheme.accentColor(ref),
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+              subtitle: const Text("Select YouTube Streaming Quality"),
+              trailing: DropdownButton<int>(
+                value: settings.ytStreamingQuality,
+                icon: const Icon(Icons.arrow_drop_down),
+                dropdownColor: const Color.fromARGB(255, 39, 39, 39),
+                onChanged: (int? newValue) {
+                  if (newValue != null) {
+                    notifier.updateYTStreamingQuality(newValue);
+                  }
+                },
+                items: youtubeQualities.map((int quality) {
+                  return DropdownMenuItem<int>(
+                    value: quality,
+                    child: Text('$quality kbps'),
+                  );
+                }).toList(),
+              ),
+            ),
+            ListTile(
               leading: const Icon(Icons.shuffle),
               iconColor: AppTheme.accentColor(ref),
               title: const Text("Keep Shuffle Mode On"),
@@ -258,7 +314,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
-              trailing: Switch.adaptive(
+              trailing: CupertinoSwitch(
                 activeColor: AppTheme.accentColor(ref),
                 value: settings.shuffleMode,
                 onChanged: (value) {
@@ -277,7 +333,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
-              trailing: Switch.adaptive(
+              trailing: CupertinoSwitch(
                 activeColor: AppTheme.accentColor(ref),
                 value: settings.separatePlaylistFolder,
                 onChanged: (value) {

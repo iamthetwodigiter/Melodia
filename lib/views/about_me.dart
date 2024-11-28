@@ -102,6 +102,7 @@ class _AboutMeState extends ConsumerState<AboutMe> {
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
+                    textAlign: TextAlign.center,
                   ),
                   InkWell(
                     child: Image.asset(
@@ -125,6 +126,7 @@ class _AboutMeState extends ConsumerState<AboutMe> {
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
+                    textAlign: TextAlign.center,
                   ),
                   TextButton(
                     style: const ButtonStyle(

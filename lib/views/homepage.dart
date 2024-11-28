@@ -177,8 +177,13 @@ class _HomePageState extends ConsumerState<HomePage> {
                           size: 30,
                           color: AppTheme.accentColor(ref).withAlpha(150)),
                       style: const TextStyle(color: Colors.white),
-                      onSubmitted: _onSearch,
+                      onSubmitted: (value) {
+                        if (value.isNotEmpty) {
+                          _onSearch(value);
+                        }
+                      },
                     ),
+                    const SizedBox(height: 5),
                     if (_filteredSearchHistory.isNotEmpty)
                       Container(
                         padding: const EdgeInsets.all(8),
@@ -187,18 +192,23 @@ class _HomePageState extends ConsumerState<HomePage> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Column(
-                          children: _filteredSearchHistory
-                              .map((history) => ListTile(
-                                    title: Text(
-                                      history,
-                                      style: TextStyle(
-                                        color: AppTheme.accentColor(ref),
-                                      ),
+                          children: _filteredSearchHistory.reversed
+                              .toList()
+                              .sublist(0,
+                                  _filteredSearchHistory.length > 3 ? 3 : null)
+                              .map(
+                                (history) => ListTile(
+                                  title: Text(
+                                    history,
+                                    style: TextStyle(
+                                      color: AppTheme.accentColor(ref),
                                     ),
-                                    onTap: () {
-                                      _onSearch(history);
-                                    },
-                                  ))
+                                  ),
+                                  onTap: () {
+                                    _onSearch(history);
+                                  },
+                                ),
+                              )
                               .toList(),
                         ),
                       ),

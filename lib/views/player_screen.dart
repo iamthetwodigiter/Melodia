@@ -92,7 +92,6 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
     offlineAudioNotifier.stop();
     final audioSources = ref.read(currentSongsProvider(widget.playlist));
 
-  
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!audioNotifier.isPlaylistSet ||
           !(audioNotifier.songsList == widget.playlist)) {
@@ -183,17 +182,24 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                   if (isDownloaded) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       customSnackBar(
-                        '"${currentSong.title}" is Already Downloaded',ref
-                      ),
+                          '"${currentSong.title}" is Already Downloaded', ref),
                     );
                   } else {
-                    ScaffoldMessenger.of(context).showSnackBar(customSnackBar(
-                        '"${currentSong.title}" Downloading Started',ref));
-                    downloadSong(
-                      [currentSong],
-                      settings?.downloadQuality.toString() ?? '96',
-                      ref,
-                    );
+                    if (currentSong.type == "YouTube") {
+                      // Download stops abruptly at around 97% and speed is way too slow, will be fixed in the next build
+                      // ytDownload(currentSong);
+                      ScaffoldMessenger.of(context).showSnackBar(customSnackBar(
+                          'YouTube download is broken and will be fixed in the next update',
+                          ref));
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(customSnackBar(
+                          '"${currentSong.title}" Downloading Started', ref));
+                      downloadSong(
+                        [currentSong],
+                        settings?.downloadQuality.toString() ?? '96',
+                        ref,
+                      );
+                    }
                   }
                 },
                 child: Text(
@@ -333,7 +339,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                       total: total,
                       progressBarColor: AppTheme.accentColor(ref),
                       baseBarColor: AppTheme.accentColor(ref).withAlpha(100),
-                      bufferedBarColor: AppTheme.accentColor(ref).withAlpha(100),
+                      bufferedBarColor:
+                          AppTheme.accentColor(ref).withAlpha(100),
                       thumbColor: AppTheme.accentColor(ref),
                       onSeek: (duration) {
                         audioNotifier.seek(duration);
@@ -454,10 +461,10 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                       });
                       ScaffoldMessenger.of(context).showSnackBar(
                         customSnackBar(
-                          !isFavorite
-                              ? 'Added to Favorites ❤️'
-                              : 'Removed from Favorites',ref
-                        ),
+                            !isFavorite
+                                ? 'Added to Favorites ❤️'
+                                : 'Removed from Favorites',
+                            ref),
                       );
                     },
                     child: isFavorite

@@ -8,15 +8,16 @@ class SearchResultSongs {
   final String artists;
   final String singers;
 
-  SearchResultSongs(
-      {required this.id,
-      required this.title,
-      required this.image,
-      required this.albumTitle,
-      required this.url,
-      required this.type,
-      required this.artists,
-      required this.singers});
+  SearchResultSongs({
+    required this.id,
+    required this.title,
+    required this.image,
+    required this.albumTitle,
+    required this.url,
+    required this.type,
+    required this.artists,
+    required this.singers,
+  });
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
@@ -54,14 +55,15 @@ class SearchResultAlbums {
   final String type;
   final String year;
 
-  SearchResultAlbums(
-      {required this.id,
-      required this.title,
-      required this.image,
-      required this.artist,
-      required this.url,
-      required this.type,
-      required this.year});
+  SearchResultAlbums({
+    required this.id,
+    required this.title,
+    required this.image,
+    required this.artist,
+    required this.url,
+    required this.type,
+    required this.year,
+  });
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
@@ -95,12 +97,13 @@ class SearchResultPlaylists {
   final String url;
   final String type;
 
-  SearchResultPlaylists(
-      {required this.id,
-      required this.title,
-      required this.image,
-      required this.url,
-      required this.type});
+  SearchResultPlaylists({
+    required this.id,
+    required this.title,
+    required this.image,
+    required this.url,
+    required this.type,
+  });
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
@@ -128,10 +131,11 @@ class SearchResult {
   final List<SearchResultAlbums> searchResultAlbums;
   final List<SearchResultPlaylists> searchResultPlaylists;
 
-  SearchResult(
-      {required this.searchResultSongs,
-      required this.searchResultAlbums,
-      required this.searchResultPlaylists});
+  SearchResult({
+    required this.searchResultSongs,
+    required this.searchResultAlbums,
+    required this.searchResultPlaylists,
+  });
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
@@ -155,7 +159,8 @@ class SearchResult {
         ),
       ),
       searchResultPlaylists: List<SearchResultPlaylists>.from(
-        (map['playlists']['results'] as List<dynamic>).map<SearchResultPlaylists>(
+        (map['playlists']['results'] as List<dynamic>)
+            .map<SearchResultPlaylists>(
           (x) => SearchResultPlaylists.fromMap(x as Map<String, dynamic>),
         ),
       ),

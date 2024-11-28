@@ -10,8 +10,6 @@ import 'package:melodia/providers/settings_provider.dart';
 import 'package:melodia/services/api_calls.dart';
 import 'package:path_provider/path_provider.dart';
 
-Audiotagger tagger = Audiotagger();
-
 Future<void> downloadSong(
   List<Songs> songsList,
   String quality,
@@ -24,7 +22,6 @@ Future<void> downloadSong(
     final settings = ref.watch(settingsProvider);
     final cacheDirectory = await getApplicationCacheDirectory();
     final path = ref.watch(downloadPathProvider);
-
     path.then(
       (downloadDir) async {
         String finalPath = '';
@@ -78,6 +75,6 @@ Future<void> downloadSong(
       },
     );
   } catch (e) {
-    rethrow;
+    throw Exception(e);
   }
 }

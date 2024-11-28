@@ -14,8 +14,8 @@ const lyricsAPI = "https://melodia-six.vercel.app/api/songs";
 const suggestionAPI = "https://melodia-six.vercel.app/api/songs";
 const searchAPI = "https://melodia-six.vercel.app/api/search?query=";
 const songAPI = "https://melodia-six.vercel.app/api/songs";
- const repositoryURL =
-      'https://api.github.com/repos/iamthetwodigiter/melodia/releases/latest';
+const repositoryURL =
+    'https://api.github.com/repos/iamthetwodigiter/melodia/releases/latest';
 
 Future<HomePageModel> homePageData() async {
   final response = await http.get(Uri.parse(homepageUrl));
@@ -80,7 +80,7 @@ Future<String> fetchLyrics(String id) async {
 
 Future<List<Songs>> getSuggestions(String songID) async {
   final response = await http.get(
-    Uri.parse('$suggestionAPI/$songID/suggestions?limit=20'),
+    Uri.parse('$suggestionAPI/$songID/suggestions?limit=100'),
   );
   final data = jsonDecode(response.body);
   if (data['success'] == true && data['data'] != null) {
@@ -92,11 +92,10 @@ Future<List<Songs>> getSuggestions(String songID) async {
   }
 }
 
-Future<SearchResult> searchResults(String query) async {
+Future<SearchResult> searchResults(String query, int quality) async {
   final response =
       await http.get(Uri.parse('$searchAPI${query.replaceAll(" ", "+")}'));
   final data = jsonDecode(response.body);
-
   if (data['success'] == true) {
     return SearchResult.fromMap(data['data']);
   } else {
@@ -132,7 +131,6 @@ Future<Songs> getSong(String songID) async {
 }
 
 Future<String> fetchUpdates() async {
- 
   final response = await http.get(Uri.parse(repositoryURL));
   if (response.statusCode == 200) {
     final jsonResponse = json.decode(response.body);

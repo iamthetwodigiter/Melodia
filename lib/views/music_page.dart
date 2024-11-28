@@ -84,7 +84,23 @@ class _MusicPageState extends ConsumerState<MusicPage> {
             ? [
                 IconButton(
                   icon: const Icon(Icons.delete),
-                  onPressed: () => _deleteSelectedSongs(ref),
+                  onPressed: () {
+                    _deleteSelectedSongs(ref);
+                  },
+                ),
+                IconButton(
+                  onPressed: () {
+                    List<int> allIndices =
+                        List.generate(files.length, (index) => index);
+                    setState(() {
+                      if (_selectedIndices.containsAll(allIndices)) {
+                        _selectedIndices.clear();
+                      } else {
+                        _selectedIndices.addAll(allIndices);
+                      }
+                    });
+                  },
+                  icon: const Icon(Icons.select_all),
                 ),
                 IconButton(
                   icon: const Icon(Icons.close),

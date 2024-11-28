@@ -58,7 +58,7 @@ class FilesNotifier extends StateNotifier<List<Songs>> {
         state = songs;
       }
     } catch (e) {
-      return;
+      throw Exception(e);
     }
   }
 
@@ -75,7 +75,7 @@ class FilesNotifier extends StateNotifier<List<Songs>> {
       id: (tag.title) ?? id,
       title: tag.title ?? filePath.split('/').last,
       // type is set to lyrics
-      type: tag.lyrics ?? '',
+      type: tag.lyrics ?? 'No lyrics available',
       year: tag.year ?? '2024',
       duration: 0,
       explicitContent: false,
@@ -123,7 +123,7 @@ class FilesNotifier extends StateNotifier<List<Songs>> {
       state = List.from(songs);
 
     } catch (e) {
-      rethrow;
+      throw Exception(e);
     }
   }
 }

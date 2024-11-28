@@ -19,6 +19,8 @@ class SettingsNotifier extends StateNotifier<Settings?> {
   Future<void> _loadSettings() async {
     final downloadQuality = _box.get('downloadQuality', defaultValue: 96);
     final streamingQuality = _box.get('streamingQuality', defaultValue: 96);
+    final ytDownloadQuality = _box.get('ytDownloadQuality', defaultValue: 48);
+    final ytStreamingQuality = _box.get('ytStreamingQuality', defaultValue: 48);
     final shuffleMode = _box.get('shuffleMode', defaultValue: false);
     final separatePlaylistFolder =
         _box.get('separatePlaylistFolder', defaultValue: false);
@@ -28,6 +30,8 @@ class SettingsNotifier extends StateNotifier<Settings?> {
     state = Settings(
       downloadQuality: downloadQuality,
       streamingQuality: streamingQuality,
+      ytDownloadQuality: ytDownloadQuality,
+      ytStreamingQuality: ytStreamingQuality,
       shuffleMode: shuffleMode,
       separatePlaylistFolder: separatePlaylistFolder,
       accentColor: accentColorValue, 
@@ -40,6 +44,8 @@ class SettingsNotifier extends StateNotifier<Settings?> {
       state = Settings(
         downloadQuality: quality,
         streamingQuality: state!.streamingQuality,
+        ytDownloadQuality: state!.ytDownloadQuality,
+        ytStreamingQuality: state!.ytStreamingQuality,
         shuffleMode: state!.shuffleMode,
         separatePlaylistFolder: state!.separatePlaylistFolder,
         accentColor: state!.accentColor,
@@ -53,6 +59,8 @@ class SettingsNotifier extends StateNotifier<Settings?> {
       state = Settings(
         downloadQuality: state!.downloadQuality,
         streamingQuality: quality,
+        ytDownloadQuality: state!.ytDownloadQuality,
+        ytStreamingQuality: state!.ytStreamingQuality,
         shuffleMode: state!.shuffleMode,
         separatePlaylistFolder: state!.separatePlaylistFolder,
         accentColor: state!.accentColor,
@@ -66,6 +74,8 @@ class SettingsNotifier extends StateNotifier<Settings?> {
       state = Settings(
         downloadQuality: state!.downloadQuality,
         streamingQuality: state!.streamingQuality,
+        ytDownloadQuality: state!.ytDownloadQuality,
+        ytStreamingQuality: state!.ytStreamingQuality,
         shuffleMode: isEnabled,
         separatePlaylistFolder: state!.separatePlaylistFolder,
         accentColor: state!.accentColor,
@@ -79,6 +89,8 @@ class SettingsNotifier extends StateNotifier<Settings?> {
       state = Settings(
         downloadQuality: state!.downloadQuality,
         streamingQuality: state!.streamingQuality,
+        ytDownloadQuality: state!.ytDownloadQuality,
+        ytStreamingQuality: state!.ytStreamingQuality,
         shuffleMode: state!.shuffleMode,
         separatePlaylistFolder: isEnabled,
         accentColor: state!.accentColor,
@@ -92,9 +104,41 @@ class SettingsNotifier extends StateNotifier<Settings?> {
       state = Settings(
         downloadQuality: state!.downloadQuality,
         streamingQuality: state!.streamingQuality,
+        ytDownloadQuality: state!.ytDownloadQuality,
+        ytStreamingQuality: state!.ytStreamingQuality,
         shuffleMode: state!.shuffleMode,
         separatePlaylistFolder: state!.separatePlaylistFolder,
         accentColor: accentColor,
+      );
+    }
+  }
+
+  void updateYTDownloadQuality(int quality) {
+    _box.put('ytDownloadQuality', quality);
+    if(state != null) {
+      state = Settings(
+        downloadQuality: state!.downloadQuality,
+        streamingQuality: state!.streamingQuality,
+        ytDownloadQuality: quality,
+        ytStreamingQuality: state!.ytStreamingQuality,
+        shuffleMode: state!.shuffleMode,
+        separatePlaylistFolder: state!.separatePlaylistFolder,
+        accentColor: state!.accentColor,
+      );
+    }
+  }
+
+  void updateYTStreamingQuality(int quality) {
+    _box.put('ytStreamingQuality', quality);
+    if(state != null) {
+      state = Settings(
+        downloadQuality: state!.downloadQuality,
+        streamingQuality: state!.streamingQuality,
+        ytDownloadQuality: state!.ytDownloadQuality,
+        ytStreamingQuality: quality,
+        shuffleMode: state!.shuffleMode,
+        separatePlaylistFolder: state!.separatePlaylistFolder,
+        accentColor: state!.accentColor,
       );
     }
   }

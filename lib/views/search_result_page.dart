@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:melodia/providers/search_history_provider.dart';
 import 'package:melodia/providers/search_result_provider.dart';
 import 'package:melodia/providers/search_song_data_provider.dart';
+import 'package:melodia/providers/watch_history_provider.dart';
+import 'package:melodia/providers/youtube_provider.dart';
 import 'package:melodia/utils/colors.dart';
 import 'package:melodia/views/albums_page.dart';
 import 'package:melodia/views/player_screen.dart';
@@ -25,6 +27,7 @@ class SearchResultPage extends ConsumerStatefulWidget {
 class _SearchResultPageState extends ConsumerState<SearchResultPage> {
   late TextEditingController _searchController;
   List<String> _filteredSearchHistory = [];
+  bool isYoutube = false;
 
   @override
   void initState() {
@@ -79,6 +82,8 @@ class _SearchResultPageState extends ConsumerState<SearchResultPage> {
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
     final searchResult = ref.watch(searchResultProvider(widget.query));
+    final history = ref.watch(historyProvider.notifier);
+    final youtube = ref.watch(youtubeProvider(widget.query));
 
     return Scaffold(
       appBar: AppBar(
@@ -114,7 +119,7 @@ class _SearchResultPageState extends ConsumerState<SearchResultPage> {
                               controller: _searchController,
                               padding: const EdgeInsets.all(15),
                               backgroundColor: Colors.black,
-                              placeholder: 'Search',
+                              placeholder: widget.query,
                               placeholderStyle: TextStyle(
                                 fontSize: 22,
                                 color: AppTheme.accentColor(ref).withAlpha(150),
@@ -130,156 +135,237 @@ class _SearchResultPageState extends ConsumerState<SearchResultPage> {
                           ),
                           CupertinoListSection.insetGrouped(
                             backgroundColor: Colors.transparent,
-                            header: const Text(
-                              'Songs',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 35,
-                              ),
-                            ),
-                            children: data.searchResultSongs.map((song) {
-                              return CupertinoListTile(
-                                padding: const EdgeInsets.all(15),
-                                leadingSize: 50,
-                                leading: ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: CachedNetworkImage(
-                                    imageUrl: song.image,
-                                    height: 50,
-                                    width: 50,
-                                    errorWidget: (context, url, error) {
-                                      return Image.asset(
-                                          'assets/song_thumb.png');
-                                    },
-                                  ),
-                                ),
-                                title: Text(
-                                  song.title,
+                            header: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  isYoutube ? 'YouTube' : 'Saavn',
                                   style: const TextStyle(
-                                    fontSize: 20,
                                     color: Colors.white,
+                                    fontSize: 35,
                                   ),
                                 ),
-                                subtitle: Text(
-                                  song.artists,
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                  ),
+                                CupertinoSwitch(
+                                  activeColor: AppTheme.accentColor(ref),
+                                  value: isYoutube,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      isYoutube = !isYoutube;
+                                    });
+                                  },
                                 ),
-                                onTap: () async {
-                                  final playlist = ref
-                                      .watch(searchSongDataProvider(song.id));
+                              ],
+                            ),
+                            children: isYoutube
+                                ? youtube.when(data: (data) {
+                                    return data.map((song) {
+                                      return CupertinoListTile(
+                                          padding: const EdgeInsets.all(15),
+                                          leadingSize: 50,
+                                          leading: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            child: CachedNetworkImage(
+                                              imageUrl: song.image,
+                                              height: 50,
+                                              width: 50,
+                                              fit: BoxFit.cover,
+                                              errorWidget:
+                                                  (context, url, error) {
+                                                return Image.asset(
+                                                  'assets/song_thumb.png',
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                          title: Text(
+                                            song.title,
+                                            style: const TextStyle(
+                                              fontSize: 20,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                          subtitle: Text(
+                                            song.artists.first.name,
+                                            style: const TextStyle(
+                                              fontSize: 15,
+                                            ),
+                                          ),
+                                          onTap: () {
+                                            Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    PlayerScreen(
+                                                  playlist: data,
+                                                  initialIndex:
+                                                      data.indexOf(song),
+                                                ),
+                                              ),
+                                            );
+                                          });
+                                    }).toList();
+                                  }, error: (err, stack) {
+                                    return [
+                                      const Text(
+                                          'Error occured while fetching the data')
+                                    ];
+                                  }, loading: () {
+                                    return [
+                                      Container(
+                                        padding: const EdgeInsets.all(10),
+                                        child: const CircularProgressIndicator
+                                            .adaptive(),
+                                      )
+                                    ];
+                                  })
+                                : data.searchResultSongs.map((song) {
+                                    return CupertinoListTile(
+                                      padding: const EdgeInsets.all(15),
+                                      leadingSize: 50,
+                                      leading: ClipRRect(
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: CachedNetworkImage(
+                                          imageUrl: song.image,
+                                          height: 50,
+                                          width: 50,
+                                          errorWidget: (context, url, error) {
+                                            return Image.asset(
+                                              'assets/song_thumb.png',
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                      title: Text(
+                                        song.title,
+                                        style: const TextStyle(
+                                          fontSize: 20,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      subtitle: Text(
+                                        song.artists,
+                                        style: const TextStyle(
+                                          fontSize: 15,
+                                        ),
+                                      ),
+                                      onTap: () async {
+                                        final playlist = ref.watch(
+                                            searchSongDataProvider(song.id));
 
-                                  if (playlist is AsyncData) {
-                                    final data = playlist.value;
+                                        if (playlist is AsyncData) {
+                                          final data = playlist.value;
+                                          history.addHistory(data![0]);
+                                          Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  PlayerScreen(
+                                                playlist: data,
+                                                initialIndex: 0,
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      },
+                                    );
+                                  }).toList(),
+                          ),
+                          if (!isYoutube)
+                            CupertinoListSection.insetGrouped(
+                              backgroundColor: Colors.transparent,
+                              header: const Text(
+                                'Albums',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 35,
+                                ),
+                              ),
+                              children: data.searchResultAlbums.map((album) {
+                                return CupertinoListTile(
+                                  padding: const EdgeInsets.all(15),
+                                  leadingSize: 50,
+                                  leading: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: CachedNetworkImage(
+                                      imageUrl: album.image,
+                                      height: 50,
+                                      width: 50,
+                                      errorWidget: (context, url, error) {
+                                        return Image.asset(
+                                            'assets/playlist_art.png');
+                                      },
+                                    ),
+                                  ),
+                                  title: Text(
+                                    album.title,
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  subtitle: Text(
+                                    album.artist,
+                                    style: const TextStyle(
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                  onTap: () async {
                                     Navigator.of(context).push(
                                       MaterialPageRoute(
-                                        builder: (context) => PlayerScreen(
-                                          playlist: data!,
-                                          initialIndex: 0,
+                                        builder: (context) => AlbumsPage(
+                                          albumID: album.id,
                                         ),
                                       ),
                                     );
-                                  }
-                                },
-                              );
-                            }).toList(),
-                          ),
-                          CupertinoListSection.insetGrouped(
-                            backgroundColor: Colors.transparent,
-                            header: const Text(
-                              'Albums',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 35,
-                              ),
+                                  },
+                                );
+                              }).toList(),
                             ),
-                            children: data.searchResultAlbums.map((album) {
-                              return CupertinoListTile(
-                                padding: const EdgeInsets.all(15),
-                                leadingSize: 50,
-                                leading: ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: CachedNetworkImage(
-                                    imageUrl: album.image,
-                                    height: 50,
-                                    width: 50,
-                                    errorWidget: (context, url, error) {
-                                      return Image.asset(
-                                          'assets/playlist_art.png');
-                                    },
-                                  ),
+                          if (!isYoutube)
+                            CupertinoListSection.insetGrouped(
+                              backgroundColor: Colors.transparent,
+                              header: const Text(
+                                'Playlists',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 35,
                                 ),
-                                title: Text(
-                                  album.title,
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                subtitle: Text(
-                                  album.artist,
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                  ),
-                                ),
-                                onTap: () async {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (context) => AlbumsPage(
-                                        albumID: album.id,
-                                      ),
-                                    ),
-                                  );
-                                },
-                              );
-                            }).toList(),
-                          ),
-                          CupertinoListSection.insetGrouped(
-                            backgroundColor: Colors.transparent,
-                            header: const Text(
-                              'Playlists',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 35,
                               ),
-                            ),
-                            children:
-                                data.searchResultPlaylists.map((playlist) {
-                              return CupertinoListTile(
-                                padding: const EdgeInsets.all(15),
-                                leadingSize: 50,
-                                leading: ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: CachedNetworkImage(
-                                    imageUrl: playlist.image,
-                                    height: 50,
-                                    width: 50,
-                                    errorWidget: (context, url, error) {
-                                      return Image.asset(
-                                          'assets/playlist_art.png');
-                                    },
-                                  ),
-                                ),
-                                title: Text(
-                                  playlist.title,
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                onTap: () async {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (context) => PlaylistsPage(
-                                        playlistID: playlist.id,
-                                      ),
+                              children:
+                                  data.searchResultPlaylists.map((playlist) {
+                                return CupertinoListTile(
+                                  padding: const EdgeInsets.all(15),
+                                  leadingSize: 50,
+                                  leading: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: CachedNetworkImage(
+                                      imageUrl: playlist.image,
+                                      height: 50,
+                                      width: 50,
+                                      errorWidget: (context, url, error) {
+                                        return Image.asset(
+                                            'assets/playlist_art.png');
+                                      },
                                     ),
-                                  );
-                                },
-                              );
-                            }).toList(),
-                          ),
+                                  ),
+                                  title: Text(
+                                    playlist.title,
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  onTap: () async {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (context) => PlaylistsPage(
+                                          playlistID: playlist.id,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+                              }).toList(),
+                            ),
                         ],
                       ),
                     ),
@@ -306,7 +392,10 @@ class _SearchResultPageState extends ConsumerState<SearchResultPage> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Column(
-                      children: _filteredSearchHistory
+                      children: _filteredSearchHistory.reversed
+                          .toList()
+                          .sublist(
+                              0, _filteredSearchHistory.length > 3 ? 3 : null)
                           .map((history) => ListTile(
                                 title: Text(
                                   history,
