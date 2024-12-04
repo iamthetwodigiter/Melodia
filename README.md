@@ -22,6 +22,9 @@ Minimal Music Streaming/ Downloader/ Player App created with Flutter 💙
 - Clear watch history
 - Suggested songs at the end of searched songs
 - YouTube streaming feature added with v4.1.0
+- Added Bottom Tab for easier navigation [customisable]
+- Added Library section
+- Added swipe down to refresh throughout the app
 - And many more, find yourself....
 
 ## Screens
