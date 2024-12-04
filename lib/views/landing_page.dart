@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:melodia/providers/settings_provider.dart';
 import 'package:melodia/utils/colors.dart';
-import 'package:melodia/views/about_me.dart';
 import 'package:melodia/views/favorites_page.dart';
 import 'package:melodia/views/homepage.dart';
 import 'package:melodia/views/library_page.dart';
@@ -31,7 +30,6 @@ class _LandingPageState extends ConsumerState<LandingPage> {
       if (bottomTabIndices.contains('playlists')) const UserPlaylistsList(),
       const LibraryPage(),
       if (bottomTabIndices.contains('settings')) const SettingsPage(),
-      if (bottomTabIndices.contains('profile')) const AboutMe(),
     ];
 
     return Scaffold(
@@ -71,12 +69,7 @@ class _LandingPageState extends ConsumerState<LandingPage> {
               title: const Text("Setting"),
               selectedColor: Colors.deepPurpleAccent,
             ),
-          if (bottomTabIndices.contains('profile'))
-            SalomonBottomBarItem(
-              icon: const Icon(Icons.person),
-              title: const Text("Profile"),
-              selectedColor: Colors.teal,
-            ),
+          
         ],
       ),
     );
