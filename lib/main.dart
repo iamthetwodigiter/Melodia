@@ -9,7 +9,7 @@ import 'package:melodia/models/playlists_model.dart';
 import 'package:melodia/models/songs_model.dart';
 import 'package:melodia/secrets/secrets.dart';
 import 'package:melodia/utils/colors.dart';
-import 'package:melodia/views/homepage.dart';
+import 'package:melodia/views/landing_page.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -101,25 +101,25 @@ class _MyAppState extends ConsumerState<MyApp> {
           ),
         ),
         brightness: Brightness.dark,
-        textTheme: const TextTheme(
-          displayLarge: TextStyle(color: Colors.white),
-          displayMedium: TextStyle(color: Colors.white),
-          displaySmall: TextStyle(color: Colors.white),
-          headlineLarge: TextStyle(color: Colors.white),
-          headlineMedium: TextStyle(color: Colors.white),
-          headlineSmall: TextStyle(color: Colors.white),
-          titleLarge: TextStyle(color: Colors.white),
-          titleMedium: TextStyle(color: Colors.white),
-          titleSmall: TextStyle(color: Colors.white),
-          bodyLarge: TextStyle(color: Colors.white),
-          bodyMedium: TextStyle(color: Colors.white),
-          bodySmall: TextStyle(color: Colors.white),
-          labelLarge: TextStyle(color: Colors.white),
-          labelMedium: TextStyle(color: Colors.white),
-          labelSmall: TextStyle(color: Colors.white),
-        ),
+        // textTheme: const TextTheme(
+        //   displayLarge: TextStyle(color: Colors.white),
+        //   displayMedium: TextStyle(color: Colors.white),
+        //   displaySmall: TextStyle(color: Colors.white),
+        //   headlineLarge: TextStyle(color: Colors.white),
+        //   headlineMedium: TextStyle(color: Colors.white),
+        //   headlineSmall: TextStyle(color: Colors.white),
+        //   titleLarge: TextStyle(color: Colors.white),
+        //   titleMedium: TextStyle(color: Colors.white),
+        //   titleSmall: TextStyle(color: Colors.white),
+        //   bodyLarge: TextStyle(color: Colors.white),
+        //   bodyMedium: TextStyle(color: Colors.white),
+        //   bodySmall: TextStyle(color: Colors.white),
+        //   labelLarge: TextStyle(color: Colors.white),
+        //   labelMedium: TextStyle(color: Colors.white),
+        //   labelSmall: TextStyle(color: Colors.white),
+        // ),
       ),
-      home: const HomePage(),
+      home: const LandingPage(),
       debugShowCheckedModeBanner: false,
     );
   }

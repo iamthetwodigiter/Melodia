@@ -5,6 +5,7 @@ import 'package:melodia/models/songs_model.dart';
 import 'package:melodia/providers/user_playlists_provider.dart';
 import 'package:melodia/utils/colors.dart';
 import 'package:melodia/widgets/custom_snackbar.dart';
+import 'package:melodia/widgets/music_slab.dart';
 import 'package:melodia/widgets/songs_list_item.dart';
 
 class UserPlaylistsPage extends ConsumerStatefulWidget {
@@ -23,9 +24,10 @@ class _UserPlaylistsPageState extends ConsumerState<UserPlaylistsPage> {
     final size = MediaQuery.sizeOf(context);
     List<Songs> songsList = widget.playlist.songs;
     final userPlaylistsNotifier = ref.watch(userPlaylistsProvider.notifier);
+    ref.watch(userPlaylistsProvider);
     bool isPlaylistAdded =
         userPlaylistsNotifier.isPlaylistAdded(widget.playlist);
-
+    
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -44,8 +46,8 @@ class _UserPlaylistsPageState extends ConsumerState<UserPlaylistsPage> {
               setState(() {
                 userPlaylistsNotifier.removePlaylist(widget.playlist);
               });
-              ScaffoldMessenger.of(context)
-                  .showSnackBar(customSnackBar('Removed Playlist, Please Go Back to Update The List',ref));
+              ScaffoldMessenger.of(context).showSnackBar(customSnackBar(
+                  'Removed Playlist, Please Go Back to Update The List', ref));
             },
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -62,20 +64,35 @@ class _UserPlaylistsPageState extends ConsumerState<UserPlaylistsPage> {
         toolbarHeight: 50,
       ),
       body: SafeArea(
-        child: Container(
-          height: size.height,
-          width: size.width,
-          padding: const EdgeInsets.all(10),
-          child: ListView.builder(
-            itemCount: songsList.length,
-            itemBuilder: (context, index) {
-              Songs song = songsList[index];
-              return SongsListItem(
-                song: song,
-                playlist: songsList,
-                index: index,
-              );
-            },
+        child: RefreshIndicator.adaptive(
+          color: AppTheme.accentColor(ref),
+          onRefresh: () async {
+            setState(() {
+              ref.read(userPlaylistsProvider);
+            });
+          },
+          child: Stack(
+            alignment: Alignment.bottomCenter,
+            children: [
+              Container(
+                height: size.height,
+                width: size.width,
+                padding: const EdgeInsets.all(10),
+                child: ListView.builder(
+                  itemCount: songsList.length,
+                  itemBuilder: (context, index) {
+                    Songs song = songsList[index];
+                    return SongsListItem(
+                      song: song,
+                      songsList: songsList,
+                      index: index,
+                      playlist: widget.playlist,
+                    );
+                  },
+                ),
+              ),
+              const MusicSlab()
+            ],
           ),
         ),
       ),

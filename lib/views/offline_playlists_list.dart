@@ -8,6 +8,7 @@ import 'package:melodia/providers/offline_playlists_provider.dart';
 import 'package:melodia/utils/colors.dart';
 import 'package:melodia/views/offline_playlists_page.dart';
 import 'package:melodia/widgets/custom_snackbar.dart';
+import 'package:melodia/widgets/music_slab.dart';
 
 class OfflinePlaylistsList extends ConsumerStatefulWidget {
   const OfflinePlaylistsList({super.key});
@@ -124,68 +125,80 @@ class _OfflinePlaylistsListState extends ConsumerState<OfflinePlaylistsList> {
         toolbarHeight: 50,
       ),
       body: SafeArea(
-        child: SizedBox(
-          height: size.height,
-          width: size.width,
-          child: offlinePlaylists.isEmpty
-              ? const Center(
-                  child: Text(
-                    'No playlists added!',
-                    style: TextStyle(fontSize: 25),
-                    textAlign: TextAlign.center,
-                  ),
-                )
-              : ListView.builder(
-                  itemCount: offlinePlaylists.length,
-                  itemBuilder: (context, index) {
-                    Playlists playlist = offlinePlaylists.elementAt(index);
-
-                    return ListTile(
-                      leading: playlist.image.contains('http')
-                          ? ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: CachedNetworkImage(
-                                imageUrl: playlist.image,
-                                height: 50,
-                                width: 50,
-                                errorWidget: (context, url, error) {
-                                  return Image.asset(
-                                    'assets/playlist_art.png',
-                                  );
-                                },
-                              ),
-                            )
-                          : Image.asset(
-                              'assets/playlist_art.png',
-                            ),
-                      title: Text(
-                        playlist.title,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      subtitle: Text('${playlist.songCount.toString()} Songs'),
-                      trailing: CupertinoButton(
-                        padding: EdgeInsets.zero,
-                        child: const Icon(
-                          Icons.delete,
-                          color: Colors.red,
+        child: RefreshIndicator.adaptive(
+          color: AppTheme.accentColor(ref),
+          onRefresh: () async {
+            ref.read(offlinePlaylistsProvider);
+          },
+          child: Stack(
+            alignment: Alignment.bottomCenter,
+            children: [
+              SizedBox(
+                height: size.height,
+                width: size.width,
+                child: offlinePlaylists.isEmpty
+                    ? const Center(
+                        child: Text(
+                          'No playlists added!',
+                          style: TextStyle(fontSize: 25),
+                          textAlign: TextAlign.center,
                         ),
-                        onPressed: () {
-                          offlinePlaylistNotifier.removePlaylist(playlist);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            customSnackBar('Removed playlist from library',ref),
+                      )
+                    : ListView.builder(
+                        itemCount: offlinePlaylists.length,
+                        itemBuilder: (context, index) {
+                          Playlists playlist = offlinePlaylists.elementAt(index);
+              
+                          return ListTile(
+                            leading: playlist.image.contains('http')
+                                ? ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: CachedNetworkImage(
+                                      imageUrl: playlist.image,
+                                      height: 50,
+                                      width: 50,
+                                      errorWidget: (context, url, error) {
+                                        return Image.asset(
+                                          'assets/playlist_art.png',
+                                        );
+                                      },
+                                    ),
+                                  )
+                                : Image.asset(
+                                    'assets/playlist_art.png',
+                                  ),
+                            title: Text(
+                              playlist.title,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            subtitle: Text('${playlist.songCount.toString()} Songs'),
+                            trailing: CupertinoButton(
+                              padding: EdgeInsets.zero,
+                              child: const Icon(
+                                Icons.delete,
+                                color: Colors.red,
+                              ),
+                              onPressed: () {
+                                offlinePlaylistNotifier.removePlaylist(playlist);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  customSnackBar('Removed playlist from library',ref),
+                                );
+                              },
+                            ),
+                            onTap: () {
+                              Navigator.of(context)
+                                  .push(MaterialPageRoute(builder: (context) {
+                                return OfflinePlaylistsPage(playlist: playlist);
+                              }));
+                            },
                           );
                         },
                       ),
-                      onTap: () {
-                        Navigator.of(context)
-                            .push(MaterialPageRoute(builder: (context) {
-                          return OfflinePlaylistsPage(playlist: playlist);
-                        }));
-                      },
-                    );
-                  },
-                ),
+              ),
+              const MusicSlab()
+            ],
+          ),
         ),
       ),
     );

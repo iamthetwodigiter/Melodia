@@ -23,12 +23,16 @@ class AudioPlayerNotifier extends StateNotifier<AudioPlayerState> {
   }
 
   void _initialize() {
-    final settings = ref.read(settingsProvider);
+    final settings = ref.watch(settingsProvider);
 
     _audioPlayer.setShuffleModeEnabled(settings?.shuffleMode ?? false);
+    _audioPlayer.setLoopMode(
+        settings?.repeatMode == true ? LoopMode.all : LoopMode.off);
 
     _audioPlayer.currentIndexStream.listen((index) {
-      state = state.copyWith(currentIndex: index);
+      if (index != null) {
+        state = state.copyWith(currentIndex: index);
+      }
     });
 
     _audioPlayer.playingStream.listen((isPlaying) {
@@ -49,7 +53,7 @@ class AudioPlayerNotifier extends StateNotifier<AudioPlayerState> {
 
     durationStateStream.listen((updatedState) {
       state = updatedState;
-    }); 
+    });
   }
 
   Stream<AudioPlayerState> get durationStateStream =>
@@ -68,7 +72,8 @@ class AudioPlayerNotifier extends StateNotifier<AudioPlayerState> {
 
   Future<void> setPlaylist(List<AudioSource> playlist, List<Songs>? songsList,
       {int? initialIndex}) async {
-    final streamingQuality = ref.watch(settingsProvider)?.streamingQuality;
+    final settings = ref.read(settingsProvider);
+    final streamingQuality = settings?.streamingQuality;
 
     _currentPlaylist = playlist;
 
@@ -83,7 +88,7 @@ class AudioPlayerNotifier extends StateNotifier<AudioPlayerState> {
       _songsList = [];
     }
 
-    final audioSource = ConcatenatingAudioSource(children: playlist);
+    final audioSource = ConcatenatingAudioSource(children: _currentPlaylist);
     await _audioPlayer.setAudioSource(audioSource, initialIndex: initialIndex);
     state = state.copyWith(currentIndex: initialIndex);
   }

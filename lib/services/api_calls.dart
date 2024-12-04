@@ -80,7 +80,7 @@ Future<String> fetchLyrics(String id) async {
 
 Future<List<Songs>> getSuggestions(String songID) async {
   final response = await http.get(
-    Uri.parse('$suggestionAPI/$songID/suggestions?limit=100'),
+    Uri.parse('$suggestionAPI/$songID/suggestions?limit=25'),
   );
   final data = jsonDecode(response.body);
   if (data['success'] == true && data['data'] != null) {

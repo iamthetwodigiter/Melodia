@@ -104,118 +104,138 @@ class _HomePageState extends ConsumerState<HomePage> {
         centerTitle: true,
       ),
       body: SafeArea(
-        child: GestureDetector(
-          behavior: HitTestBehavior.translucent,
-          onTap: () {
-            setState(() {
-              _filteredSearchHistory.clear();
-            });
+        child: RefreshIndicator.adaptive(
+          color: AppTheme.accentColor(ref),
+          onRefresh: () async {
+            ref.read(homePageProvider);
           },
-          child: Stack(
-            alignment: Alignment.topCenter,
-            children: [
-              Stack(
-                alignment: Alignment.bottomCenter,
-                children: [
-                  homePageState.when(
-                    data: (HomePageModel homePageData) {
-                      return SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            const SizedBox(height: 55),
-                            NewAlbumsCards(
-                              newAlbumData: homePageData.newAlbums,
-                            ),
-                            if (history.isNotEmpty)
-                              HistoryCards(history: history),
-                            FeaturedPlaylistsCards(
-                              featuredPlaylistsData:
-                                  homePageData.featuredPlaylists,
-                            ),
-                            ChartsCards(
-                              chartsData: homePageData.charts,
-                            ),
-                            SizedBox(
-                                height: audioProvider.isSlabShown ||
-                                        offlineAudioProvider.isSlabShown
-                                    ? 60
-                                    : 0),
-                          ],
-                        ),
-                      );
-                    },
-                    loading: () => const Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                    error: (error, stackTrace) {
-                      return const Center(
-                        child: Text(
-                          "Error occured!!\nPlease check your internet connection and try again later!!",
-                          style: TextStyle(fontSize: 18),
-                          textAlign: TextAlign.center,
-                        ),
-                      );
-                    },
-                  ),
-                  const MusicSlab(),
-                ],
-              ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                child: Column(
+          child: GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: () {
+              setState(() {
+                _filteredSearchHistory.clear();
+              });
+            },
+            child: Stack(
+              alignment: Alignment.topCenter,
+              children: [
+                Stack(
+                  alignment: Alignment.bottomCenter,
                   children: [
-                    CupertinoSearchTextField(
-                      controller: _searchController,
-                      padding: const EdgeInsets.all(15),
-                      backgroundColor: Colors.black,
-                      placeholder: 'Search',
-                      placeholderStyle: TextStyle(
-                          fontSize: 22,
-                          color: AppTheme.accentColor(ref).withAlpha(150)),
-                      prefixIcon: Icon(Icons.search,
-                          size: 30,
-                          color: AppTheme.accentColor(ref).withAlpha(150)),
-                      style: const TextStyle(color: Colors.white),
-                      onSubmitted: (value) {
-                        if (value.isNotEmpty) {
-                          _onSearch(value);
-                        }
+                    homePageState.when(
+                      data: (HomePageModel homePageData) {
+                        return SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              const SizedBox(height: 55),
+                              NewAlbumsCards(
+                                newAlbumData: homePageData.newAlbums,
+                              ),
+                              if (history.isNotEmpty)
+                                HistoryCards(history: history),
+                              FeaturedPlaylistsCards(
+                                featuredPlaylistsData:
+                                    homePageData.featuredPlaylists,
+                              ),
+                              ChartsCards(
+                                chartsData: homePageData.charts,
+                              ),
+                              SizedBox(
+                                  height: audioProvider.isSlabShown ||
+                                          offlineAudioProvider.isSlabShown
+                                      ? 75
+                                      : 0),
+                            ],
+                          ),
+                        );
+                      },
+                      loading: () => const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                      error: (error, stackTrace) {
+                        return const Center(
+                          child: Text(
+                            "Error occured!!\nPlease check your internet connection and try again later!!",
+                            style: TextStyle(fontSize: 18),
+                            textAlign: TextAlign.center,
+                          ),
+                        );
                       },
                     ),
-                    const SizedBox(height: 5),
-                    if (_filteredSearchHistory.isNotEmpty)
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: const Color.fromARGB(255, 27, 27, 27),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Column(
-                          children: _filteredSearchHistory.reversed
-                              .toList()
-                              .sublist(0,
-                                  _filteredSearchHistory.length > 3 ? 3 : null)
-                              .map(
-                                (history) => ListTile(
-                                  title: Text(
-                                    history,
-                                    style: TextStyle(
-                                      color: AppTheme.accentColor(ref),
-                                    ),
-                                  ),
-                                  onTap: () {
-                                    _onSearch(history);
-                                  },
-                                ),
-                              )
-                              .toList(),
-                        ),
-                      ),
+                    const MusicSlab(),
                   ],
                 ),
-              ),
-            ],
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  child: Column(
+                    children: [
+                      CupertinoSearchTextField(
+                        decoration: BoxDecoration(
+                            color: Colors.black,
+                            border:
+                                Border.all(color: AppTheme.accentColor(ref)),
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppTheme.accentColor(ref),
+                                blurRadius: 5,
+                                spreadRadius: 0.5,
+                              )
+                            ]),
+                        controller: _searchController,
+                        padding: const EdgeInsets.all(10),
+                        placeholder: 'Search',
+                        placeholderStyle: TextStyle(
+                            fontSize: 22,
+                            color: AppTheme.accentColor(ref).withAlpha(150)),
+                        prefixIcon: Icon(Icons.search,
+                            size: 30,
+                            color: AppTheme.accentColor(ref).withAlpha(150)),
+                        style: const TextStyle(color: Colors.white),
+                        onSubmitted: (value) {
+                          if (value.isNotEmpty) {
+                            _onSearch(value);
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 5),
+                      if (_filteredSearchHistory.isNotEmpty)
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: const Color.fromARGB(255, 27, 27, 27),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Column(
+                            children: _filteredSearchHistory.reversed
+                                .toList()
+                                .sublist(
+                                    0,
+                                    _filteredSearchHistory.length > 3
+                                        ? 3
+                                        : null)
+                                .map(
+                                  (history) => ListTile(
+                                    title: Text(
+                                      history,
+                                      style: TextStyle(
+                                        color: AppTheme.accentColor(ref),
+                                      ),
+                                    ),
+                                    onTap: () {
+                                      _onSearch(history);
+                                    },
+                                  ),
+                                )
+                                .toList(),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

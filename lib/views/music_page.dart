@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:melodia/providers/offline_audio_provider.dart';
 import 'package:melodia/providers/offline_files_provider.dart';
 import 'package:melodia/utils/colors.dart';
+import 'package:melodia/widgets/music_slab.dart';
 import 'package:melodia/widgets/offline_song_list_item.dart';
 
 class MusicPage extends ConsumerStatefulWidget {
@@ -117,54 +118,63 @@ class _MusicPageState extends ConsumerState<MusicPage> {
         centerTitle: true,
         toolbarHeight: 50,
       ),
-      body: files.isEmpty
-          ? const Center(
-              child: Text(
-                'No Songs found!!\nTry refreshing the library',
-                style: TextStyle(fontSize: 25),
-                textAlign: TextAlign.center,
-              ),
-            )
-          : ListView.builder(
-              itemCount: files.length,
-              itemBuilder: (context, index) {
-                final file = files[index];
-                final isSelected = _selectedIndices.contains(index);
-
-                return GestureDetector(
-                  onLongPress: () {
-                    if (!_selectionMode) {
-                      _toggleSelectionMode();
-                      _toggleSelection(index);
-                    }
-                  },
-                  child: Stack(
-                    children: [
-                      Container(
-                        color: isSelected
-                            ? AppTheme.accentColor(ref).withAlpha(50)
-                            : null,
-                        child: OfflineSongsListItem(
-                          playlist: files,
-                          song: file,
-                          index: index,
+      body: Stack(
+        alignment: Alignment.bottomCenter,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            child: files.isEmpty
+                ? const Center(
+                    child: Text(
+                      'No Songs found!!\nTry refreshing the library',
+                      style: TextStyle(fontSize: 25),
+                      textAlign: TextAlign.center,
+                    ),
+                  )
+                : ListView.builder(
+                    itemCount: files.length,
+                    itemBuilder: (context, index) {
+                      final file = files[index];
+                      final isSelected = _selectedIndices.contains(index);
+            
+                      return GestureDetector(
+                        onLongPress: () {
+                          if (!_selectionMode) {
+                            _toggleSelectionMode();
+                            _toggleSelection(index);
+                          }
+                        },
+                        child: Stack(
+                          children: [
+                            Container(
+                              color: isSelected
+                                  ? AppTheme.accentColor(ref).withAlpha(50)
+                                  : null,
+                              child: OfflineSongsListItem(
+                                songList: files,
+                                song: file,
+                                index: index,
+                              ),
+                            ),
+                            if (_selectionMode)
+                              Positioned(
+                                left: 15,
+                                top: 15,
+                                child: Checkbox(
+                                  value: isSelected,
+                                  onChanged: (_) => _toggleSelection(index),
+                                  activeColor: AppTheme.accentColor(ref),
+                                ),
+                              ),
+                          ],
                         ),
-                      ),
-                      if (_selectionMode)
-                        Positioned(
-                          left: 15,
-                          top: 15,
-                          child: Checkbox(
-                            value: isSelected,
-                            onChanged: (_) => _toggleSelection(index),
-                            activeColor: AppTheme.accentColor(ref),
-                          ),
-                        ),
-                    ],
+                      );
+                    },
                   ),
-                );
-              },
-            ),
+          ),
+                const MusicSlab()
+        ],
+      ),
     );
   }
 }

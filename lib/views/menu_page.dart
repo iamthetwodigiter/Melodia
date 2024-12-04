@@ -1,19 +1,13 @@
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ionicons/ionicons.dart';
 import 'package:melodia/constants/constants.dart';
 import 'package:melodia/providers/watch_history_provider.dart';
 import 'package:melodia/services/api_calls.dart';
 import 'package:melodia/utils/colors.dart';
 import 'package:melodia/views/about_me.dart';
-import 'package:melodia/views/music_page.dart';
-import 'package:melodia/views/offline_favorites_page.dart';
-import 'package:melodia/views/offline_playlists_list.dart';
 import 'package:melodia/views/settings_page.dart';
-import 'package:melodia/views/user_albums_list.dart';
-import 'package:melodia/views/favorites_page.dart';
-import 'package:melodia/views/user_playlists_list.dart';
 import 'package:melodia/widgets/custom_snackbar.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -25,7 +19,15 @@ class MenuPage extends ConsumerStatefulWidget {
 }
 
 class _MenuPageState extends ConsumerState<MenuPage> {
+  List<String> abi = [];
   void showUpdateDialog(String latestVersion) {
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    deviceInfo.androidInfo.then((androidInfo) {
+      setState(() {
+        abi = androidInfo.supportedAbis;
+      });
+    });
+
     showCupertinoDialog(
       context: context,
       builder: (context) => CupertinoAlertDialog(
@@ -33,7 +35,8 @@ class _MenuPageState extends ConsumerState<MenuPage> {
           'Update Available',
           style: TextStyle(color: AppTheme.accentColor(ref)),
         ),
-        content: Text('A new version ($latestVersion) is available.'),
+        content: Text(
+            'Another latest stable version ($latestVersion) is available.'),
         actions: [
           CupertinoDialogAction(
             isDestructiveAction: true,
@@ -43,7 +46,22 @@ class _MenuPageState extends ConsumerState<MenuPage> {
           CupertinoDialogAction(
             onPressed: () {
               Navigator.pop(context);
-              launchUrl(Uri.parse('https://melodiahub.netlify.app/#download'));
+              String urlToHit = '';
+              if (abi.contains('armeabi-v7a')) {
+
+                urlToHit +=
+                    'https://github.com/iamthetwodigiter/Melodia/releases/download/$latestVersion/Melodia-$latestVersion-armeabi-v7a.apk';
+              } else if (abi.contains('arm64-v8a')) {
+                urlToHit +=
+                    'https://github.com/iamthetwodigiter/Melodia/releases/download/$latestVersion/Melodia-$latestVersion-arm64-v8a.apk';
+              } else if (abi.contains('x86')) {
+                urlToHit +=
+                    'https://github.com/iamthetwodigiter/Melodia/releases/download/$latestVersion/Melodia-$latestVersion-x86_64.apk';
+              } else {
+                urlToHit +=
+                    'https://github.com/iamthetwodigiter/Melodia/releases/download/$latestVersion/Melodia-$latestVersion-universal.apk';
+              }
+              launchUrl(Uri.parse(urlToHit));
             },
             child: Text(
               'Update',
@@ -129,155 +147,6 @@ class _MenuPageState extends ConsumerState<MenuPage> {
             children: [
               ListTile(
                 //  tileColor: AppTheme.accentColor(ref)!.withAlpha(50),
-                leading: Icon(Icons.album, color: AppTheme.accentColor(ref)),
-                title: const Text('Albums'),
-                subtitle: const Text('All your favorite albums are here'),
-                titleTextStyle: TextStyle(
-                  color: AppTheme.accentColor(ref),
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => const UserAlbumsList(),
-                    ),
-                  );
-                },
-              ),
-              ListTile(
-                //  tileColor: AppTheme.accentColor(ref)!.withAlpha(50),
-                leading:
-                    Icon(Icons.playlist_play, color: AppTheme.accentColor(ref)),
-                title: const Text('Playlists'),
-                subtitle: const Text('All your favorite playlists are here'),
-                titleTextStyle: TextStyle(
-                  color: AppTheme.accentColor(ref),
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => const UserPlaylistsList(),
-                    ),
-                  );
-                },
-              ),
-              ListTile(
-                //  tileColor: AppTheme.accentColor(ref)!.withAlpha(50),
-                leading: Icon(Ionicons.musical_notes,
-                    color: AppTheme.accentColor(ref)),
-                title: const Text('Offline Playlist'),
-                subtitle: const Text('All your playlists for offline songs'),
-                titleTextStyle: TextStyle(
-                  color: AppTheme.accentColor(ref),
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => const OfflinePlaylistsList(),
-                    ),
-                  );
-                },
-              ),
-              ListTile(
-                //  tileColor: AppTheme.accentColor(ref)!.withAlpha(50),
-                leading: Icon(Icons.favorite, color: AppTheme.accentColor(ref)),
-                title: const Text('Favorites'),
-                subtitle: const Text('All your favorite songs are here'),
-                titleTextStyle: TextStyle(
-                  color: AppTheme.accentColor(ref),
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => const FavoritesPage(),
-                    ),
-                  );
-                },
-              ),
-              ListTile(
-                //  tileColor: AppTheme.accentColor(ref)!.withAlpha(50),
-                leading: Icon(Icons.favorite_border,
-                    color: AppTheme.accentColor(ref)),
-                title: const Text('Offline Favorites'),
-                subtitle:
-                    const Text('All your offline favorite songs are here'),
-                titleTextStyle: TextStyle(
-                  color: AppTheme.accentColor(ref),
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => const OfflineFavoritesPage(),
-                    ),
-                  );
-                },
-              ),
-              ListTile(
-                //  tileColor: AppTheme.accentColor(ref)!.withAlpha(50),
-                leading:
-                    Icon(Icons.library_music, color: AppTheme.accentColor(ref)),
-                title: const Text('All Songs'),
-                subtitle: const Text('Browse all the music on device'),
-                titleTextStyle: TextStyle(
-                  color: AppTheme.accentColor(ref),
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          const MusicPage(isDownloadsFolder: false),
-                    ),
-                  );
-                },
-              ),
-              ListTile(
-                //  tileColor: AppTheme.accentColor(ref)!.withAlpha(50),
-                leading:
-                    Icon(Icons.download_done, color: AppTheme.accentColor(ref)),
-                title: const Text('Downloads'),
-                subtitle: const Text('Browse all Melodia downloads'),
-                titleTextStyle: TextStyle(
-                  color: AppTheme.accentColor(ref),
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          const MusicPage(isDownloadsFolder: true),
-                    ),
-                  );
-                },
-              ),
-              ListTile(
-                //  tileColor: AppTheme.accentColor(ref)!.withAlpha(50),
-                leading: Icon(Icons.delete, color: AppTheme.accentColor(ref)),
-                title: const Text('Clear History'),
-                titleTextStyle: TextStyle(
-                  color: AppTheme.accentColor(ref),
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-                onTap: () {
-                  history.clearHistory();
-                  ScaffoldMessenger.of(context)
-                      .showSnackBar(customSnackBar('History has been cleared',ref));
-                },
-              ),
-              ListTile(
-                //  tileColor: AppTheme.accentColor(ref)!.withAlpha(50),
                 leading: Icon(Icons.settings, color: AppTheme.accentColor(ref)),
                 title: const Text('Settings'),
                 subtitle: const Text('Tune it to your preference'),
@@ -292,6 +161,22 @@ class _MenuPageState extends ConsumerState<MenuPage> {
                       builder: (context) => const SettingsPage(),
                     ),
                   );
+                },
+              ),
+              ListTile(
+                //  tileColor: AppTheme.accentColor(ref)!.withAlpha(50),
+                leading: Icon(Icons.delete, color: AppTheme.accentColor(ref)),
+                title: const Text('Clear History'),
+                subtitle: const Text('Clear your streaming history'),
+                titleTextStyle: TextStyle(
+                  color: AppTheme.accentColor(ref),
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+                onTap: () {
+                  history.clearHistory();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      customSnackBar('History has been cleared', ref));
                 },
               ),
               ListTile(

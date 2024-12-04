@@ -30,7 +30,7 @@ class ChartsCards extends ConsumerWidget {
           ),
         ),
         SizedBox(
-          height: size.height * 0.28,
+          height: size.height * 0.32,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             itemCount: chartsData.length,
@@ -46,35 +46,38 @@ class ChartsCards extends ConsumerWidget {
                 },
                 child: Container(
                   margin: const EdgeInsets.all(10).copyWith(bottom: 0),
-                  height: size.height * 0.3,
-                  width: size.width * 0.35,
-                  child: Column(
-                    children: [
-                      Container(
-                        height: size.height * 0.2,
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: CachedNetworkImageProvider(
-                              playlistItem.image,
+                  // height: size.height * 0.3,
+                  // width: size.width * 0.35,
+                  child: AspectRatio(
+                    aspectRatio: 10/16,
+                    child: Column(
+                      children: [
+                        Container(
+                          height: size.height * 0.25,
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: CachedNetworkImageProvider(
+                                playlistItem.image,
+                              ),
+                              fit: BoxFit.cover,
                             ),
-                            fit: BoxFit.cover,
+                            borderRadius: BorderRadius.circular(20),
                           ),
-                          borderRadius: BorderRadius.circular(20),
                         ),
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        playlistItem.title,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          // fontWeight: FontWeight.bold,
-                          height: 0.98,
+                        const SizedBox(height: 5),
+                        Text(
+                          playlistItem.title,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            // fontWeight: FontWeight.bold,
+                            height: 0.98,
+                          ),
+                          maxLines: 2,
+                          textAlign: TextAlign.center,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        maxLines: 2,
-                        textAlign: TextAlign.center,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               );

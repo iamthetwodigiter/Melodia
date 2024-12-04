@@ -15,18 +15,21 @@ import 'package:melodia/utils/colors.dart';
 import 'package:melodia/views/player_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:melodia/widgets/custom_snackbar.dart';
+import 'package:swipe_to/swipe_to.dart';
 
 class SongsListItem extends ConsumerStatefulWidget {
-  final List<Songs> playlist;
+  final List<Songs> songsList;
   final Songs song;
   final int index;
   final bool fromPlayingQueue;
+  final Playlists? playlist;
   const SongsListItem({
     super.key,
-    required this.playlist,
+    required this.songsList,
     required this.song,
     required this.index,
     this.fromPlayingQueue = false,
+    this.playlist,
   });
 
   @override
@@ -86,10 +89,10 @@ class _SongsListItemState extends ConsumerState<SongsListItem> {
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
                       customSnackBar(
-                        isAdded
-                            ? '${widget.song.title} added to Playlist ${playlist.title}'
-                            : 'Song already exists in Playlist',ref
-                      ),
+                          isAdded
+                              ? '${widget.song.title} added to Playlist ${playlist.title}'
+                              : 'Song already exists in Playlist',
+                          ref),
                     );
                   },
                   child: Text(
@@ -150,7 +153,8 @@ class _SongsListItemState extends ConsumerState<SongsListItem> {
                             },
                             child: Text(
                               'Create',
-                              style: TextStyle(color: AppTheme.accentColor(ref)),
+                              style:
+                                  TextStyle(color: AppTheme.accentColor(ref)),
                             ),
                           ),
                         ],
@@ -169,169 +173,198 @@ class _SongsListItemState extends ConsumerState<SongsListItem> {
       );
     }
 
-    return ListTile(
-      splashColor: Colors.white.withAlpha(50),
-      enableFeedback: true,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
-      contentPadding: EdgeInsets.zero,
-      leading: ClipRRect(
-        borderRadius: BorderRadius.circular(10),
-        child: Stack(
-          alignment: Alignment.bottomRight,
-          children: [
-            CachedNetworkImage(
-              imageUrl: widget.song.image,
-              height: 50,
-              width: 50,
-              fit: BoxFit.cover,
-              memCacheHeight: 50,
-              memCacheWidth: 50,
-              errorWidget: (context, url, error) {
-                return Center(
-                  child: Image.asset('assets/song_thumb.png'),
-                );
-              },
-            ),
-            if (isDownloaded)
-              Container(
-                height: 20,
-                width: 20,
-                decoration: const BoxDecoration(
-                    shape: BoxShape.circle, color: Colors.green),
-                child: const Icon(
-                  Icons.download_done_outlined,
-                  color: Colors.white,
-                  size: 15,
+    return SwipeTo(
+      iconOnLeftSwipe: Icons.delete,
+      iconColor: Colors.red,
+      onLeftSwipe: widget.playlist != null
+          ? (details) {
+              if (widget.playlist != null) {
+                try {
+                  userPlaylistNotifier.removeSongFromPlaylist(
+                      widget.playlist!, widget.song);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    customSnackBar(
+                        '${widget.song.title} removed from playlist ${widget.playlist!.title}\nRefresh the page to update the list',
+                        ref),
+                  );
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    customSnackBar('Unable to remove song from playlist', ref),
+                  );
+                  throw Exception(e);
+                }
+              }
+            }
+          : null,
+      child: ListTile(
+        splashColor: Colors.white.withAlpha(50),
+        enableFeedback: true,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        contentPadding: EdgeInsets.zero,
+        leading: ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: Stack(
+            alignment: Alignment.bottomRight,
+            children: [
+              CachedNetworkImage(
+                imageUrl: widget.song.image,
+                height: 50,
+                width: 50,
+                fit: BoxFit.cover,
+                memCacheHeight: 50,
+                memCacheWidth: 50,
+                errorWidget: (context, url, error) {
+                  return Center(
+                    child: Image.asset('assets/song_thumb.png'),
+                  );
+                },
+              ),
+              if (isDownloaded)
+                Container(
+                  height: 20,
+                  width: 20,
+                  decoration: const BoxDecoration(
+                      shape: BoxShape.circle, color: Colors.green),
+                  child: const Icon(
+                    Icons.download_done_outlined,
+                    color: Colors.white,
+                    size: 15,
+                  ),
+                ),
+            ],
+          ),
+        ),
+        trailing: SizedBox(
+          width: 68,
+          child: Row(
+            children: [
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    if (isFavorite) {
+                      favoritesNotifier.removeFavorite(widget.song);
+                    } else {
+                      favoritesNotifier.addFavorite(widget.song);
+                    }
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    customSnackBar(
+                        isFavorite
+                            ? '${widget.song.title} removed from Favorites'
+                            : '${widget.song.title} added to Favorites',
+                        ref),
+                  );
+                },
+                child: Icon(
+                  isFavorite ? Icons.favorite : Icons.favorite_border,
+                  color: isFavorite ? Colors.red : null,
                 ),
               ),
-          ],
-        ),
-      ),
-      trailing: SizedBox(
-        width: 68,
-        child: Row(
-          children: [
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  if (isFavorite) {
-                    favoritesNotifier.removeFavorite(widget.song);
-                  } else {
-                    favoritesNotifier.addFavorite(widget.song);
-                  }
-                });
-                ScaffoldMessenger.of(context).showSnackBar(
-                  customSnackBar(isFavorite
-                      ? '${widget.song.title} removed from Favorites'
-                      : '${widget.song.title} added to Favorites',ref),
-                );
-              },
-              child: Icon(
-                isFavorite ? Icons.favorite : Icons.favorite_border,
-                color: isFavorite ? Colors.red : null,
-              ),
-            ),
-            CupertinoButton(
-              padding: EdgeInsets.zero,
-              child: Icon(Icons.more_vert, color: AppTheme.accentColor(ref)),
-              onPressed: () {
-                showCupertinoDialog(
-                  context: context,
-                  builder: (context) {
-                    return CupertinoActionSheet(
-                      cancelButton: CupertinoActionSheetAction(
-                        isDestructiveAction: true,
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: const Text('Cancel'),
-                      ),
-                      title: Text(
-                        widget.song.title,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      actions: [
-                        CupertinoActionSheetAction(
+              CupertinoButton(
+                padding: EdgeInsets.zero,
+                child: Icon(Icons.more_vert, color: AppTheme.accentColor(ref)),
+                onPressed: () {
+                  showCupertinoDialog(
+                    context: context,
+                    builder: (context) {
+                      return CupertinoActionSheet(
+                        cancelButton: CupertinoActionSheetAction(
+                          isDestructiveAction: true,
                           onPressed: () {
                             Navigator.pop(context);
-                            addToPlaylist();
                           },
-                          child: Text(
-                            'Add to Playlist',
-                            style: TextStyle(color: AppTheme.accentColor(ref)),
+                          child: const Text('Cancel'),
+                        ),
+                        title: Text(
+                          widget.song.title,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                        CupertinoActionSheetAction(
-                          onPressed: () {
-                            Navigator.pop(context);
-                            if (isDownloaded) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                customSnackBar(
-                                  '"${widget.song.title}" is Already Downloaded',ref
-                                ),
-                              );
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
+                        actions: [
+                          CupertinoActionSheetAction(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              addToPlaylist();
+                            },
+                            child: Text(
+                              'Add to Playlist',
+                              style:
+                                  TextStyle(color: AppTheme.accentColor(ref)),
+                            ),
+                          ),
+                          CupertinoActionSheetAction(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              if (isDownloaded) {
+                                ScaffoldMessenger.of(context).showSnackBar(
                                   customSnackBar(
-                                      '"${widget.song.title}" Downloading Started',ref));
-                              downloadSong(
-                                [widget.song],
-                                settings?.downloadQuality.toString() ?? '96',
-                                ref,
-                              );
-                            }
-                          },
-                          child: Text(
-                            'Download',
-                            style: TextStyle(color: AppTheme.accentColor(ref)),
+                                      '"${widget.song.title}" is Already Downloaded',
+                                      ref),
+                                );
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    customSnackBar(
+                                        '"${widget.song.title}" Downloading Started',
+                                        ref));
+                                downloadSong(
+                                  [widget.song],
+                                  settings?.downloadQuality.toString() ?? '96',
+                                  ref,
+                                );
+                              }
+                            },
+                            child: Text(
+                              'Download',
+                              style:
+                                  TextStyle(color: AppTheme.accentColor(ref)),
+                            ),
                           ),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
-            ),
-          ],
-        ),
-      ),
-      title: Text(
-        widget.song.title,
-        style: const TextStyle(fontSize: 18),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      ),
-      subtitle: Text(
-        widget.song.artists.map((artist) => artist.name).toSet().join(', '),
-        style: const TextStyle(color: Colors.grey, fontSize: 15),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      ),
-      onTap: () {
-        history.addHistory(widget.song);
-        if (widget.fromPlayingQueue) {
-          setState(() {
-            Navigator.pop(context);
-            audioNotifier.seek(Duration.zero, index: widget.index);
-            audioNotifier.play();
-          });
-        } else {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => PlayerScreen(
-                playlist: widget.playlist,
-                initialIndex: widget.index,
+                        ],
+                      );
+                    },
+                  );
+                },
               ),
-            ),
-          );
-        }
-      },
+            ],
+          ),
+        ),
+        title: Text(
+          widget.song.title,
+          style: const TextStyle(fontSize: 18),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        subtitle: Text(
+          widget.song.artists.map((artist) => artist.name).toSet().join(', '),
+          style: const TextStyle(color: Colors.grey, fontSize: 15),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        onTap: () {
+          history.addHistory(widget.song);
+          if (widget.fromPlayingQueue) {
+            setState(() {
+              Navigator.pop(context);
+              audioNotifier.seek(Duration.zero, index: widget.index);
+              audioNotifier.play();
+            });
+          } else {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => PlayerScreen(
+                  playlist: widget.songsList,
+                  initialIndex: widget.index,
+                ),
+              ),
+            );
+          }
+        },
+      ),
     );
   }
 }

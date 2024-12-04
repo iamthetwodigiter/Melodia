@@ -10,6 +10,7 @@ class AudioPlayerState {
   final Duration buffered;
   final Duration total;
   final bool isSlabShown;
+  final bool isLoading;
 
   const AudioPlayerState({
     this.currentIndex,
@@ -21,6 +22,7 @@ class AudioPlayerState {
     this.buffered = Duration.zero,
     this.total = Duration.zero,
     this.isSlabShown = false,
+    this.isLoading = true,
   });
 
   AudioPlayerState copyWith({
@@ -33,6 +35,7 @@ class AudioPlayerState {
     Duration? buffered,
     Duration? total,
     bool? isSlabShown,
+    bool? isLoading,
   }) {
     return AudioPlayerState(
       currentIndex: currentIndex ?? this.currentIndex,
@@ -44,6 +47,7 @@ class AudioPlayerState {
       buffered: buffered ?? this.buffered,
       total: total ?? this.total,
       isSlabShown: isSlabShown ?? this.isSlabShown,
+      isLoading: isLoading ?? this.isLoading,
     );
   }
 }

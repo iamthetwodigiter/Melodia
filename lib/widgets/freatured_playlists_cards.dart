@@ -30,7 +30,7 @@ class FeaturedPlaylistsCards extends ConsumerWidget {
           ),
         ),
         SizedBox(
-          height: size.height * 0.32,
+          height: size.height * 0.37,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             itemCount: featuredPlaylistsData.length,
@@ -47,57 +47,60 @@ class FeaturedPlaylistsCards extends ConsumerWidget {
                 },
                 child: Container(
                   margin: const EdgeInsets.all(10).copyWith(bottom: 0),
-                  height: size.height * 0.3,
-                  width: size.width * 0.35,
-                  child: Column(
-                    children: [
-                      Container(
-                        height: size.height * 0.2,
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: CachedNetworkImageProvider(
-                              playlistItem.image,
+                  // height: size.height * 0.3,
+                  // width: size.width * 0.35,
+                  child: AspectRatio(
+                    aspectRatio: 10/16,
+                    child: Column(
+                      children: [
+                        Container(
+                          height: size.height * 0.25,
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: CachedNetworkImageProvider(
+                                playlistItem.image,
+                              ),
+                              fit: BoxFit.cover,
                             ),
-                            fit: BoxFit.cover,
+                            borderRadius: BorderRadius.circular(20),
                           ),
-                          borderRadius: BorderRadius.circular(20),
                         ),
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        playlistItem.listName,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          // fontWeight: FontWeight.bold
-                          height: 0.98,
+                        const SizedBox(height: 5),
+                        Text(
+                          playlistItem.listName,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            // fontWeight: FontWeight.bold
+                            height: 0.98,
+                          ),
+                          maxLines: 1,
+                          textAlign: TextAlign.center,
                         ),
-                        maxLines: 1,
-                        textAlign: TextAlign.center,
-                      ),
-                      Text(
-                        '${playlistItem.count} Songs',
-                        style: const TextStyle(
-                          fontSize: 15,
+                        Text(
+                          '${playlistItem.count} Songs',
+                          style: const TextStyle(
+                            fontSize: 15,
+                          ),
+                          maxLines: 1,
+                          textAlign: TextAlign.center,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        maxLines: 1,
-                        textAlign: TextAlign.center,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Text(
-                        playlistItem.dataType.toUpperCase(),
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
+                        Text(
+                          playlistItem.dataType.toUpperCase(),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                      Text(
-                        '${playlistItem.followerCount} 🙎🏻',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
+                        Text(
+                          '${playlistItem.followerCount} 🙎🏻',
+                          style: const TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               );

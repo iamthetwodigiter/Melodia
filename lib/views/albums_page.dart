@@ -123,10 +123,10 @@ class _AlbumsPageState extends ConsumerState<AlbumsPage> {
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
                                         customSnackBar(
-                                          isAlbumAdded
-                                              ? 'Removed Album'
-                                              : 'Added Album',ref
-                                        ),
+                                            isAlbumAdded
+                                                ? 'Removed Album'
+                                                : 'Added Album',
+                                            ref),
                                       );
                                     },
                                     style: ButtonStyle(
@@ -148,8 +148,8 @@ class _AlbumsPageState extends ConsumerState<AlbumsPage> {
                                 onPressed: () {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     customSnackBar(
-                                      'Downloading "${data.title}" Album Started',ref
-                                    ),
+                                        'Downloading "${data.title}" Album Started',
+                                        ref),
                                   );
 
                                   downloadSong(
@@ -191,7 +191,7 @@ class _AlbumsPageState extends ConsumerState<AlbumsPage> {
 
                               return SongsListItem(
                                 song: song,
-                                playlist: songsList,
+                                songsList: songsList,
                                 index: index,
                               );
                             } else {
@@ -241,7 +241,7 @@ class _AlbumsPageState extends ConsumerState<AlbumsPage> {
                           },
                         ),
                       ),
-                      SizedBox(height: audioProvider.isSlabShown ? 60 : 0),
+                      SizedBox(height: audioProvider.isSlabShown ? 75 : 0),
                     ],
                   ),
                 );

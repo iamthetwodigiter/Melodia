@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ionicons/ionicons.dart';
@@ -13,6 +15,7 @@ import 'package:melodia/providers/offline_favorites_provider.dart';
 import 'package:melodia/utils/colors.dart';
 import 'package:melodia/widgets/custom_snackbar.dart';
 import 'package:melodia/widgets/offline_song_list_item.dart';
+import 'package:melodia/widgets/sleep_timer.dart';
 
 class OfflinePlayerScreen extends ConsumerStatefulWidget {
   final List<Songs> playlist;
@@ -34,6 +37,48 @@ class _OfflinePlayerScreenState extends ConsumerState<OfflinePlayerScreen> {
   late final OfflineAudioPlayerNotifier audioNotifier;
   String lyrics = '';
   bool _showLyrics = false;
+
+  Duration? _remainingDuration;
+  Timer? _countdownTimer;
+
+  void startSleepTimer(Duration duration) {
+    setState(() {
+      _remainingDuration = duration;
+    });
+
+    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_remainingDuration! > const Duration(seconds: 1)) {
+        setState(() {
+          _remainingDuration = _remainingDuration! - const Duration(seconds: 1);
+        });
+      } else {
+        timer.cancel();
+        ref.read(offlineAudioPlayerProvider.notifier).stop(); // Stop music
+        setState(() {
+          _remainingDuration = null; // Reset timer
+        });
+      }
+    });
+  }
+
+  void cancelSleepTimer() {
+    _countdownTimer?.cancel();
+    setState(() {
+      _remainingDuration = null;
+    });
+  }
+
+  void addTimer(BuildContext context) {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => SleepTimerDialog(
+        stopMusic: cancelSleepTimer,
+        remainingDuration: _remainingDuration,
+        onStartTimer: startSleepTimer,
+        onCancelTimer: cancelSleepTimer,
+      ),
+    );
+  }
 
   @override
   void initState() {
@@ -67,6 +112,12 @@ class _OfflinePlayerScreenState extends ConsumerState<OfflinePlayerScreen> {
   }
 
   @override
+  void dispose() {
+    _countdownTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final audioState = ref.watch(offlineAudioPlayerProvider);
     final audioNotifier = ref.read(offlineAudioPlayerProvider.notifier);
@@ -82,7 +133,6 @@ class _OfflinePlayerScreenState extends ConsumerState<OfflinePlayerScreen> {
     final isFavorite = offlineFavorites.isFavorite(currentSong);
 
     if (currentSong.hasLyrics) {
-
       setState(() {
         lyrics = currentSong.type;
       });
@@ -116,7 +166,7 @@ class _OfflinePlayerScreenState extends ConsumerState<OfflinePlayerScreen> {
                         ? AppTheme.accentColor(ref).withAlpha(50)
                         : null,
                     child: OfflineSongsListItem(
-                      playlist: audioNotifier.songsList,
+                      songList: audioNotifier.songsList,
                       song: song,
                       index: index - 1,
                       fromPlayingQueue: true,
@@ -222,7 +272,8 @@ class _OfflinePlayerScreenState extends ConsumerState<OfflinePlayerScreen> {
                       total: total,
                       progressBarColor: AppTheme.accentColor(ref),
                       baseBarColor: AppTheme.accentColor(ref).withAlpha(100),
-                      bufferedBarColor: AppTheme.accentColor(ref).withAlpha(100),
+                      bufferedBarColor:
+                          AppTheme.accentColor(ref).withAlpha(100),
                       thumbColor: AppTheme.accentColor(ref),
                       onSeek: (duration) {
                         audioNotifier.seek(duration);
@@ -343,10 +394,10 @@ class _OfflinePlayerScreenState extends ConsumerState<OfflinePlayerScreen> {
                       });
                       ScaffoldMessenger.of(context).showSnackBar(
                         customSnackBar(
-                          !isFavorite
-                              ? 'Added to Favorites ❤️'
-                              : 'Removed from Favorites',ref
-                        ),
+                            !isFavorite
+                                ? 'Added to Favorites ❤️'
+                                : 'Removed from Favorites',
+                            ref),
                       );
                     },
                     child: isFavorite
@@ -354,11 +405,23 @@ class _OfflinePlayerScreenState extends ConsumerState<OfflinePlayerScreen> {
                         : const Icon(Icons.favorite_border,
                             color: Colors.white),
                   ),
-                  GestureDetector(
-                    onTap: () {},
-                    child:
-                        const Icon(Icons.bedtime_outlined, color: Colors.white),
-                  ),
+                  (_remainingDuration == null)
+                      ? GestureDetector(
+                          onTap: () {
+                            addTimer(context);
+                          },
+                          child: const Icon(Icons.bedtime_outlined,
+                              color: Colors.white),
+                        )
+                      : GestureDetector(
+                          onTap: () {
+                            cancelSleepTimer();
+                          },
+                          child: Text(
+                            "${_remainingDuration!.inMinutes}:${(_remainingDuration!.inSeconds % 60).toString().padLeft(2, '0')}",
+                            style: TextStyle(color: AppTheme.accentColor(ref)),
+                          ),
+                        ),
                   GestureDetector(
                     onTap: () {
                       setState(() {

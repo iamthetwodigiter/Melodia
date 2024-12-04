@@ -30,7 +30,7 @@ class NewAlbumsCards extends ConsumerWidget {
           ),
         ),
         SizedBox(
-          height: size.height * 0.3,
+          height: size.height * 0.35,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             itemCount: newAlbumData.length,
@@ -48,43 +48,46 @@ class NewAlbumsCards extends ConsumerWidget {
                 },
                 child: Container(
                   margin: const EdgeInsets.all(10).copyWith(bottom: 0),
-                  height: size.height * 0.3,
-                  width: size.width * 0.35,
-                  child: Column(
-                    children: [
-                      Container(
-                        height: size.height * 0.2,
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: CachedNetworkImageProvider(
-                              albumItem.image,
+                  // height: size.height * 0.3,
+                  // width: size.width * 0.35,
+                  child: AspectRatio(
+                    aspectRatio: 10/16,
+                    child: Column(
+                      children: [
+                        Container(
+                          height: size.height * 0.25,
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: CachedNetworkImageProvider(
+                                albumItem.image,
+                              ),
+                              fit: BoxFit.cover,
                             ),
-                            fit: BoxFit.cover,
+                            borderRadius: BorderRadius.circular(20),
                           ),
-                          borderRadius: BorderRadius.circular(20),
                         ),
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        albumItem.title,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          // fontWeight: FontWeight.bold,
-                          height: 0.98,
+                        const SizedBox(height: 5),
+                        Text(
+                          albumItem.title,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            // fontWeight: FontWeight.bold,
+                            height: 0.98,
+                          ),
+                          maxLines: 2,
+                          textAlign: TextAlign.center,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        maxLines: 2,
-                        textAlign: TextAlign.center,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        '${albumItem.year} • ${albumItem.language.toUpperCase()}',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
+                        const SizedBox(height: 5),
+                        Text(
+                          '${albumItem.year} • ${albumItem.language.toUpperCase()}',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               );

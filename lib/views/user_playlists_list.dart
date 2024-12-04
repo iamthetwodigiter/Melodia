@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +8,7 @@ import 'package:melodia/providers/user_playlists_provider.dart';
 import 'package:melodia/utils/colors.dart';
 import 'package:melodia/views/user_playlists_page.dart';
 import 'package:melodia/widgets/custom_snackbar.dart';
+import 'package:melodia/widgets/music_slab.dart';
 
 class UserPlaylistsList extends ConsumerStatefulWidget {
   const UserPlaylistsList({super.key});
@@ -40,86 +40,6 @@ class _UserPlaylistsListState extends ConsumerState<UserPlaylistsList> {
     final userPlaylistNotifier = ref.watch(userPlaylistsProvider.notifier);
 
     void playlistNameDialog() {
-      // showAdaptiveDialog(
-      //   context: context,
-      //   builder: (context) {
-      //     return AlertDialog.adaptive(
-      //       title: Text(
-      //         'Create Playlist',
-      //         style: TextStyle(
-      //             color: AppTheme.accentColor(ref), fontWeight: FontWeight.bold),
-      //       ),
-      //       content: TextField(
-      //         controller: _playlistNameController,
-      //         cursorColor: AppTheme.accentColor(ref),
-      //         onChanged: (value) {
-      //           setState(() {});
-      //         },
-      //         decoration: InputDecoration(
-      //           focusColor: AppTheme.accentColor(ref),
-      //           focusedBorder: OutlineInputBorder(
-      //             borderSide: BorderSide(color: AppTheme.accentColor(ref)!),
-      //           ),
-      //           labelText: 'Enter Playlist Name',
-      //           floatingLabelStyle: TextStyle(color: AppTheme.accentColor(ref)),
-      //           suffixIcon: InkWell(
-      //             onTap: () {
-      //               _playlistNameController.clear();
-      //             },
-      //             child: const Icon(
-      //               Icons.delete,
-      //               color: Colors.red,
-      //             ),
-      //           ),
-      //         ),
-      //       ),
-      //       actions: [
-      //         GestureDetector(
-      //           onTap: () {
-      //             Navigator.of(context).pop();
-      //             _playlistNameController.clear();
-      //           },
-      //           child: const Text(
-      //             'Cancel',
-      //             style: TextStyle(
-      //               color: Colors.red,
-      //               fontWeight: FontWeight.bold,
-      //             ),
-      //           ),
-      //         ),
-      //         GestureDetector(
-      //           onTap: () {
-      //             String id = Random().nextInt(1000000000).toString();
-      //             int year = DateTime.now().year;
-      //             userPlaylistsNotifier.addPlaylist(
-      //               Playlists(
-      //                 id: id,
-      //                 title: _playlistNameController.text,
-      //                 type: 'User Playlist',
-      //                 year: year,
-      //                 language: '',
-      //                 explicitContent: false,
-      //                 url: '',
-      //                 songCount: 0,
-      //                 artists: [],
-      //                 image: '',
-      //                 songs: [],
-      //               ),
-      //             );
-      //             Navigator.of(context).pop();
-      //             _playlistNameController.clear();
-      //           },
-      //           child: const Text(
-      //             'Create',
-      //             style: TextStyle(
-      //               fontWeight: FontWeight.bold,
-      //             ),
-      //           ),
-      //         ),
-      //       ],
-      //     );
-      //   },
-      // );
       showCupertinoDialog(
         context: context,
         builder: (context) {
@@ -203,68 +123,82 @@ class _UserPlaylistsListState extends ConsumerState<UserPlaylistsList> {
         toolbarHeight: 50,
       ),
       body: SafeArea(
-        child: SizedBox(
-          height: size.height,
-          width: size.width,
-          child: userPlaylists.isEmpty
-              ? const Center(
-                  child: Text(
-                    'No playlists added!',
-                    style: TextStyle(fontSize: 25),
-                    textAlign: TextAlign.center,
-                  ),
-                )
-              : ListView.builder(
-                  itemCount: userPlaylists.length,
-                  itemBuilder: (context, index) {
-                    Playlists playlist = userPlaylists.elementAt(index);
-
-                    return ListTile(
-                      leading: playlist.image.contains('http')
-                          ? ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: CachedNetworkImage(
-                                imageUrl: playlist.image,
-                                height: 50,
-                                width: 50,
-                                errorWidget: (context, url, error) {
-                                  return Image.asset(
-                                    'assets/playlist_art.png',
-                                  );
-                                },
-                              ),
-                            )
-                          : Image.asset(
-                              'assets/playlist_art.png',
-                            ),
-                      title: Text(
-                        playlist.title,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      subtitle: Text('${playlist.songCount.toString()} Songs'),
-                      trailing: CupertinoButton(
-                        padding: EdgeInsets.zero,
-                        child: const Icon(
-                          Icons.delete,
-                          color: Colors.red,
+        child: RefreshIndicator.adaptive(
+          color: AppTheme.accentColor(ref),
+          onRefresh: () async {
+            ref.read(userPlaylistsProvider);
+          },
+          child: Stack(
+            alignment: Alignment.bottomCenter,
+            children: [
+              SizedBox(
+                height: size.height,
+                width: size.width,
+                child: userPlaylists.isEmpty
+                    ? const Center(
+                        child: Text(
+                          'No playlists added!',
+                          style: TextStyle(fontSize: 25),
+                          textAlign: TextAlign.center,
                         ),
-                        onPressed: () {
-                          userPlaylistNotifier.removePlaylist(playlist);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            customSnackBar('Removed playlist from library',ref),
+                      )
+                    : ListView.builder(
+                        itemCount: userPlaylists.length,
+                        itemBuilder: (context, index) {
+                          Playlists playlist = userPlaylists.elementAt(index);
+              
+                          return ListTile(
+                            leading: playlist.image.contains('http')
+                                ? ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: CachedNetworkImage(
+                                      imageUrl: playlist.image,
+                                      height: 50,
+                                      width: 50,
+                                      errorWidget: (context, url, error) {
+                                        return Image.asset(
+                                          'assets/playlist_art.png',
+                                        );
+                                      },
+                                    ),
+                                  )
+                                : Image.asset(
+                                    'assets/playlist_art.png',
+                                  ),
+                            title: Text(
+                              playlist.title,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            subtitle:
+                                Text('${playlist.songCount.toString()} Songs'),
+                            trailing: CupertinoButton(
+                              padding: EdgeInsets.zero,
+                              child: const Icon(
+                                Icons.delete,
+                                color: Colors.red,
+                              ),
+                              onPressed: () {
+                                userPlaylistNotifier.removePlaylist(playlist);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  customSnackBar(
+                                      'Removed playlist ${playlist.title} from library', ref),
+                                );
+                              },
+                            ),
+                            onTap: () {
+                              Navigator.of(context)
+                                  .push(MaterialPageRoute(builder: (context) {
+                                return UserPlaylistsPage(playlist: playlist);
+                              }));
+                            },
                           );
                         },
                       ),
-                      onTap: () {
-                        Navigator.of(context)
-                            .push(MaterialPageRoute(builder: (context) {
-                          return UserPlaylistsPage(playlist: playlist);
-                        }));
-                      },
-                    );
-                  },
-                ),
+              ),
+              const MusicSlab()
+            ],
+          ),
         ),
       ),
     );

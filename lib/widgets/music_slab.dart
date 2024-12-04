@@ -7,6 +7,7 @@ import 'package:ionicons/ionicons.dart';
 import 'package:melodia/models/songs_model.dart';
 import 'package:melodia/providers/audio_provider.dart';
 import 'package:melodia/providers/offline_audio_provider.dart';
+import 'package:melodia/utils/colors.dart';
 import 'package:melodia/views/player_screen.dart';
 import 'package:melodia/views/offline_player_screen.dart';
 
@@ -30,7 +31,8 @@ class _MusicSlabState extends ConsumerState<MusicSlab> {
     final offlineAudioProvider = ref.watch(offlineAudioPlayerProvider);
     final offlineAudioNotifier = ref.watch(offlineAudioPlayerProvider.notifier);
 
-    final isOnlineSongsPlaying = audioProvider.currentIndex != null && !offlineAudioProvider.isPlaying;
+    final isOnlineSongsPlaying =
+        audioProvider.currentIndex != null && !offlineAudioProvider.isPlaying;
 
     final index = isOnlineSongsPlaying
         ? audioProvider.currentIndex
@@ -63,26 +65,35 @@ class _MusicSlabState extends ConsumerState<MusicSlab> {
             AnimatedPositioned(
               duration: const Duration(milliseconds: 200),
               bottom: 0,
+              left: 5,
               child: Container(
-                height: 60,
-                width: size.width,
-                color: Colors.black,
+                height: 75,
+                width: size.width - 10,
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.circular(10),
+                  border:
+                      Border.all(color: AppTheme.accentColor(ref), width: 0.25),
+                ),
                 child: Row(
                   children: [
-                    isOnlineSongsPlaying
-                        ? CachedNetworkImage(
-                            imageUrl: song.image,
-                            placeholder: (context, url) =>
-                                const CircularProgressIndicator(),
-                            errorWidget: (context, url, error) =>
-                                const Icon(Icons.music_note),
-                          )
-                        : Image.file(
-                            File(song.image),
-                            errorBuilder: (context, error, stackTrace) {
-                              return Image.asset('assets/song_thumb.png');
-                            },
-                          ),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: isOnlineSongsPlaying
+                          ? CachedNetworkImage(
+                              imageUrl: song.image,
+                              placeholder: (context, url) =>
+                                  const CircularProgressIndicator(),
+                              errorWidget: (context, url, error) =>
+                                  const Icon(Icons.music_note),
+                            )
+                          : Image.file(
+                              File(song.image),
+                              errorBuilder: (context, error, stackTrace) {
+                                return Image.asset('assets/song_thumb.png');
+                              },
+                            ),
+                    ),
                     const SizedBox(width: 5),
                     Expanded(
                       child: Column(

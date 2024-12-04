@@ -213,13 +213,13 @@ class _PlaylistsPageState extends ConsumerState<PlaylistsPage> {
                             Songs song = songsList[index];
                             return SongsListItem(
                               song: song,
-                              playlist: songsList,
+                              songsList: songsList,
                               index: index,
                             );
                           },
                         ),
                       ),
-                      SizedBox(height: audioProvider.isSlabShown ? 60 : 0),
+                      SizedBox(height: audioProvider.isSlabShown ? 75 : 0),
                     ],
                   ),
                 );

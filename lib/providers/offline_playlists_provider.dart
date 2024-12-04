@@ -58,6 +58,29 @@ class OfflinePlaylistsNotifier extends StateNotifier<List<Playlists>> {
     return false;
   }
 
+  void removeSongFromPlaylist(Playlists playlist, Songs song) {
+    final existingPlaylist = _offlinePlaylistsBox.get(playlist.id) as Playlists?;
+
+    if (existingPlaylist != null && existingPlaylist.songs.contains(song)) {
+      final updatedSongs = List<Songs>.from(existingPlaylist.songs)
+        ..removeWhere((item) => item.id == song.id);
+
+      int songsCount = existingPlaylist.songCount! - 1;
+      final updatedPlaylist = existingPlaylist.copyWith(
+        songs: updatedSongs,
+        songCount: songsCount,
+      );
+
+      _offlinePlaylistsBox.put(playlist.id, updatedPlaylist);
+
+      state = [
+        for (final item in state)
+          if (item.id == playlist.id) updatedPlaylist else item
+      ];
+    }
+  }
+  
+
   bool isPlaylistAdded(Playlists playlist) {
     return _offlinePlaylistsBox.containsKey(playlist.id);
   }

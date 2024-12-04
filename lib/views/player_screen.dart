@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
@@ -7,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:melodia/models/audio_player_state_model.dart';
+import 'package:melodia/models/playlists_model.dart';
 import 'package:melodia/models/songs_model.dart';
 import 'package:melodia/providers/audio_provider.dart';
 import 'package:melodia/providers/current_songs_provider.dart';
@@ -14,6 +16,7 @@ import 'package:melodia/providers/favorites_provider.dart';
 import 'package:melodia/providers/offline_audio_provider.dart';
 import 'package:melodia/providers/offline_files_provider.dart';
 import 'package:melodia/providers/settings_provider.dart';
+import 'package:melodia/providers/user_playlists_provider.dart';
 import 'package:melodia/services/api_calls.dart';
 import 'package:melodia/services/download.dart';
 import 'package:melodia/utils/colors.dart';
@@ -36,6 +39,8 @@ class PlayerScreen extends ConsumerStatefulWidget {
 }
 
 class _PlayerScreenState extends ConsumerState<PlayerScreen> {
+  late TextEditingController _playlistNameController;
+
   late final AudioPlayerState audioProvider;
   late final AudioPlayerNotifier audioNotifier;
   String lyrics = '';
@@ -83,38 +88,51 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
     );
   }
 
+  Future<void> initializeData() async {
+    try {
+      audioProvider = ref.read(audioPlayerProvider);
+      audioNotifier = ref.read(audioPlayerProvider.notifier);
+      final offlineAudioNotifier =
+          ref.read(offlineAudioPlayerProvider.notifier);
+      offlineAudioNotifier.stop();
+
+      final audioSources =
+          await ref.read(currentSongsProvider(widget.playlist));
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!audioNotifier.isPlaylistSet ||
+            !(audioNotifier.songsList == widget.playlist)) {
+          audioNotifier.setPlaylist(
+            audioSources,
+            widget.playlist,
+            initialIndex: widget.initialIndex,
+          );
+        } else {
+          if (audioProvider.currentIndex == widget.initialIndex) {
+            audioNotifier.seek(audioProvider.progress,
+                index: widget.initialIndex);
+          } else {
+            audioNotifier.seek(Duration.zero, index: widget.initialIndex);
+          }
+        }
+        audioNotifier.changeSlabShowStatus();
+        audioNotifier.play();
+      });
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-    audioProvider = ref.read(audioPlayerProvider);
-    audioNotifier = ref.read(audioPlayerProvider.notifier);
-    final offlineAudioNotifier = ref.read(offlineAudioPlayerProvider.notifier);
-    offlineAudioNotifier.stop();
-    final audioSources = ref.read(currentSongsProvider(widget.playlist));
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!audioNotifier.isPlaylistSet ||
-          !(audioNotifier.songsList == widget.playlist)) {
-        audioNotifier.setPlaylist(
-          audioSources,
-          widget.playlist,
-          initialIndex: widget.initialIndex,
-        );
-      } else {
-        if (audioProvider.currentIndex == widget.initialIndex) {
-          audioNotifier.seek(audioProvider.progress,
-              index: widget.initialIndex);
-        } else {
-          audioNotifier.seek(Duration.zero, index: widget.initialIndex);
-        }
-      }
-      audioNotifier.changeSlabShowStatus();
-      audioNotifier.play();
-    });
+    initializeData();
+    _playlistNameController = TextEditingController();
   }
 
   @override
   void dispose() {
+    _playlistNameController.dispose();
     _countdownTimer?.cancel();
     super.dispose();
   }
@@ -128,6 +146,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
     final settings = ref.watch(settingsProvider);
     ref.watch(filesProvider(true));
     final files = ref.watch(filesProvider(true).notifier);
+    final userPlaylist = ref.watch(userPlaylistsProvider);
+    final userPlaylistNotifier = ref.watch(userPlaylistsProvider.notifier);
 
     final size = MediaQuery.of(context).size;
 
@@ -154,63 +174,6 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
       setState(() {
         lyrics = "No lyrics found";
       });
-    }
-
-    void moreOptions() {
-      showCupertinoDialog(
-        context: context,
-        builder: (context) {
-          return CupertinoActionSheet(
-            cancelButton: CupertinoActionSheetAction(
-              isDestructiveAction: true,
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text('Cancel'),
-            ),
-            title: Text(
-              currentSong.title,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            actions: [
-              CupertinoActionSheetAction(
-                onPressed: () {
-                  Navigator.pop(context);
-                  if (isDownloaded) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      customSnackBar(
-                          '"${currentSong.title}" is Already Downloaded', ref),
-                    );
-                  } else {
-                    if (currentSong.type == "YouTube") {
-                      // Download stops abruptly at around 97% and speed is way too slow, will be fixed in the next build
-                      // ytDownload(currentSong);
-                      ScaffoldMessenger.of(context).showSnackBar(customSnackBar(
-                          'YouTube download is broken and will be fixed in the next update',
-                          ref));
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(customSnackBar(
-                          '"${currentSong.title}" Downloading Started', ref));
-                      downloadSong(
-                        [currentSong],
-                        settings?.downloadQuality.toString() ?? '96',
-                        ref,
-                      );
-                    }
-                  }
-                },
-                child: Text(
-                  'Download',
-                  style: TextStyle(color: AppTheme.accentColor(ref)),
-                ),
-              ),
-            ],
-          );
-        },
-      );
     }
 
     void showPlayingQueue() {
@@ -243,7 +206,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                           ? AppTheme.accentColor(ref).withAlpha(50)
                           : null,
                       child: SongsListItem(
-                        playlist: audioNotifier.songsList,
+                        songsList: audioNotifier.songsList,
                         song: song,
                         index: index - 1,
                         fromPlayingQueue: true,
@@ -253,6 +216,182 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                 },
               );
             },
+          );
+        },
+      );
+    }
+
+    void addToPlaylist() {
+      showCupertinoDialog(
+        context: context,
+        builder: (context) {
+          return CupertinoActionSheet(
+            message: Text('Add "${currentSong.title}" to Playlist',
+                style: const TextStyle(fontSize: 18)),
+            cancelButton: CupertinoActionSheetAction(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+            actions: [
+              for (final playlist in userPlaylist)
+                CupertinoActionSheetAction(
+                  onPressed: () {
+                    bool isAdded = userPlaylistNotifier.addSongToPlaylist(
+                        playlist, currentSong);
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      customSnackBar(
+                          isAdded
+                              ? '${currentSong.title} added to Playlist ${playlist.title}'
+                              : 'Song already exists in Playlist',
+                          ref),
+                    );
+                  },
+                  child: Text(
+                    playlist.title,
+                    style: TextStyle(color: AppTheme.accentColor(ref)),
+                  ),
+                ),
+              CupertinoActionSheetAction(
+                onPressed: () {
+                  Navigator.pop(context);
+                  showCupertinoDialog(
+                    context: context,
+                    builder: (context) {
+                      return CupertinoAlertDialog(
+                        title: const Text('Create Playlist'),
+                        content: Padding(
+                          padding: const EdgeInsets.only(top: 10.0),
+                          child: CupertinoTextField(
+                            controller: _playlistNameController,
+                            placeholder: 'Enter playlist name',
+                            cursorColor: AppTheme.accentColor(ref),
+                            style: TextStyle(
+                              color: AppTheme.accentColor(ref),
+                            ),
+                          ),
+                        ),
+                        actions: [
+                          CupertinoDialogAction(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              _playlistNameController.clear();
+                            },
+                            isDestructiveAction: true,
+                            child: const Text('Cancel'),
+                          ),
+                          CupertinoDialogAction(
+                            onPressed: () {
+                              String id =
+                                  Random().nextInt(1000000000).toString();
+                              int year = DateTime.now().year;
+                              userPlaylistNotifier.addPlaylist(
+                                Playlists(
+                                  id: id,
+                                  title: _playlistNameController.text,
+                                  type: 'User Playlist',
+                                  year: year,
+                                  language: '',
+                                  explicitContent: false,
+                                  url: '',
+                                  songCount: 0,
+                                  artists: [],
+                                  image: '',
+                                  songs: [],
+                                ),
+                              );
+                              Navigator.of(context).pop();
+                              _playlistNameController.clear();
+                            },
+                            child: Text(
+                              'Create',
+                              style:
+                                  TextStyle(color: AppTheme.accentColor(ref)),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+                child: const Text(
+                  'Create Playlist',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    }
+
+    void moreOptions() {
+      showCupertinoDialog(
+        context: context,
+        builder: (context) {
+          return CupertinoActionSheet(
+            cancelButton: CupertinoActionSheetAction(
+              isDestructiveAction: true,
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Cancel'),
+            ),
+            title: Text(
+              currentSong.title,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            actions: [
+              CupertinoActionSheetAction(
+                onPressed: () {
+                  Navigator.pop(context);
+                  addToPlaylist();
+                },
+                child: Text(
+                  'Add to Playlist',
+                  style: TextStyle(color: AppTheme.accentColor(ref)),
+                ),
+              ),
+              CupertinoActionSheetAction(
+                onPressed: () {
+                  Navigator.pop(context);
+                  if (isDownloaded) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      customSnackBar(
+                          '"${currentSong.title}" is Already Downloaded', ref),
+                    );
+                  } else {
+                    if (currentSong.type == "YouTube") {
+                      // Download stops abruptly at around 97% and speed is way too slow, will be fixed in the next build
+                      // ytDownload(currentSong);
+                      ScaffoldMessenger.of(context).showSnackBar(customSnackBar(
+                          'YouTube download is broken and will be fixed in the next update',
+                          ref));
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(customSnackBar(
+                          '"${currentSong.title}" Downloading Started', ref));
+                      downloadSong(
+                        [currentSong],
+                        settings?.downloadQuality.toString() ?? '96',
+                        ref,
+                      );
+                    }
+                  }
+                },
+                child: Text(
+                  'Download',
+                  style: TextStyle(color: AppTheme.accentColor(ref)),
+                ),
+              ),
+            ],
           );
         },
       );

@@ -6,8 +6,11 @@ class Settings {
   final int ytDownloadQuality;
   final int ytStreamingQuality;
   final bool shuffleMode;
+  final bool repeatMode;
+  final bool suggestions;
   final bool separatePlaylistFolder;
   final Color accentColor;
+  final List<String> bottomTabSelection;
 
   Settings({
     required this.downloadQuality,
@@ -15,8 +18,11 @@ class Settings {
     required this.ytDownloadQuality,
     required this.ytStreamingQuality,
     required this.shuffleMode,
+    required this.repeatMode,
+    required this.suggestions,
     required this.separatePlaylistFolder,
     required this.accentColor,
+    required this.bottomTabSelection,
   });
 
   Map<String, dynamic> toMap() {
@@ -26,8 +32,11 @@ class Settings {
       'ytDownloadQuality': ytDownloadQuality,
       'ytStreamingQuality': ytStreamingQuality,
       'shuffleMode': shuffleMode,
+      'repeatMode': repeatMode,
+      'suggestions': suggestions,
       'separatePlaylistFolder': separatePlaylistFolder,
       'accentColor': accentColor,
+      'bottomTabSelection': bottomTabSelection,
     };
   }
 
@@ -38,8 +47,11 @@ class Settings {
       ytDownloadQuality: map['ytDownloadQuality'] as int,
       ytStreamingQuality: map['ytStreamingQuality'] as int,
       shuffleMode: map['shuffleMode'] as bool,
+      repeatMode: map['repeatMode'] as bool,
+      suggestions: map['suggestions'] as bool,
       separatePlaylistFolder: map['separatePlaylistFolder'] as bool,
       accentColor: map['accentColor'] as Color,
+      bottomTabSelection: map['bottomTabSelection'] as List<String>,
     );
   }
 }

@@ -139,10 +139,10 @@ class _SearchResultPageState extends ConsumerState<SearchResultPage> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  isYoutube ? 'YouTube' : 'Saavn',
+                                  isYoutube ? 'YouTube' : 'Melodia',
                                   style: const TextStyle(
                                     color: Colors.white,
-                                    fontSize: 35,
+                                    fontSize: 30,
                                   ),
                                 ),
                                 CupertinoSwitch(
@@ -249,22 +249,36 @@ class _SearchResultPageState extends ConsumerState<SearchResultPage> {
                                         ),
                                       ),
                                       onTap: () async {
-                                        final playlist = ref.watch(
-                                            searchSongDataProvider(song.id));
-
-                                        if (playlist is AsyncData) {
-                                          final data = playlist.value;
-                                          history.addHistory(data![0]);
+                                       
+                                           
+                                        ref
+                                            .watch(
+                                                searchSongDataProvider(song.id))
+                                            .when(data: (playlist) {
+                                          history.addHistory(playlist[0]);
                                           Navigator.of(context).push(
                                             MaterialPageRoute(
                                               builder: (context) =>
                                                   PlayerScreen(
-                                                playlist: data,
+                                                playlist: playlist,
                                                 initialIndex: 0,
                                               ),
                                             ),
                                           );
-                                        }
+                                        }, error: (err, stack) {
+                                          return const Center(
+                                            child: Text(
+                                                'Error while playing the song'),
+                                          );
+                                        }, loading: () {
+                                          return Center(
+                                            child: CircularProgressIndicator
+                                                .adaptive(
+                                              backgroundColor:
+                                                  AppTheme.accentColor(ref),
+                                            ),
+                                          );
+                                        });
                                       },
                                     );
                                   }).toList(),
@@ -276,7 +290,7 @@ class _SearchResultPageState extends ConsumerState<SearchResultPage> {
                                 'Albums',
                                 style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: 35,
+                                  fontSize: 30,
                                 ),
                               ),
                               children: data.searchResultAlbums.map((album) {
@@ -327,7 +341,7 @@ class _SearchResultPageState extends ConsumerState<SearchResultPage> {
                                 'Playlists',
                                 style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: 35,
+                                  fontSize: 30,
                                 ),
                               ),
                               children:

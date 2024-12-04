@@ -22,10 +22,14 @@ class SettingsNotifier extends StateNotifier<Settings?> {
     final ytDownloadQuality = _box.get('ytDownloadQuality', defaultValue: 48);
     final ytStreamingQuality = _box.get('ytStreamingQuality', defaultValue: 48);
     final shuffleMode = _box.get('shuffleMode', defaultValue: false);
+    final repeatMode = _box.get('repeatMode', defaultValue: false);
     final separatePlaylistFolder =
         _box.get('separatePlaylistFolder', defaultValue: false);
-    final accentColorValue = _box.get('accentColor',
-        defaultValue: Colors.blueAccent); 
+    final accentColorValue =
+        _box.get('accentColor', defaultValue: Colors.blueAccent);
+    final bottomTabSelection = _box.get('bottomTabSelection',
+        defaultValue: ['favorites', 'playlists', 'settings', 'profile']);
+    final suggestions = _box.get('suggestions', defaultValue: true);
 
     state = Settings(
       downloadQuality: downloadQuality,
@@ -33,8 +37,11 @@ class SettingsNotifier extends StateNotifier<Settings?> {
       ytDownloadQuality: ytDownloadQuality,
       ytStreamingQuality: ytStreamingQuality,
       shuffleMode: shuffleMode,
+      repeatMode: repeatMode,
+      suggestions: suggestions,
       separatePlaylistFolder: separatePlaylistFolder,
-      accentColor: accentColorValue, 
+      accentColor: accentColorValue,
+      bottomTabSelection: bottomTabSelection,
     );
   }
 
@@ -47,8 +54,11 @@ class SettingsNotifier extends StateNotifier<Settings?> {
         ytDownloadQuality: state!.ytDownloadQuality,
         ytStreamingQuality: state!.ytStreamingQuality,
         shuffleMode: state!.shuffleMode,
+        repeatMode: state!.repeatMode,
+        suggestions: state!.suggestions,
         separatePlaylistFolder: state!.separatePlaylistFolder,
         accentColor: state!.accentColor,
+        bottomTabSelection: state!.bottomTabSelection,
       );
     }
   }
@@ -62,8 +72,11 @@ class SettingsNotifier extends StateNotifier<Settings?> {
         ytDownloadQuality: state!.ytDownloadQuality,
         ytStreamingQuality: state!.ytStreamingQuality,
         shuffleMode: state!.shuffleMode,
+        repeatMode: state!.repeatMode,
+        suggestions: state!.suggestions,
         separatePlaylistFolder: state!.separatePlaylistFolder,
         accentColor: state!.accentColor,
+        bottomTabSelection: state!.bottomTabSelection,
       );
     }
   }
@@ -77,8 +90,29 @@ class SettingsNotifier extends StateNotifier<Settings?> {
         ytDownloadQuality: state!.ytDownloadQuality,
         ytStreamingQuality: state!.ytStreamingQuality,
         shuffleMode: isEnabled,
+        repeatMode: state!.repeatMode,
+        suggestions: state!.suggestions,
         separatePlaylistFolder: state!.separatePlaylistFolder,
         accentColor: state!.accentColor,
+        bottomTabSelection: state!.bottomTabSelection,
+      );
+    }
+  }
+
+  void updateRepeatMode(bool isEnabled) {
+    _box.put('repeatMode', isEnabled);
+    if (state != null) {
+      state = Settings(
+        downloadQuality: state!.downloadQuality,
+        streamingQuality: state!.streamingQuality,
+        ytDownloadQuality: state!.ytDownloadQuality,
+        ytStreamingQuality: state!.ytStreamingQuality,
+        shuffleMode: state!.shuffleMode,
+        repeatMode: isEnabled,
+        suggestions: state!.suggestions,
+        separatePlaylistFolder: state!.separatePlaylistFolder,
+        accentColor: state!.accentColor,
+        bottomTabSelection: state!.bottomTabSelection,
       );
     }
   }
@@ -92,8 +126,11 @@ class SettingsNotifier extends StateNotifier<Settings?> {
         ytDownloadQuality: state!.ytDownloadQuality,
         ytStreamingQuality: state!.ytStreamingQuality,
         shuffleMode: state!.shuffleMode,
+        repeatMode: state!.repeatMode,
+        suggestions: state!.suggestions,
         separatePlaylistFolder: isEnabled,
         accentColor: state!.accentColor,
+        bottomTabSelection: state!.bottomTabSelection,
       );
     }
   }
@@ -107,38 +144,83 @@ class SettingsNotifier extends StateNotifier<Settings?> {
         ytDownloadQuality: state!.ytDownloadQuality,
         ytStreamingQuality: state!.ytStreamingQuality,
         shuffleMode: state!.shuffleMode,
+        repeatMode: state!.repeatMode,
+        suggestions: state!.suggestions,
         separatePlaylistFolder: state!.separatePlaylistFolder,
         accentColor: accentColor,
+        bottomTabSelection: state!.bottomTabSelection,
       );
     }
   }
 
   void updateYTDownloadQuality(int quality) {
     _box.put('ytDownloadQuality', quality);
-    if(state != null) {
+    if (state != null) {
       state = Settings(
         downloadQuality: state!.downloadQuality,
         streamingQuality: state!.streamingQuality,
         ytDownloadQuality: quality,
         ytStreamingQuality: state!.ytStreamingQuality,
         shuffleMode: state!.shuffleMode,
+        repeatMode: state!.repeatMode,
+        suggestions: state!.suggestions,
         separatePlaylistFolder: state!.separatePlaylistFolder,
         accentColor: state!.accentColor,
+        bottomTabSelection: state!.bottomTabSelection,
       );
     }
   }
 
   void updateYTStreamingQuality(int quality) {
     _box.put('ytStreamingQuality', quality);
-    if(state != null) {
+    if (state != null) {
       state = Settings(
         downloadQuality: state!.downloadQuality,
         streamingQuality: state!.streamingQuality,
         ytDownloadQuality: state!.ytDownloadQuality,
         ytStreamingQuality: quality,
         shuffleMode: state!.shuffleMode,
+        repeatMode: state!.repeatMode,
+        suggestions: state!.suggestions,
         separatePlaylistFolder: state!.separatePlaylistFolder,
         accentColor: state!.accentColor,
+        bottomTabSelection: state!.bottomTabSelection,
+      );
+    }
+  }
+
+  void updateBottomTabSelection(List<String> updateList) {
+    _box.put('bottomTabSelection', updateList);
+    if (state != null) {
+      state = Settings(
+        downloadQuality: state!.downloadQuality,
+        streamingQuality: state!.streamingQuality,
+        ytDownloadQuality: state!.ytDownloadQuality,
+        ytStreamingQuality: state!.ytStreamingQuality,
+        shuffleMode: state!.shuffleMode,
+        repeatMode: state!.repeatMode,
+        suggestions: state!.suggestions,
+        separatePlaylistFolder: state!.separatePlaylistFolder,
+        accentColor: state!.accentColor,
+        bottomTabSelection: updateList,
+      );
+    }
+  }
+
+  void updateSuggestions(bool isEnabled) {
+    _box.put('suggestions', isEnabled);
+    if (state != null) {
+      state = Settings(
+        downloadQuality: state!.downloadQuality,
+        streamingQuality: state!.streamingQuality,
+        ytDownloadQuality: state!.ytDownloadQuality,
+        ytStreamingQuality: state!.ytStreamingQuality,
+        shuffleMode: state!.shuffleMode,
+        repeatMode: state!.repeatMode,
+        suggestions: isEnabled,
+        separatePlaylistFolder: state!.separatePlaylistFolder,
+        accentColor: state!.accentColor,
+        bottomTabSelection: state!.bottomTabSelection,
       );
     }
   }

@@ -19,6 +19,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     final notifier = ref.read(settingsProvider.notifier);
     final qualities = [48, 96, 160, 320];
     final youtubeQualities = [48, 128];
+    final bool isTablet = size.width > size.height;
+    List<String> selectedIndices = settings?.bottomTabSelection ?? [];
 
     void showAccentColorDialog() {
       List<Color> colors = [
@@ -47,6 +49,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         context: context,
         builder: (context) {
           return ListView.builder(
+            shrinkWrap: true,
             itemCount: colors.length ~/ 3,
             itemBuilder: (context, index) {
               Color color1 = colors[3 * index];
@@ -67,7 +70,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                         },
                         child: Container(
                           height: 75,
-                          width: size.width / 3 - 20,
+                          width: isTablet
+                              ? (size.width / 6) - 20
+                              : (size.width / 3) - 20,
                           margin: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
@@ -99,7 +104,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                         },
                         child: Container(
                           height: 75,
-                          width: size.width / 3 - 20,
+                          width: isTablet
+                              ? (size.width / 6) - 20
+                              : (size.width / 3) - 20,
                           margin: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
@@ -131,7 +138,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                         },
                         child: Container(
                           height: 75,
-                          width: size.width / 3 - 20,
+                          width: isTablet
+                              ? (size.width / 6) - 20
+                              : (size.width / 3) - 20,
                           margin: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
@@ -150,6 +159,123 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                           ),
                         ),
                     ],
+                  ),
+                ],
+              );
+            },
+          );
+        },
+      );
+    }
+
+    void showBottomTabOptions(BuildContext context) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                title: const Text(
+                  'Bottom Tab Options',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                content: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ListTile(
+                        leading: const Text(
+                          'Favorites',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        trailing: Checkbox(
+                          checkColor: Colors.white,
+                          activeColor: AppTheme.accentColor(ref),
+                          value: selectedIndices.contains('favorites'),
+                          onChanged: (bool? value) {
+                            setState(() {
+                              selectedIndices.contains('favorites')
+                                  ? selectedIndices.remove('favorites')
+                                  : selectedIndices.add('favorites');
+                            });
+                          },
+                        ),
+                      ),
+                      ListTile(
+                        leading: const Text(
+                          'Playlists',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        trailing: Checkbox(
+                          checkColor: Colors.white,
+                          activeColor: AppTheme.accentColor(ref),
+                          value: selectedIndices.contains('playlists'),
+                          onChanged: (bool? value) {
+                            setState(() {
+                              selectedIndices.contains('playlists')
+                                  ? selectedIndices.remove('playlists')
+                                  : selectedIndices.add('playlists');
+                            });
+                          },
+                        ),
+                      ),
+                      ListTile(
+                        leading: const Text(
+                          'Settings',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        trailing: Checkbox(
+                          checkColor: Colors.white,
+                          activeColor: AppTheme.accentColor(ref),
+                          value: selectedIndices.contains('settings'),
+                          onChanged: (bool? value) {
+                            setState(() {
+                              selectedIndices.contains('settings')
+                                  ? selectedIndices.remove('settings')
+                                  : selectedIndices.add('settings');
+                            });
+                          },
+                        ),
+                      ),
+                      ListTile(
+                        leading: const Text(
+                          'Profile',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        trailing: Checkbox(
+                          checkColor: Colors.white,
+                          activeColor: AppTheme.accentColor(ref),
+                          value: selectedIndices.contains('profile'),
+                          onChanged: (bool? value) {
+                            setState(() {
+                              selectedIndices.contains('profile')
+                                  ? selectedIndices.remove('profile')
+                                  : selectedIndices.add('profile');
+                            });
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: Text('Cancel',
+                        style: TextStyle(color: AppTheme.accentColor(ref))),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      notifier.updateBottomTabSelection(selectedIndices);
+                    },
+                    child: Text('Save',
+                        style: TextStyle(color: AppTheme.accentColor(ref))),
                   ),
                 ],
               );
@@ -252,7 +378,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               ),
             ),
             ListTile(
-              leading: const Icon(Icons.audiotrack),
+              leading: const Icon(Icons.download),
               iconColor: AppTheme.accentColor(ref),
               title: const Text("YouTube Download"),
               titleTextStyle: TextStyle(
@@ -323,6 +449,43 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               ),
             ),
             ListTile(
+              leading: const Icon(Icons.repeat),
+              iconColor: AppTheme.accentColor(ref),
+              title: const Text("Keep Repeat Mode On"),
+              titleTextStyle: TextStyle(
+                color: AppTheme.accentColor(ref),
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+              trailing: CupertinoSwitch(
+                activeColor: AppTheme.accentColor(ref),
+                value: settings.repeatMode,
+                onChanged: (value) {
+                  notifier.updateRepeatMode(value);
+                },
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.recommend),
+              iconColor: AppTheme.accentColor(ref),
+              title: const Text("Suggestions"),
+              subtitle: const Text(
+                  'Keep playing suggested songs at the end of playlists'),
+              titleTextStyle: TextStyle(
+                color: AppTheme.accentColor(ref),
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+              trailing: CupertinoSwitch(
+                activeColor: AppTheme.accentColor(ref),
+                value: settings.suggestions,
+                onChanged: (value) {
+                  notifier.updateSuggestions(value);
+                },
+              ),
+            ),
+            
+            ListTile(
               leading: const Icon(Icons.folder),
               iconColor: AppTheme.accentColor(ref),
               title: const Text("Albums/Playlists Folders"),
@@ -340,6 +503,19 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   notifier.updateseparatePlaylistFolder(value);
                 },
               ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.library_add_check_rounded),
+              iconColor: AppTheme.accentColor(ref),
+              title: const Text("Bottom Tab"),
+              subtitle:
+                  const Text('Select what to show in homepage bottom tab'),
+              titleTextStyle: TextStyle(
+                color: AppTheme.accentColor(ref),
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+              onTap: () => showBottomTabOptions(context),
             ),
           ],
         ),

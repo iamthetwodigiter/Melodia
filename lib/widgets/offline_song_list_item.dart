@@ -12,18 +12,21 @@ import 'package:melodia/utils/colors.dart';
 import 'package:melodia/views/offline_player_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:melodia/widgets/custom_snackbar.dart';
+import 'package:swipe_to/swipe_to.dart';
 
 class OfflineSongsListItem extends ConsumerStatefulWidget {
-  final List<Songs> playlist;
+  final List<Songs> songList;
   final Songs song;
   final int index;
   final bool fromPlayingQueue;
+  final Playlists? playlist;
   const OfflineSongsListItem({
     super.key,
-    required this.playlist,
+    required this.songList,
     required this.song,
     required this.index,
     this.fromPlayingQueue = false,
+    this.playlist,
   });
 
   @override
@@ -82,11 +85,10 @@ class _OfflineSongsListItemState extends ConsumerState<OfflineSongsListItem> {
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
                       customSnackBar(
-                        isAdded
-                            ? '${widget.song.title} added to Playlist ${playlist.title}'
-                            : 'Song already exists in Playlist',
-                            ref
-                      ),
+                          isAdded
+                              ? '${widget.song.title} added to Playlist ${playlist.title}'
+                              : 'Song already exists in Playlist',
+                          ref),
                     );
                   },
                   child: Text(
@@ -147,7 +149,8 @@ class _OfflineSongsListItemState extends ConsumerState<OfflineSongsListItem> {
                             },
                             child: Text(
                               'Create',
-                              style: TextStyle(color: AppTheme.accentColor(ref)),
+                              style:
+                                  TextStyle(color: AppTheme.accentColor(ref)),
                             ),
                           ),
                         ],
@@ -166,8 +169,29 @@ class _OfflineSongsListItemState extends ConsumerState<OfflineSongsListItem> {
       );
     }
 
-    return Padding(
-      padding: const EdgeInsets.all(8.0).copyWith(bottom: 0),
+    return SwipeTo(
+      iconOnLeftSwipe: Icons.delete,
+      iconColor: Colors.red,
+      onLeftSwipe: widget.playlist != null
+          ? (details) {
+              if (widget.playlist != null) {
+                try {
+                  offlinePlaylistNotifier.removeSongFromPlaylist(
+                      widget.playlist!, widget.song);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    customSnackBar(
+                        '${widget.song.title} removed from playlist ${widget.playlist!.title}\nRefresh the page to update the list',
+                        ref),
+                  );
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    customSnackBar('Unable to remove song from playlist', ref),
+                  );
+                  throw Exception(e);
+                }
+              }
+            }
+          : null,
       child: ListTile(
         splashColor: Colors.white.withAlpha(50),
         enableFeedback: true,
@@ -202,9 +226,11 @@ class _OfflineSongsListItemState extends ConsumerState<OfflineSongsListItem> {
                     }
                   });
                   ScaffoldMessenger.of(context).showSnackBar(
-                    customSnackBar(isFavorite
-                        ? '${widget.song.title} removed from Favorites'
-                        : '${widget.song.title} added to Favorites',ref),
+                    customSnackBar(
+                        isFavorite
+                            ? '${widget.song.title} removed from Favorites'
+                            : '${widget.song.title} added to Favorites',
+                        ref),
                   );
                 },
                 child: Icon(
@@ -242,7 +268,8 @@ class _OfflineSongsListItemState extends ConsumerState<OfflineSongsListItem> {
                             },
                             child: Text(
                               'Add to Playlist',
-                              style: TextStyle(color: AppTheme.accentColor(ref)),
+                              style:
+                                  TextStyle(color: AppTheme.accentColor(ref)),
                             ),
                           ),
                           CupertinoActionSheetAction(
@@ -254,7 +281,8 @@ class _OfflineSongsListItemState extends ConsumerState<OfflineSongsListItem> {
                             },
                             child: Text(
                               'Delete',
-                              style: TextStyle(color: AppTheme.accentColor(ref)),
+                              style:
+                                  TextStyle(color: AppTheme.accentColor(ref)),
                             ),
                           ),
                         ],
@@ -290,7 +318,7 @@ class _OfflineSongsListItemState extends ConsumerState<OfflineSongsListItem> {
               context,
               MaterialPageRoute(
                 builder: (_) => OfflinePlayerScreen(
-                  playlist: widget.playlist,
+                  playlist: widget.songList,
                   initialIndex: widget.index,
                 ),
               ),

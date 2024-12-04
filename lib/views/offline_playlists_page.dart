@@ -5,6 +5,7 @@ import 'package:melodia/models/songs_model.dart';
 import 'package:melodia/providers/offline_playlists_provider.dart';
 import 'package:melodia/utils/colors.dart';
 import 'package:melodia/widgets/custom_snackbar.dart';
+import 'package:melodia/widgets/music_slab.dart';
 import 'package:melodia/widgets/offline_song_list_item.dart';
 
 class OfflinePlaylistsPage extends ConsumerStatefulWidget {
@@ -45,7 +46,7 @@ class _OfflinePlaylistsPageState extends ConsumerState<OfflinePlaylistsPage> {
                 offlinePlaylistsNotifier.removePlaylist(widget.playlist);
               });
               ScaffoldMessenger.of(context).showSnackBar(customSnackBar(
-                  'Removed Playlist, Please Go Back to Update The List',ref));
+                  'Removed Playlist, Please Go Back to Update The List', ref));
             },
             child: const Padding(
               padding: EdgeInsets.all(8.0),
@@ -57,20 +58,33 @@ class _OfflinePlaylistsPageState extends ConsumerState<OfflinePlaylistsPage> {
         toolbarHeight: 50,
       ),
       body: SafeArea(
-        child: Container(
-          height: size.height,
-          width: size.width,
-          padding: const EdgeInsets.all(10),
-          child: ListView.builder(
-            itemCount: songsList.length,
-            itemBuilder: (context, index) {
-              Songs song = songsList[index];
-              return OfflineSongsListItem(
-                song: song,
-                playlist: songsList,
-                index: index,
-              );
-            },
+        child: RefreshIndicator.adaptive(
+          color: AppTheme.accentColor(ref),
+          onRefresh: () async {
+            ref.read(offlinePlaylistsProvider);
+          },
+          child: Stack(
+            alignment: Alignment.bottomCenter,
+            children: [
+              Container(
+                height: size.height,
+                width: size.width,
+                padding: const EdgeInsets.all(10),
+                child: ListView.builder(
+                  itemCount: songsList.length,
+                  itemBuilder: (context, index) {
+                    Songs song = songsList[index];
+                    return OfflineSongsListItem(
+                      song: song,
+                      songList: songsList,
+                      index: index,
+                      playlist: widget.playlist,
+                    );
+                  },
+                ),
+              ),
+              const MusicSlab()
+            ],
           ),
         ),
       ),
