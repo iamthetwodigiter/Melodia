@@ -56,8 +56,7 @@ class _OfflineSongsListItemState extends ConsumerState<OfflineSongsListItem> {
     final offlinePlaylist = ref.watch(offlinePlaylistsProvider);
     final offlinePlaylistNotifier =
         ref.watch(offlinePlaylistsProvider.notifier);
-    final isDownloadsFolder = widget.song.title.contains('Melodia');
-    final filesNotifier = ref.watch(filesProvider(isDownloadsFolder).notifier);
+    final filesNotifier = ref.watch(filesProvider.notifier);
     final audioNotifier = ref.watch(offlineAudioPlayerProvider.notifier);
 
     void addToPlaylist() {
@@ -277,7 +276,7 @@ class _OfflineSongsListItemState extends ConsumerState<OfflineSongsListItem> {
                               Navigator.pop(context);
                               filesNotifier
                                   .deleteSong([widget.song.downloadUrl]);
-                              filesNotifier.refreshFiles(isDownloadsFolder);
+                              filesNotifier.refreshFiles;
                             },
                             child: Text(
                               'Delete',

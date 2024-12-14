@@ -100,7 +100,9 @@ class _HomePageState extends ConsumerState<HomePage> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        actions: [Image.asset('assets/logo.png')],
+        actions: [
+          Image.asset('assets/logo.png')
+        ],
         centerTitle: true,
       ),
       body: SafeArea(

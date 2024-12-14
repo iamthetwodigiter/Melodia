@@ -41,7 +41,7 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
         toolbarHeight: 50,
         actions: [
           CupertinoSwitch(
-            activeColor: AppTheme.accentColor(ref),
+            activeTrackColor: AppTheme.accentColor(ref),
             value: isOnline,
             onChanged: (value) => setState(
               () {

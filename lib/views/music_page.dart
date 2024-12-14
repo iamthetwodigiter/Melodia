@@ -42,9 +42,8 @@ class _MusicPageState extends ConsumerState<MusicPage> {
   }
 
   void _deleteSelectedSongs(WidgetRef ref) {
-    final notifier =
-        ref.watch(filesProvider(widget.isDownloadsFolder).notifier);
-    final files = ref.watch(filesProvider(widget.isDownloadsFolder));
+    final notifier = ref.watch(filesProvider.notifier);
+    final files = ref.watch(filesProvider);
     final audioPlayer = ref.watch(offlineAudioPlayerProvider);
     final audioNotifier = ref.watch(offlineAudioPlayerProvider.notifier);
 
@@ -55,7 +54,7 @@ class _MusicPageState extends ConsumerState<MusicPage> {
     final selectedSongs =
         _selectedIndices.map((i) => files[i].downloadUrl).toList();
     notifier.deleteSong(selectedSongs);
-    notifier.refreshFiles(widget.isDownloadsFolder);
+    notifier.refreshFiles;
 
     setState(() {
       _selectedIndices.clear();
@@ -65,9 +64,15 @@ class _MusicPageState extends ConsumerState<MusicPage> {
 
   @override
   Widget build(BuildContext context) {
-    final files = ref.watch(filesProvider(widget.isDownloadsFolder));
-    final notifier =
-        ref.watch(filesProvider(widget.isDownloadsFolder).notifier);
+    final files = ref.watch(filesProvider);
+    final notifier = ref.watch(filesProvider.notifier);
+
+    final filteredSongs = files.where((song) {
+      if (widget.isDownloadsFolder) {
+        return song.downloadUrl.contains('/Music/Melodia');
+      }
+      return true;
+    }).toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -111,8 +116,7 @@ class _MusicPageState extends ConsumerState<MusicPage> {
             : [
                 IconButton(
                   icon: const Icon(Icons.refresh),
-                  onPressed: () =>
-                      notifier.refreshFiles(widget.isDownloadsFolder),
+                  onPressed: () => notifier.refreshFiles,
                 ),
               ],
         centerTitle: true,
@@ -132,11 +136,11 @@ class _MusicPageState extends ConsumerState<MusicPage> {
                     ),
                   )
                 : ListView.builder(
-                    itemCount: files.length,
+                    itemCount: filteredSongs.length,
                     itemBuilder: (context, index) {
-                      final file = files[index];
+                      final file = filteredSongs[index];
                       final isSelected = _selectedIndices.contains(index);
-            
+
                       return GestureDetector(
                         onLongPress: () {
                           if (!_selectionMode) {
@@ -151,7 +155,7 @@ class _MusicPageState extends ConsumerState<MusicPage> {
                                   ? AppTheme.accentColor(ref).withAlpha(50)
                                   : null,
                               child: OfflineSongsListItem(
-                                songList: files,
+                                songList: filteredSongs,
                                 song: file,
                                 index: index,
                               ),
@@ -172,7 +176,7 @@ class _MusicPageState extends ConsumerState<MusicPage> {
                     },
                   ),
           ),
-                const MusicSlab()
+          const MusicSlab()
         ],
       ),
     );

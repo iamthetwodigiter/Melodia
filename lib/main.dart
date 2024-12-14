@@ -8,6 +8,7 @@ import 'package:melodia/models/artists_model.dart';
 import 'package:melodia/models/playlists_model.dart';
 import 'package:melodia/models/songs_model.dart';
 import 'package:melodia/secrets/secrets.dart';
+import 'package:melodia/services/notification_service.dart';
 import 'package:melodia/utils/colors.dart';
 import 'package:melodia/views/landing_page.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
@@ -20,6 +21,8 @@ void main() async {
   OneSignal.initialize(oneSignalAppID);
   OneSignal.Notifications.requestPermission(true);
 
+  await NotificationService.init();
+  
   await JustAudioBackground.init(
     androidNotificationChannelId: 'com.thetwodigiter.melodia.bgaudio',
     androidNotificationChannelName: 'Background Playback',

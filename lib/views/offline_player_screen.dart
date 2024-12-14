@@ -41,6 +41,8 @@ class _OfflinePlayerScreenState extends ConsumerState<OfflinePlayerScreen> {
   Duration? _remainingDuration;
   Timer? _countdownTimer;
 
+  Duration? endOfSongAfter;
+
   void startSleepTimer(Duration duration) {
     setState(() {
       _remainingDuration = duration;
@@ -76,6 +78,7 @@ class _OfflinePlayerScreenState extends ConsumerState<OfflinePlayerScreen> {
         remainingDuration: _remainingDuration,
         onStartTimer: startSleepTimer,
         onCancelTimer: cancelSleepTimer,
+        endOfSongAfter: endOfSongAfter,
       ),
     );
   }
@@ -263,7 +266,7 @@ class _OfflinePlayerScreenState extends ConsumerState<OfflinePlayerScreen> {
                   final progress = durationState?.progress ?? Duration.zero;
                   final buffered = durationState?.buffered ?? Duration.zero;
                   final total = durationState?.total ?? Duration.zero;
-
+                  endOfSongAfter = total - progress;
                   return Padding(
                     padding: const EdgeInsets.all(10.0),
                     child: ProgressBar(

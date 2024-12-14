@@ -1,11 +1,14 @@
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:melodia/constants/constants.dart';
 import 'package:melodia/providers/watch_history_provider.dart';
 import 'package:melodia/services/api_calls.dart';
+import 'package:melodia/services/notification_service.dart';
 import 'package:melodia/utils/colors.dart';
+import 'package:melodia/utils/helper_function.dart';
 import 'package:melodia/views/about_me.dart';
 import 'package:melodia/views/settings_page.dart';
 import 'package:melodia/widgets/custom_snackbar.dart';
@@ -20,6 +23,9 @@ class MenuPage extends ConsumerStatefulWidget {
 
 class _MenuPageState extends ConsumerState<MenuPage> {
   List<String> abi = [];
+  Dio dio = Dio();
+  String downloads = 'Loading...';
+
   void showUpdateDialog(String latestVersion) {
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     deviceInfo.androidInfo.then((androidInfo) {
@@ -46,22 +52,47 @@ class _MenuPageState extends ConsumerState<MenuPage> {
           CupertinoDialogAction(
             onPressed: () {
               Navigator.pop(context);
-              String urlToHit = '';
-              if (abi.contains('armeabi-v7a')) {
-
-                urlToHit +=
-                    'https://github.com/iamthetwodigiter/Melodia/releases/download/$latestVersion/Melodia-$latestVersion-armeabi-v7a.apk';
-              } else if (abi.contains('arm64-v8a')) {
-                urlToHit +=
-                    'https://github.com/iamthetwodigiter/Melodia/releases/download/$latestVersion/Melodia-$latestVersion-arm64-v8a.apk';
+              String urlToHit =
+                  'https://github.com/iamthetwodigiter/Melodia/releases/download/$latestVersion/';
+              String fileName = '';
+              if (abi.contains('arm64-v8a')) {
+                urlToHit += 'Melodia-$latestVersion-arm64-v8a.apk';
+                fileName = 'Melodia-$latestVersion-arm64-v8a.apk';
+              } else if (abi.contains('armeabi-v7a')) {
+                urlToHit += 'Melodia-$latestVersion-armeabi-v7a.apk';
+                fileName = 'Melodia-$latestVersion-armeabi-v7a.apk';
               } else if (abi.contains('x86')) {
-                urlToHit +=
-                    'https://github.com/iamthetwodigiter/Melodia/releases/download/$latestVersion/Melodia-$latestVersion-x86_64.apk';
+                urlToHit += 'Melodia-$latestVersion-x86_64.apk';
+                fileName = 'Melodia-$latestVersion-x86_64.apk';
               } else {
-                urlToHit +=
-                    'https://github.com/iamthetwodigiter/Melodia/releases/download/$latestVersion/Melodia-$latestVersion-universal.apk';
+                urlToHit += 'Melodia-$latestVersion-x86_64.apk';
+                fileName = 'Melodia-$latestVersion-x86_64.apk';
               }
-              launchUrl(Uri.parse(urlToHit));
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(customSnackBar('Downloading update...', ref));
+
+              dio.download(
+                urlToHit,
+                'storage/emulated/0/Download/$fileName',
+                onReceiveProgress: (count, total) {
+                  String progress = formatBytes(count.floor());
+                  String maxProgress = formatBytes(total.floor());
+                  NotificationService.showInstanceNotification(
+                    'Downloading Update $latestVersion',
+                    '$progress/$maxProgress',
+                    progress: count,
+                    maxProgress: total,
+                  );
+                  if (count == total) {
+                    NotificationService.showInstanceNotification(
+                      'Update $latestVersion Download Finished',
+                      '',
+                      progress: count.floor(),
+                      maxProgress: total.floor(),
+                    );
+                  }
+                },
+              );
             },
             child: Text(
               'Update',
@@ -123,6 +154,19 @@ class _MenuPageState extends ConsumerState<MenuPage> {
     } catch (e) {
       showErrorDialog();
     }
+  }
+
+  void getTotalDownloads() async {
+    String t = await totalDownloads();
+    setState(() {
+      downloads = t;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getTotalDownloads();
   }
 
   @override
@@ -229,6 +273,17 @@ class _MenuPageState extends ConsumerState<MenuPage> {
                   );
                 },
               ),
+              ListTile(
+                title:
+                    Text('$downloads 🥳', textAlign: TextAlign.center),
+                titleTextStyle: TextStyle(
+                  color: AppTheme.accentColor(ref),
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+                subtitle: const Text('Thank you all for supporting the app 💙\n Keep spreading the love... Happy Listening 😉', textAlign: TextAlign.center),
+              ),
+              
               ListTile(
                 // leading: const Icon(Icons.developer_mode),
                 iconColor: AppTheme.accentColor(ref),

@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:melodia/models/songs_model.dart';
+import 'package:melodia/providers/playing_queue_provider.dart';
 import 'package:melodia/providers/settings_provider.dart';
 import 'package:melodia/services/api_calls.dart';
 
@@ -11,16 +12,22 @@ final currentSongsProvider =
     final settings = ref.watch(settingsProvider);
     final streamingQuality = settings?.streamingQuality ?? 96;
     final suggestionsEnabled = settings?.suggestions ?? false;
-
+    final playingQueue = ref.read(playingQueueProvider);
+    final playingQueueNotifier = ref.read(playingQueueProvider.notifier);
+    List<Songs> finalPlaylist = playlist;
     try {
       if (suggestionsEnabled) {
         final currentSongID = playlist.last.id;
         final suggestedSongs = await getSuggestions(currentSongID);
-
-        playlist.addAll(suggestedSongs);
+        finalPlaylist = playlist + suggestedSongs;
+        if (playingQueue.isEmpty ||
+            playlist.first.id !=
+                ref.read(playingQueueProvider).first.id) {
+          playingQueueNotifier.clear();
+          playingQueueNotifier.addAll(playlist + suggestedSongs);
+        }
       }
-
-      return playlist.map((song) {
+      return finalPlaylist.map((song) {
         final currentSong = song.copyWith(
           downloadUrl: song.downloadUrl.replaceAll(
             "_320",

@@ -16,6 +16,8 @@ const searchAPI = "https://melodia-six.vercel.app/api/search?query=";
 const songAPI = "https://melodia-six.vercel.app/api/songs";
 const repositoryURL =
     'https://api.github.com/repos/iamthetwodigiter/melodia/releases/latest';
+const totalDownloadsURL =
+    "https://camo.githubusercontent.com/6866c8078291f77e71be9fa00c67aebed355962abfd30dc1fe2e04640ac53933/68747470733a2f2f696d672e736869656c64732e696f2f6769746875622f646f776e6c6f6164732f69616d74686574776f646967697465722f6d656c6f6469612f746f74616c3f6c6162656c3d446f776e6c6f616473266c6f676f3d476974487562";
 
 Future<HomePageModel> homePageData() async {
   final response = await http.get(Uri.parse(homepageUrl));
@@ -80,7 +82,7 @@ Future<String> fetchLyrics(String id) async {
 
 Future<List<Songs>> getSuggestions(String songID) async {
   final response = await http.get(
-    Uri.parse('$suggestionAPI/$songID/suggestions?limit=25'),
+    Uri.parse('$suggestionAPI/$songID/suggestions?limit=20'),
   );
   final data = jsonDecode(response.body);
   if (data['success'] == true && data['data'] != null) {
@@ -137,5 +139,21 @@ Future<String> fetchUpdates() async {
     return jsonResponse['tag_name'];
   } else {
     throw Exception('Failed to fetch latest release');
+  }
+}
+
+Future<String> totalDownloads() async {
+  final response = await http.get(Uri.parse(totalDownloadsURL));
+  if (response.statusCode == 200) {
+    final responseBody = response.body;
+    final titleRegExp = RegExp(r'<title>(.*?)<\/title>');
+    final match = titleRegExp.firstMatch(responseBody);
+    if (match != null) {
+      return match.group(1) ?? '';
+    } else {
+      return 'Loading...';
+    }
+  } else {
+    return 'Error';
   }
 }

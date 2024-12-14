@@ -8,6 +8,7 @@ class SleepTimerDialog extends ConsumerStatefulWidget {
   final Duration? remainingDuration;
   final ValueChanged<Duration> onStartTimer;
   final VoidCallback onCancelTimer;
+  final Duration? endOfSongAfter;
 
   const SleepTimerDialog({
     super.key,
@@ -15,6 +16,7 @@ class SleepTimerDialog extends ConsumerStatefulWidget {
     this.remainingDuration,
     required this.onStartTimer,
     required this.onCancelTimer,
+    required this.endOfSongAfter,
   });
 
   @override
@@ -23,7 +25,7 @@ class SleepTimerDialog extends ConsumerStatefulWidget {
 
 class _SleepTimerDialogState extends ConsumerState<SleepTimerDialog> {
   Duration _selectedDuration = Duration.zero;
-
+  bool isEndofPlaybackEnabled = false;
   @override
   void initState() {
     super.initState();
@@ -66,6 +68,26 @@ class _SleepTimerDialogState extends ConsumerState<SleepTimerDialog> {
               },
             ),
           ),
+          CupertinoListTile(
+            title: const Text(
+              'Stop at the end of playback',
+              style: TextStyle(color: Colors.white),
+            ),
+            trailing: CupertinoSwitch(
+              activeTrackColor: AppTheme.accentColor(ref),
+              value: isEndofPlaybackEnabled,
+              onChanged: (value) {
+                setState(() {
+                  isEndofPlaybackEnabled = !isEndofPlaybackEnabled;
+                  _selectedDuration = widget.endOfSongAfter ?? Duration.zero;
+                });
+                Navigator.pop(context);
+                widget.onStartTimer(
+                    _selectedDuration - const Duration(seconds: 1));
+              },
+            ),
+          ),
+          const SizedBox(height: 10)
         ],
       ),
     );

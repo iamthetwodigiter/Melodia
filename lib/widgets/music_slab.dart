@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,6 +6,7 @@ import 'package:ionicons/ionicons.dart';
 import 'package:melodia/models/songs_model.dart';
 import 'package:melodia/providers/audio_provider.dart';
 import 'package:melodia/providers/offline_audio_provider.dart';
+import 'package:melodia/providers/playing_queue_provider.dart';
 import 'package:melodia/utils/colors.dart';
 import 'package:melodia/views/player_screen.dart';
 import 'package:melodia/views/offline_player_screen.dart';
@@ -24,6 +24,7 @@ class _MusicSlabState extends ConsumerState<MusicSlab> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
+    final playingQueue = ref.read(playingQueueProvider);
 
     final audioProvider = ref.watch(audioPlayerProvider);
     final audioPlayerNotifier = ref.watch(audioPlayerProvider.notifier);
@@ -38,9 +39,8 @@ class _MusicSlabState extends ConsumerState<MusicSlab> {
         ? audioProvider.currentIndex
         : offlineAudioProvider.currentIndex;
 
-    final songsList = isOnlineSongsPlaying
-        ? audioPlayerNotifier.songsList
-        : offlineAudioNotifier.songsList;
+    final songsList =
+        isOnlineSongsPlaying ? playingQueue : offlineAudioNotifier.songsList;
 
     if (songsList.isNotEmpty) {
       Songs song = songsList.elementAt(index ?? 0);
@@ -50,7 +50,7 @@ class _MusicSlabState extends ConsumerState<MusicSlab> {
             MaterialPageRoute(
               builder: (context) => isOnlineSongsPlaying
                   ? PlayerScreen(
-                      playlist: songsList,
+                      playlist: playingQueue,
                       initialIndex: index ?? 0,
                     )
                   : OfflinePlayerScreen(
@@ -172,6 +172,9 @@ class _MusicSlabState extends ConsumerState<MusicSlab> {
                               setState(() {
                                 if (isOnlineSongsPlaying) {
                                   audioPlayerNotifier.stop();
+                                  ref
+                                      .read(playingQueueProvider.notifier)
+                                      .clear();
                                   audioPlayerNotifier.resetSongsList();
                                   audioPlayerNotifier.changeSlabShowStatus();
                                 } else {

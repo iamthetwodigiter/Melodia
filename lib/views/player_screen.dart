@@ -15,10 +15,12 @@ import 'package:melodia/providers/current_songs_provider.dart';
 import 'package:melodia/providers/favorites_provider.dart';
 import 'package:melodia/providers/offline_audio_provider.dart';
 import 'package:melodia/providers/offline_files_provider.dart';
+import 'package:melodia/providers/playing_queue_provider.dart';
 import 'package:melodia/providers/settings_provider.dart';
 import 'package:melodia/providers/user_playlists_provider.dart';
 import 'package:melodia/services/api_calls.dart';
 import 'package:melodia/services/download.dart';
+import 'package:melodia/services/youtube_download.dart';
 import 'package:melodia/utils/colors.dart';
 import 'package:melodia/widgets/custom_snackbar.dart';
 import 'package:melodia/widgets/sleep_timer.dart';
@@ -49,6 +51,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
   Duration? _remainingDuration;
   Timer? _countdownTimer;
 
+  Duration? endOfSongAfter;
+
   void startSleepTimer(Duration duration) {
     setState(() {
       _remainingDuration = duration;
@@ -61,9 +65,9 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
         });
       } else {
         timer.cancel();
-        ref.read(audioPlayerProvider.notifier).stop(); // Stop music
+        ref.read(audioPlayerProvider.notifier).stop();
         setState(() {
-          _remainingDuration = null; // Reset timer
+          _remainingDuration = null;
         });
       }
     });
@@ -84,6 +88,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
         remainingDuration: _remainingDuration,
         onStartTimer: startSleepTimer,
         onCancelTimer: cancelSleepTimer,
+        endOfSongAfter: endOfSongAfter,
       ),
     );
   }
@@ -95,16 +100,17 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
       final offlineAudioNotifier =
           ref.read(offlineAudioPlayerProvider.notifier);
       offlineAudioNotifier.stop();
+      final playingQueue = ref.read(playingQueueProvider);
 
       final audioSources =
           await ref.read(currentSongsProvider(widget.playlist));
-
+      
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!audioNotifier.isPlaylistSet ||
-            !(audioNotifier.songsList == widget.playlist)) {
+            !(audioNotifier.songsList == playingQueue)) {
           audioNotifier.setPlaylist(
             audioSources,
-            widget.playlist,
+            playingQueue,
             initialIndex: widget.initialIndex,
           );
         } else {
@@ -144,17 +150,17 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
     final favorites = ref.watch(favoritesProvider.notifier);
     final streamingQuality = ref.watch(settingsProvider)?.streamingQuality;
     final settings = ref.watch(settingsProvider);
-    ref.watch(filesProvider(true));
-    final files = ref.watch(filesProvider(true).notifier);
+    ref.watch(filesProvider);
+    final files = ref.watch(filesProvider.notifier);
     final userPlaylist = ref.watch(userPlaylistsProvider);
     final userPlaylistNotifier = ref.watch(userPlaylistsProvider.notifier);
-
+    final playingQueue = ref.watch(playingQueueProvider);
     final size = MediaQuery.of(context).size;
 
     final tempSong = (audioState.currentIndex != null &&
-            audioState.currentIndex! < widget.playlist.length)
-        ? widget.playlist[audioState.currentIndex!]
-        : widget.playlist[widget.initialIndex];
+            audioState.currentIndex! < playingQueue.length)
+        ? playingQueue[audioState.currentIndex!]
+        : playingQueue[widget.initialIndex];
 
     final currentSong = tempSong.copyWith(
       downloadUrl:
@@ -183,7 +189,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
           return Consumer(
             builder: (context, ref, _) {
               return ListView.builder(
-                itemCount: audioNotifier.songsList.length + 1,
+                itemCount: playingQueue.length + 1,
                 itemBuilder: (context, index) {
                   if (index == 0) {
                     return const ListTile(
@@ -193,7 +199,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                       ),
                     );
                   }
-                  final song = audioNotifier.songsList.elementAt(index - 1);
+                  final song = playingQueue.elementAt(index - 1);
 
                   return InkWell(
                     onTap: () {
@@ -206,7 +212,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                           ? AppTheme.accentColor(ref).withAlpha(50)
                           : null,
                       child: SongsListItem(
-                        songsList: audioNotifier.songsList,
+                        songsList: playingQueue,
                         song: song,
                         index: index - 1,
                         fromPlayingQueue: true,
@@ -372,9 +378,11 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                     if (currentSong.type == "YouTube") {
                       // Download stops abruptly at around 97% and speed is way too slow, will be fixed in the next build
                       // ytDownload(currentSong);
-                      ScaffoldMessenger.of(context).showSnackBar(customSnackBar(
-                          'YouTube download is broken and will be fixed in the next update',
-                          ref));
+                      // ScaffoldMessenger.of(context).showSnackBar(customSnackBar(
+                      //     'YouTube download is broken and will be fixed in the next update',
+                      //     ref));
+
+                      ytDownload(currentSong, ref);
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(customSnackBar(
                           '"${currentSong.title}" Downloading Started', ref));
@@ -394,6 +402,14 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
             ],
           );
         },
+      );
+    }
+
+    if (playingQueue.isEmpty) {
+      return const Scaffold(
+        body: Center(
+          child: Text("Error playing songs...\nPlease try again..."),
+        ),
       );
     }
 
@@ -425,8 +441,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                     ? Container(
                         color: AppTheme.accentColor(ref).withAlpha(25),
                         padding: const EdgeInsets.all(5),
-                        height: 300,
-                        width: 300,
+                        height: size.height * 0.45,
+                        width: size.height * 0.45,
                         alignment: Alignment.center,
                         child: SingleChildScrollView(
                           child: Text(
@@ -438,8 +454,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                       )
                     : CachedNetworkImage(
                         imageUrl: currentSong.image,
-                        height: 300,
-                        width: 300,
+                        height: size.height * 0.45,
+                        width: size.height * 0.45,
                       ),
               ),
               const SizedBox(height: 20),
@@ -469,6 +485,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                   final progress = durationState?.progress ?? Duration.zero;
                   final buffered = durationState?.buffered ?? Duration.zero;
                   final total = durationState?.total ?? Duration.zero;
+
+                  endOfSongAfter = total - progress;
 
                   return Padding(
                     padding: const EdgeInsets.all(10.0),

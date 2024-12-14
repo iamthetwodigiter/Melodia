@@ -30,7 +30,7 @@ class FeaturedPlaylistsCards extends ConsumerWidget {
           ),
         ),
         SizedBox(
-          height: size.height * 0.37,
+          height: size.height * 0.32,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             itemCount: featuredPlaylistsData.length,
@@ -54,7 +54,7 @@ class FeaturedPlaylistsCards extends ConsumerWidget {
                     child: Column(
                       children: [
                         Container(
-                          height: size.height * 0.25,
+                          height: size.height * 0.2,
                           decoration: BoxDecoration(
                             image: DecorationImage(
                               image: CachedNetworkImageProvider(
@@ -79,7 +79,7 @@ class FeaturedPlaylistsCards extends ConsumerWidget {
                         Text(
                           '${playlistItem.count} Songs',
                           style: const TextStyle(
-                            fontSize: 15,
+                            fontSize: 12,
                           ),
                           maxLines: 1,
                           textAlign: TextAlign.center,
@@ -88,14 +88,14 @@ class FeaturedPlaylistsCards extends ConsumerWidget {
                         Text(
                           playlistItem.dataType.toUpperCase(),
                           style: const TextStyle(
-                            fontSize: 12,
+                            fontSize: 11,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         Text(
                           '${playlistItem.followerCount} 🙎🏻',
                           style: const TextStyle(
-                            fontSize: 10,
+                            fontSize: 12,
                             fontWeight: FontWeight.bold,
                           ),
                         ),

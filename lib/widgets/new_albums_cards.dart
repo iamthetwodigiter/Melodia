@@ -30,7 +30,7 @@ class NewAlbumsCards extends ConsumerWidget {
           ),
         ),
         SizedBox(
-          height: size.height * 0.35,
+          height: size.height * 0.3,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             itemCount: newAlbumData.length,
@@ -55,7 +55,7 @@ class NewAlbumsCards extends ConsumerWidget {
                     child: Column(
                       children: [
                         Container(
-                          height: size.height * 0.25,
+                          height: size.height * 0.2,
                           decoration: BoxDecoration(
                             image: DecorationImage(
                               image: CachedNetworkImageProvider(

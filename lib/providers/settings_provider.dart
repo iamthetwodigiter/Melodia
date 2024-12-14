@@ -24,7 +24,7 @@ class SettingsNotifier extends StateNotifier<Settings?> {
     final shuffleMode = _box.get('shuffleMode', defaultValue: false);
     final repeatMode = _box.get('repeatMode', defaultValue: false);
     final separatePlaylistFolder =
-        _box.get('separatePlaylistFolder', defaultValue: false);
+        _box.get('separatePlaylistFolder', defaultValue: true);
     final accentColorValue =
         _box.get('accentColor', defaultValue: Colors.blueAccent);
     final bottomTabSelection = _box.get('bottomTabSelection',

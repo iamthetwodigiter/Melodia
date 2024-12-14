@@ -146,7 +146,7 @@ class _SearchResultPageState extends ConsumerState<SearchResultPage> {
                                   ),
                                 ),
                                 CupertinoSwitch(
-                                  activeColor: AppTheme.accentColor(ref),
+                                  activeTrackColor: AppTheme.accentColor(ref),
                                   value: isYoutube,
                                   onChanged: (value) {
                                     setState(() {
@@ -249,8 +249,6 @@ class _SearchResultPageState extends ConsumerState<SearchResultPage> {
                                         ),
                                       ),
                                       onTap: () async {
-                                       
-                                           
                                         ref
                                             .watch(
                                                 searchSongDataProvider(song.id))

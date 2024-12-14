@@ -59,8 +59,8 @@ class _SongsListItemState extends ConsumerState<SongsListItem> {
     final userPlaylistNotifier = ref.watch(userPlaylistsProvider.notifier);
     final settings = ref.watch(settingsProvider);
     final history = ref.watch(historyProvider.notifier);
-    ref.watch(filesProvider(true));
-    final files = ref.watch(filesProvider(true).notifier);
+    ref.watch(filesProvider);
+    final files = ref.watch(filesProvider.notifier);
     bool isDownloaded = files.isDownloaded(widget.song.title);
     final audioNotifier = ref.watch(audioPlayerProvider.notifier);
 

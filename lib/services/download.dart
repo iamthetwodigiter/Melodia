@@ -8,6 +8,8 @@ import 'package:melodia/providers/download_path_provider.dart';
 import 'package:melodia/providers/offline_files_provider.dart';
 import 'package:melodia/providers/settings_provider.dart';
 import 'package:melodia/services/api_calls.dart';
+import 'package:melodia/services/notification_service.dart';
+import 'package:melodia/utils/helper_function.dart';
 import 'package:path_provider/path_provider.dart';
 
 Future<void> downloadSong(
@@ -41,6 +43,20 @@ Future<void> downloadSong(
           await dio.download(
             song.downloadUrl.replaceAll("_320", "_$quality"),
             finalPath,
+            onReceiveProgress: (count, total) {
+              String progress = formatBytes(count.ceil());
+              String maxProgress = formatBytes(total.ceil());
+              if (count == total) {
+                NotificationService.showInstanceNotification(
+                    'Downloading Songs complete', '');
+              }
+              NotificationService.showInstanceNotification(
+                'Downloading ${song.title}',
+                '$progress/$maxProgress',
+                progress: count.floor(),
+                maxProgress: total.floor(),
+              );
+            },
           );
 
           final imageFilePath =
@@ -68,9 +84,10 @@ Future<void> downloadSong(
               tag: tag,
             );
           });
-
-          final filesNotifier = ref.read(filesProvider(true).notifier);
-          await filesNotifier.refreshFiles(true);
+          final filesNotifier = ref.read(filesProvider.notifier);
+          await filesNotifier.refreshFiles();
+          NotificationService.showInstanceNotification('Download Song complete',
+              'Downloading ${song.title} has been completed');
         }
       },
     );

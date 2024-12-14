@@ -100,6 +100,10 @@ class _AlbumsPageState extends ConsumerState<AlbumsPage> {
                                       );
                                     },
                                     style: ButtonStyle(
+                                      iconColor: WidgetStatePropertyAll(
+                                          AppTheme.accentColor(ref)),
+                                      iconSize:
+                                          const WidgetStatePropertyAll(25),
                                       backgroundColor:
                                           const WidgetStatePropertyAll(
                                               Color.fromARGB(255, 59, 59, 59)),
@@ -130,6 +134,10 @@ class _AlbumsPageState extends ConsumerState<AlbumsPage> {
                                       );
                                     },
                                     style: ButtonStyle(
+                                      iconColor: WidgetStatePropertyAll(
+                                          AppTheme.accentColor(ref)),
+                                      iconSize:
+                                          const WidgetStatePropertyAll(25),
                                       backgroundColor:
                                           const WidgetStatePropertyAll(
                                               Color.fromARGB(255, 59, 59, 59)),

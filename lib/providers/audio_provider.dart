@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:melodia/models/audio_player_state_model.dart';
 import 'package:melodia/models/songs_model.dart';
+import 'package:melodia/providers/playing_queue_provider.dart';
 import 'package:melodia/providers/settings_provider.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -72,18 +73,10 @@ class AudioPlayerNotifier extends StateNotifier<AudioPlayerState> {
 
   Future<void> setPlaylist(List<AudioSource> playlist, List<Songs>? songsList,
       {int? initialIndex}) async {
-    final settings = ref.read(settingsProvider);
-    final streamingQuality = settings?.streamingQuality;
-
     _currentPlaylist = playlist;
 
     if (songsList != null) {
-      _songsList = songsList.map((song) {
-        return song.copyWith(
-          downloadUrl:
-              song.downloadUrl.replaceAll("_320", "_$streamingQuality"),
-        );
-      }).toList();
+      _songsList = ref.read(playingQueueProvider);
     } else {
       _songsList = [];
     }
@@ -100,6 +93,7 @@ class AudioPlayerNotifier extends StateNotifier<AudioPlayerState> {
   void stop() => _audioPlayer.stop();
 
   void resetSongsList() {
+    
     _songsList = [];
   }
 

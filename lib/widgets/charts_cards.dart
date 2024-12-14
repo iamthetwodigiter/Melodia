@@ -30,7 +30,7 @@ class ChartsCards extends ConsumerWidget {
           ),
         ),
         SizedBox(
-          height: size.height * 0.32,
+          height: size.height * 0.27,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             itemCount: chartsData.length,
@@ -53,7 +53,7 @@ class ChartsCards extends ConsumerWidget {
                     child: Column(
                       children: [
                         Container(
-                          height: size.height * 0.25,
+                          height: size.height * 0.2,
                           decoration: BoxDecoration(
                             image: DecorationImage(
                               image: CachedNetworkImageProvider(

@@ -2,35 +2,23 @@ import 'dart:io';
 import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:melodia/models/artists_model.dart';
+import 'package:melodia/utils/helper_function.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:audiotagger/audiotagger.dart';
 import 'package:audiotagger/models/tag.dart';
 import 'package:melodia/models/songs_model.dart';
 
-final filesProvider =
-    StateNotifierProvider.family<FilesNotifier, List<Songs>, bool>(
-  (ref, isDownloadsFolder) => FilesNotifier(isDownloadsFolder),
+final filesProvider = StateNotifierProvider<FilesNotifier, List<Songs>>(
+  (ref) => FilesNotifier(),
 );
 
 class FilesNotifier extends StateNotifier<List<Songs>> {
   List<Songs> songs = [];
-  FilesNotifier(bool isDownloadsFolder) : super([]) {
-    _loadMusicFiles(isDownloadsFolder);
+  FilesNotifier() : super([]) {
+    _loadMusicFiles();
   }
 
-  String formatBytes(int bytes) {
-    if (bytes < 1024) {
-      return '$bytes B';
-    } else if (bytes < 1024 * 1024) {
-      return '${(bytes / 1024).toStringAsFixed(2)} KB';
-    } else if (bytes < 1024 * 1024 * 1024) {
-      return '${(bytes / (1024 * 1024)).toStringAsFixed(2)} MB';
-    } else {
-      return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(2)} GB';
-    }
-  }
-
-  Future<void> _loadMusicFiles(bool isDownloadsFolder) async {
+  Future<void> _loadMusicFiles() async {
     try {
       Directory musicDir = Directory('');
       if (Platform.isAndroid) {
@@ -38,7 +26,7 @@ class FilesNotifier extends StateNotifier<List<Songs>> {
         if (directory == null) return;
 
         musicDir = Directory(
-            '${directory.parent.parent.parent.parent.path}${isDownloadsFolder ? '/Music/Melodia' : ''}');
+            '${directory.parent.parent.parent.parent.path}/Music/Melodia');
       } else if (Platform.isIOS) {
         final directory = await getApplicationDocumentsDirectory();
 
@@ -74,7 +62,6 @@ class FilesNotifier extends StateNotifier<List<Songs>> {
     return Songs(
       id: (tag.title) ?? id,
       title: tag.title ?? filePath.split('/').last,
-      // type is set to lyrics
       type: tag.lyrics ?? 'No lyrics available',
       year: tag.year ?? '2024',
       duration: 0,
@@ -98,8 +85,8 @@ class FilesNotifier extends StateNotifier<List<Songs>> {
     );
   }
 
-  Future<void> refreshFiles(bool isDownloadsFolder) async {
-    await _loadMusicFiles(isDownloadsFolder);
+  Future<void> refreshFiles() async {
+    await _loadMusicFiles();
   }
 
   bool isDownloaded(String title) {
@@ -119,9 +106,8 @@ class FilesNotifier extends StateNotifier<List<Songs>> {
           file.deleteSync();
         }
       }
-      await refreshFiles(filePathList.any((path) => path.contains('Melodia')));
+      await refreshFiles();
       state = List.from(songs);
-
     } catch (e) {
       throw Exception(e);
     }

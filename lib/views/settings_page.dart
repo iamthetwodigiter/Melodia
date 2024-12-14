@@ -242,24 +242,24 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                           },
                         ),
                       ),
-                      ListTile(
-                        leading: const Text(
-                          'Profile',
-                          style: TextStyle(fontSize: 16),
-                        ),
-                        trailing: Checkbox(
-                          checkColor: Colors.white,
-                          activeColor: AppTheme.accentColor(ref),
-                          value: selectedIndices.contains('profile'),
-                          onChanged: (bool? value) {
-                            setState(() {
-                              selectedIndices.contains('profile')
-                                  ? selectedIndices.remove('profile')
-                                  : selectedIndices.add('profile');
-                            });
-                          },
-                        ),
-                      ),
+                      // ListTile(
+                      //   leading: const Text(
+                      //     'Profile',
+                      //     style: TextStyle(fontSize: 16),
+                      //   ),
+                      //   trailing: Checkbox(
+                      //     checkColor: Colors.white,
+                      //     activeColor: AppTheme.accentColor(ref),
+                      //     value: selectedIndices.contains('profile'),
+                      //     onChanged: (bool? value) {
+                      //       setState(() {
+                      //         selectedIndices.contains('profile')
+                      //             ? selectedIndices.remove('profile')
+                      //             : selectedIndices.add('profile');
+                      //       });
+                      //     },
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),
@@ -267,15 +267,19 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
                     child: Text('Cancel',
-                        style: TextStyle(color: AppTheme.accentColor(ref))),
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: AppTheme.accentColor(ref))),
                   ),
-                  ElevatedButton(
+                  TextButton(
                     onPressed: () {
                       Navigator.of(context).pop();
                       notifier.updateBottomTabSelection(selectedIndices);
                     },
                     child: Text('Save',
-                        style: TextStyle(color: AppTheme.accentColor(ref))),
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: AppTheme.accentColor(ref))),
                   ),
                 ],
               );
@@ -441,7 +445,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 fontWeight: FontWeight.bold,
               ),
               trailing: CupertinoSwitch(
-                activeColor: AppTheme.accentColor(ref),
+                activeTrackColor: AppTheme.accentColor(ref),
                 value: settings.shuffleMode,
                 onChanged: (value) {
                   notifier.updateShuffleMode(value);
@@ -458,7 +462,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 fontWeight: FontWeight.bold,
               ),
               trailing: CupertinoSwitch(
-                activeColor: AppTheme.accentColor(ref),
+                activeTrackColor: AppTheme.accentColor(ref),
                 value: settings.repeatMode,
                 onChanged: (value) {
                   notifier.updateRepeatMode(value);
@@ -468,16 +472,17 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             ListTile(
               leading: const Icon(Icons.recommend),
               iconColor: AppTheme.accentColor(ref),
+              isThreeLine: true,
               title: const Text("Suggestions"),
               subtitle: const Text(
-                  'Keep playing suggested songs at the end of playlists'),
+                  'Keep playing suggested songs at the end of playlists\n[Enabling might sometimes cause delay when playing a song]'),
               titleTextStyle: TextStyle(
                 color: AppTheme.accentColor(ref),
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
               trailing: CupertinoSwitch(
-                activeColor: AppTheme.accentColor(ref),
+                activeTrackColor: AppTheme.accentColor(ref),
                 value: settings.suggestions,
                 onChanged: (value) {
                   notifier.updateSuggestions(value);
@@ -497,7 +502,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 fontWeight: FontWeight.bold,
               ),
               trailing: CupertinoSwitch(
-                activeColor: AppTheme.accentColor(ref),
+                activeTrackColor: AppTheme.accentColor(ref),
                 value: settings.separatePlaylistFolder,
                 onChanged: (value) {
                   notifier.updateseparatePlaylistFolder(value);
