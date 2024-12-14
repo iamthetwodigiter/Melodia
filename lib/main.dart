@@ -22,7 +22,7 @@ void main() async {
   OneSignal.Notifications.requestPermission(true);
 
   await NotificationService.init();
-  
+
   await JustAudioBackground.init(
     androidNotificationChannelId: 'com.thetwodigiter.melodia.bgaudio',
     androidNotificationChannelName: 'Background Playback',
@@ -45,6 +45,7 @@ void main() async {
   await Hive.openBox('offlinePlaylists');
   await Hive.openBox('offlineFavorites');
   await Hive.openBox('searchHistory');
+  await Hive.openBox('version');
 
   runApp(const ProviderScope(child: MyApp()));
 }
@@ -86,8 +87,18 @@ class _MyAppState extends ConsumerState<MyApp> {
     super.initState();
     getStoragePermission();
     Box settings = Hive.box('settings');
+    Box version = Hive.box('version');
+
     if (!settings.keys.contains('accentColor')) {
       settings.put('accentColor', Colors.blueAccent);
+    }
+
+    if (!version.keys.contains('last')) {
+      version.put('last', 'v4.2.0');
+    }
+
+    if (!version.keys.contains('latest')) {
+      version.put('latest', 'v4.3.0');
     }
   }
 

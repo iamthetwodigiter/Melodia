@@ -104,7 +104,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
 
       final audioSources =
           await ref.read(currentSongsProvider(widget.playlist));
-      
+
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!audioNotifier.isPlaylistSet ||
             !(audioNotifier.songsList == playingQueue)) {
@@ -156,6 +156,14 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
     final userPlaylistNotifier = ref.watch(userPlaylistsProvider.notifier);
     final playingQueue = ref.watch(playingQueueProvider);
     final size = MediaQuery.of(context).size;
+
+    if (playingQueue.isEmpty) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator.adaptive(),
+        ),
+      );
+    }
 
     final tempSong = (audioState.currentIndex != null &&
             audioState.currentIndex! < playingQueue.length)

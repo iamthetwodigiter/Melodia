@@ -130,10 +130,14 @@ class _PlaylistsPageState extends ConsumerState<PlaylistsPage> {
                                         );
                                       },
                                       style: ButtonStyle(
+                                        iconColor: WidgetStatePropertyAll(
+                                            AppTheme.accentColor(ref)),
+                                        iconSize:
+                                            const WidgetStatePropertyAll(25),
                                         backgroundColor:
                                             const WidgetStatePropertyAll(
                                                 Color.fromARGB(
-                                                    255, 59, 59, 59)),
+                                                    255, 35, 35, 35)),
                                         foregroundColor: WidgetStatePropertyAll(
                                             AppTheme.accentColor(ref)),
                                         padding: const WidgetStatePropertyAll(
@@ -156,17 +160,21 @@ class _PlaylistsPageState extends ConsumerState<PlaylistsPage> {
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(
                                           customSnackBar(
-                                            isPlaylistAdded
-                                                ? 'Removed Playlist'
-                                                : 'Added Playlist',ref
-                                          ),
+                                              isPlaylistAdded
+                                                  ? 'Removed Playlist'
+                                                  : 'Added Playlist',
+                                              ref),
                                         );
                                       },
                                       style: ButtonStyle(
+                                        iconColor: WidgetStatePropertyAll(
+                                            AppTheme.accentColor(ref)),
+                                        iconSize:
+                                            const WidgetStatePropertyAll(25),
                                         backgroundColor:
                                             const WidgetStatePropertyAll(
                                                 Color.fromARGB(
-                                                    255, 59, 59, 59)),
+                                                    255, 35, 35, 35)),
                                         foregroundColor: WidgetStatePropertyAll(
                                             AppTheme.accentColor(ref)),
                                         padding: const WidgetStatePropertyAll(
@@ -182,8 +190,8 @@ class _PlaylistsPageState extends ConsumerState<PlaylistsPage> {
                                   onPressed: () {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       customSnackBar(
-                                        'Downloading "${data.title}" Playlist Started',ref
-                                      ),
+                                          'Downloading "${data.title}" Playlist Started',
+                                          ref),
                                     );
                                     downloadSong(
                                       songsList,
@@ -195,7 +203,7 @@ class _PlaylistsPageState extends ConsumerState<PlaylistsPage> {
                                   style: ButtonStyle(
                                     backgroundColor:
                                         const WidgetStatePropertyAll(
-                                            Color.fromARGB(255, 59, 59, 59)),
+                                            Color.fromARGB(255, 35, 35, 35)),
                                     foregroundColor: WidgetStatePropertyAll(
                                         AppTheme.accentColor(ref)),
                                   ),

@@ -69,7 +69,6 @@ class _LandingPageState extends ConsumerState<LandingPage> {
               title: const Text("Setting"),
               selectedColor: Colors.deepPurpleAccent,
             ),
-          
         ],
       ),
     );

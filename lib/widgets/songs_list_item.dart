@@ -7,6 +7,7 @@ import 'package:melodia/models/songs_model.dart';
 import 'package:melodia/providers/audio_provider.dart';
 import 'package:melodia/providers/favorites_provider.dart';
 import 'package:melodia/providers/offline_files_provider.dart';
+import 'package:melodia/providers/playing_queue_provider.dart';
 import 'package:melodia/providers/settings_provider.dart';
 import 'package:melodia/providers/user_playlists_provider.dart';
 import 'package:melodia/providers/watch_history_provider.dart';
@@ -353,6 +354,7 @@ class _SongsListItemState extends ConsumerState<SongsListItem> {
               audioNotifier.play();
             });
           } else {
+            ref.read(playingQueueProvider.notifier).clear();
             Navigator.push(
               context,
               MaterialPageRoute(

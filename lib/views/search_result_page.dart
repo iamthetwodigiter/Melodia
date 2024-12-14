@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:melodia/providers/playing_queue_provider.dart';
 import 'package:melodia/providers/search_history_provider.dart';
 import 'package:melodia/providers/search_result_provider.dart';
 import 'package:melodia/providers/search_song_data_provider.dart';
@@ -192,6 +193,10 @@ class _SearchResultPageState extends ConsumerState<SearchResultPage> {
                                             ),
                                           ),
                                           onTap: () {
+                                            ref
+                                                .read(playingQueueProvider
+                                                    .notifier)
+                                                .clear();
                                             Navigator.of(context).push(
                                               MaterialPageRoute(
                                                 builder: (context) =>
@@ -254,6 +259,10 @@ class _SearchResultPageState extends ConsumerState<SearchResultPage> {
                                                 searchSongDataProvider(song.id))
                                             .when(data: (playlist) {
                                           history.addHistory(playlist[0]);
+                                          ref
+                                              .read(
+                                                  playingQueueProvider.notifier)
+                                              .clear();
                                           Navigator.of(context).push(
                                             MaterialPageRoute(
                                               builder: (context) =>

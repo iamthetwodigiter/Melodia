@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:melodia/models/songs_model.dart';
+import 'package:melodia/providers/playing_queue_provider.dart';
 import 'package:melodia/utils/colors.dart';
 import 'package:melodia/views/player_screen.dart';
 
@@ -38,6 +39,7 @@ class HistoryCards extends ConsumerWidget {
               Songs song = history.elementAt(index);
               return GestureDetector(
                 onTap: () {
+                  ref.read(playingQueueProvider.notifier).clear();
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (conetxt) => PlayerScreen(

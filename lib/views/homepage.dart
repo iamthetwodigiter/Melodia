@@ -100,9 +100,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        actions: [
-          Image.asset('assets/logo.png')
-        ],
+        actions: [Image.asset('assets/logo.png')],
         centerTitle: true,
       ),
       body: SafeArea(
@@ -155,11 +153,17 @@ class _HomePageState extends ConsumerState<HomePage> {
                         child: CircularProgressIndicator(),
                       ),
                       error: (error, stackTrace) {
-                        return const Center(
-                          child: Text(
-                            "Error occured!!\nPlease check your internet connection and try again later!!",
-                            style: TextStyle(fontSize: 18),
-                            textAlign: TextAlign.center,
+                        return RefreshIndicator.adaptive(
+                          color: AppTheme.accentColor(ref),
+                          onRefresh: () async {
+                            ref.read(homePageProvider);
+                          },
+                          child: const Center(
+                            child: Text(
+                              "Error occured!!\nPlease check your internet connection and try again later!!",
+                              style: TextStyle(fontSize: 18),
+                              textAlign: TextAlign.center,
+                            ),
                           ),
                         );
                       },

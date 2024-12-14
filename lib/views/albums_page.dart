@@ -106,7 +106,7 @@ class _AlbumsPageState extends ConsumerState<AlbumsPage> {
                                           const WidgetStatePropertyAll(25),
                                       backgroundColor:
                                           const WidgetStatePropertyAll(
-                                              Color.fromARGB(255, 59, 59, 59)),
+                                              Color.fromARGB(255, 35, 35, 35)),
                                       foregroundColor: WidgetStatePropertyAll(
                                           AppTheme.accentColor(ref)),
                                       padding: const WidgetStatePropertyAll(
@@ -140,7 +140,7 @@ class _AlbumsPageState extends ConsumerState<AlbumsPage> {
                                           const WidgetStatePropertyAll(25),
                                       backgroundColor:
                                           const WidgetStatePropertyAll(
-                                              Color.fromARGB(255, 59, 59, 59)),
+                                              Color.fromARGB(255, 35, 35, 35)),
                                       foregroundColor: WidgetStatePropertyAll(
                                           AppTheme.accentColor(ref)),
                                       padding: const WidgetStatePropertyAll(
@@ -169,7 +169,7 @@ class _AlbumsPageState extends ConsumerState<AlbumsPage> {
                                 },
                                 style: ButtonStyle(
                                   backgroundColor: const WidgetStatePropertyAll(
-                                      Color.fromARGB(255, 59, 59, 59)),
+                                      Color.fromARGB(255, 35, 35, 35)),
                                   foregroundColor: WidgetStatePropertyAll(
                                       AppTheme.accentColor(ref)),
                                 ),
