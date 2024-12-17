@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:melodia/providers/settings_provider.dart';
 import 'package:melodia/utils/colors.dart';
 import 'package:melodia/views/favorites_page.dart';
@@ -7,6 +8,7 @@ import 'package:melodia/views/homepage.dart';
 import 'package:melodia/views/library_page.dart';
 import 'package:melodia/views/settings_page.dart';
 import 'package:melodia/views/user_playlists_list.dart';
+import 'package:melodia/widgets/changelog_dialog.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 
 class LandingPage extends ConsumerStatefulWidget {
@@ -18,11 +20,14 @@ class LandingPage extends ConsumerStatefulWidget {
 
 class _LandingPageState extends ConsumerState<LandingPage> {
   int _currentIndex = 0;
+  Box version = Hive.box('version');
 
   @override
   Widget build(BuildContext context) {
     final settings = ref.watch(settingsProvider);
     List<String> bottomTabIndices = settings!.bottomTabSelection;
+    final String last = version.get('last');
+    final String latest = version.get('latest');
 
     final pages = <Widget>[
       const HomePage(),
@@ -33,9 +38,31 @@ class _LandingPageState extends ConsumerState<LandingPage> {
     ];
 
     return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: pages,
+      body: Stack(
+        alignment: Alignment.bottomCenter,
+        children: [
+          IndexedStack(
+            index: _currentIndex,
+            children: pages,
+          ),
+          if (latest != last)
+            ElevatedButton(
+              style:  ButtonStyle(
+                  shadowColor: WidgetStatePropertyAll(AppTheme.accentColor(ref))),
+              onPressed: () {
+                setState(() {
+                  version.put('last', latest);
+                });
+                ChangelogDialog.show(context, ref);
+              },
+              child: Text(
+                'Show Changelog',
+                style: TextStyle(
+                  color: AppTheme.accentColor(ref),
+                ),
+              ),
+            ),
+        ],
       ),
       bottomNavigationBar: SalomonBottomBar(
         currentIndex: _currentIndex,

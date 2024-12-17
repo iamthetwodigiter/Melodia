@@ -10,7 +10,7 @@ import 'package:melodia/models/songs_model.dart';
 import 'package:melodia/secrets/secrets.dart';
 import 'package:melodia/services/notification_service.dart';
 import 'package:melodia/utils/colors.dart';
-import 'package:melodia/views/landing_page.dart';
+import 'package:melodia/views/splash_screen.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -46,6 +46,7 @@ void main() async {
   await Hive.openBox('offlineFavorites');
   await Hive.openBox('searchHistory');
   await Hive.openBox('version');
+  await Hive.openBox<Songs>('playMe');
 
   runApp(const ProviderScope(child: MyApp()));
 }
@@ -94,11 +95,11 @@ class _MyAppState extends ConsumerState<MyApp> {
     }
 
     if (!version.keys.contains('last')) {
-      version.put('last', 'v4.2.0');
+      version.put('last', 'v4.3.0');
     }
 
     if (!version.keys.contains('latest')) {
-      version.put('latest', 'v4.3.0');
+      version.put('latest', 'v4.4.0');
     }
   }
 
@@ -114,6 +115,8 @@ class _MyAppState extends ConsumerState<MyApp> {
             iconColor: WidgetStatePropertyAll(AppTheme.accentColor(ref)),
           ),
         ),
+        progressIndicatorTheme:
+            ProgressIndicatorThemeData(color: AppTheme.accentColor(ref)),
         brightness: Brightness.dark,
         // textTheme: const TextTheme(
         //   displayLarge: TextStyle(color: Colors.white),
@@ -133,7 +136,7 @@ class _MyAppState extends ConsumerState<MyApp> {
         //   labelSmall: TextStyle(color: Colors.white),
         // ),
       ),
-      home: const LandingPage(),
+      home: const SplashScreen(),
       debugShowCheckedModeBanner: false,
     );
   }

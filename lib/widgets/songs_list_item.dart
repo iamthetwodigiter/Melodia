@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:melodia/models/playlists_model.dart';
 import 'package:melodia/models/songs_model.dart';
 import 'package:melodia/providers/audio_provider.dart';
@@ -24,6 +25,7 @@ class SongsListItem extends ConsumerStatefulWidget {
   final int index;
   final bool fromPlayingQueue;
   final Playlists? playlist;
+  final bool fromPlayMe;
   const SongsListItem({
     super.key,
     required this.songsList,
@@ -31,6 +33,7 @@ class SongsListItem extends ConsumerStatefulWidget {
     required this.index,
     this.fromPlayingQueue = false,
     this.playlist,
+    this.fromPlayMe = false,
   });
 
   @override
@@ -39,6 +42,7 @@ class SongsListItem extends ConsumerStatefulWidget {
 
 class _SongsListItemState extends ConsumerState<SongsListItem> {
   late TextEditingController _playlistNameController;
+  Box<Songs> playMeBox = Hive.box('playMe');
 
   @override
   void initState() {
@@ -64,6 +68,7 @@ class _SongsListItemState extends ConsumerState<SongsListItem> {
     final files = ref.watch(filesProvider.notifier);
     bool isDownloaded = files.isDownloaded(widget.song.title);
     final audioNotifier = ref.watch(audioPlayerProvider.notifier);
+    final playingQueue = ref.watch(playingQueueProvider.notifier);
 
     void addToPlaylist() {
       showCupertinoDialog(
@@ -324,6 +329,64 @@ class _SongsListItemState extends ConsumerState<SongsListItem> {
                                   TextStyle(color: AppTheme.accentColor(ref)),
                             ),
                           ),
+                          if (!widget.fromPlayMe)
+                            CupertinoActionSheetAction(
+                              onPressed: () {
+                                playMeBox.add(widget.song);
+
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  customSnackBar(
+                                    '${widget.song.title} added to PlayMe\nVisit Library to find out more',
+                                    ref,
+                                  ),
+                                );
+                                Navigator.pop(context);
+                              },
+                              child: Text(
+                                'Add to PlayMe',
+                                style:
+                                    TextStyle(color: AppTheme.accentColor(ref)),
+                              ),
+                            ),
+                          if (widget.fromPlayMe)
+                            CupertinoActionSheetAction(
+                              onPressed: () {
+                                setState(() {
+                                  playMeBox.deleteAt(widget.index);
+                                });
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  customSnackBar(
+                                    '${widget.song.title} removed from PlayMe\nGo back to update the list',
+                                    ref,
+                                  ),
+                                );
+                                Navigator.pop(context);
+                              },
+                              child: Text(
+                                'Remove from PlayMe',
+                                style:
+                                    TextStyle(color: AppTheme.accentColor(ref)),
+                              ),
+                            ),
+                          if (widget.fromPlayingQueue)
+                            CupertinoActionSheetAction(
+                              onPressed: () {
+                                Navigator.pop(context);
+                                playingQueue.remove(widget.song);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  customSnackBar(
+                                    '${widget.song.title} removed from playing queue',
+                                    ref,
+                                  ),
+                                );
+                                Navigator.pop(context);
+                              },
+                              child: Text(
+                                'Remove from Playing Queue',
+                                style:
+                                    TextStyle(color: AppTheme.accentColor(ref)),
+                              ),
+                            ),
                         ],
                       );
                     },
@@ -361,6 +424,7 @@ class _SongsListItemState extends ConsumerState<SongsListItem> {
                 builder: (_) => PlayerScreen(
                   playlist: widget.songsList,
                   initialIndex: widget.index,
+                  fromPlayMe: widget.fromPlayMe ,
                 ),
               ),
             );

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
@@ -5,17 +7,21 @@ import 'package:melodia/models/songs_model.dart';
 import 'package:melodia/providers/playing_queue_provider.dart';
 import 'package:melodia/providers/settings_provider.dart';
 import 'package:melodia/services/api_calls.dart';
+import 'package:tuple/tuple.dart';
 
 final currentSongsProvider =
-    StateProvider.autoDispose.family<Future<List<AudioSource>>, List<Songs>>(
-  (ref, playlist) async {
+    StateProvider.autoDispose.family<Future<List<AudioSource>>,Tuple2<List<Songs>, bool>>(
+  (ref, params) async {
+    final playlist = params.item1;
+    final fromPlayMe = params.item2;
+
     final settings = ref.watch(settingsProvider);
     final streamingQuality = settings?.streamingQuality ?? 96;
     final suggestionsEnabled = settings?.suggestions ?? false;
     final playingQueue = ref.read(playingQueueProvider);
     final playingQueueNotifier = ref.read(playingQueueProvider.notifier);
     try {
-      if (suggestionsEnabled) {
+      if (suggestionsEnabled && !fromPlayMe) {
         final currentSongID = playlist.last.id;
         final suggestedSongs = await getSuggestions(currentSongID);
         final List<Songs> finalPlaylist = playlist + suggestedSongs;
@@ -49,6 +55,13 @@ final currentSongsProvider =
               "_$streamingQuality",
             ),
           );
+          Future.delayed(const Duration(seconds: 1), () {
+            if (playingQueue.isEmpty ||
+                playlist != ref.read(playingQueueProvider)) {
+              playingQueueNotifier.clear();
+              playingQueueNotifier.addAll(playlist);
+            }
+          });
           return AudioSource.uri(
             Uri.parse(currentSong.downloadUrl),
             tag: MediaItem(

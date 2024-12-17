@@ -1,6 +1,16 @@
-const String lastVersion = "v4.2.0";
-const String appVersion = "v4.3.0";
+const String lastVersion = "v4.3.0";
+const String appVersion = "v4.4.0";
 const List<Map<String, List<String>>> changelogs = [
+  {
+    "v4.4.0": [
+      "Added changelog dialog",
+      "Minor UI fixes",
+      "Added support to remove song(s) from current playing queue",
+      "Added support for a local playing queue PlayMe",
+      "Fixed the issue where songs were not playing if suggestions option was off",
+      "Added OnBackInvokedCallback in manifest",
+    ]
+  },
   {
     "v4.3.0": [
       "NOTE: Since this is a beta release, YouTube Download feature might not work as expected. While testing it worked fine and was saving it in storage, but support for playing YouTube downloads from Melodia will be added in future","Added End of Playback option in sleep timer",

@@ -25,15 +25,18 @@ import 'package:melodia/utils/colors.dart';
 import 'package:melodia/widgets/custom_snackbar.dart';
 import 'package:melodia/widgets/sleep_timer.dart';
 import 'package:melodia/widgets/songs_list_item.dart';
+import 'package:tuple/tuple.dart';
 
 class PlayerScreen extends ConsumerStatefulWidget {
   final List<Songs> playlist;
   final int initialIndex;
+  final bool fromPlayMe;
 
   const PlayerScreen({
     super.key,
     required this.playlist,
     required this.initialIndex,
+    this.fromPlayMe = false,
   });
 
   @override
@@ -102,8 +105,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
       offlineAudioNotifier.stop();
       final playingQueue = ref.read(playingQueueProvider);
 
-      final audioSources =
-          await ref.read(currentSongsProvider(widget.playlist));
+      final audioSources = await ref.read(
+          currentSongsProvider(Tuple2(widget.playlist, widget.fromPlayMe)));
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!audioNotifier.isPlaylistSet ||

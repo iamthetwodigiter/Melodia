@@ -197,6 +197,7 @@ class _SearchResultPageState extends ConsumerState<SearchResultPage> {
                                                 .read(playingQueueProvider
                                                     .notifier)
                                                 .clear();
+                                            history.addHistory(song);
                                             Navigator.of(context).push(
                                               MaterialPageRoute(
                                                 builder: (context) =>

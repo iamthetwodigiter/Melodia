@@ -6,6 +6,7 @@ import 'package:melodia/views/favorites_page.dart';
 import 'package:melodia/views/menu_page.dart';
 import 'package:melodia/views/music_page.dart';
 import 'package:melodia/views/offline_playlists_list.dart';
+import 'package:melodia/views/playing_queue_page.dart';
 import 'package:melodia/views/user_albums_list.dart';
 import 'package:melodia/views/user_playlists_list.dart';
 import 'package:melodia/widgets/music_slab.dart';
@@ -69,8 +70,8 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                 ),
                 ListTile(
                   //  tileColor: AppTheme.accentColor(ref)!.withAlpha(50),
-                  leading:
-                      Icon(Icons.playlist_play, color: AppTheme.accentColor(ref)),
+                  leading: Icon(Icons.playlist_play,
+                      color: AppTheme.accentColor(ref)),
                   title: const Text('Playlists'),
                   subtitle: const Text('All your favorite playlists are here'),
                   titleTextStyle: TextStyle(
@@ -107,7 +108,8 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                 ),
                 ListTile(
                   //  tileColor: AppTheme.accentColor(ref)!.withAlpha(50),
-                  leading: Icon(Icons.favorite, color: AppTheme.accentColor(ref)),
+                  leading:
+                      Icon(Icons.favorite, color: AppTheme.accentColor(ref)),
                   title: const Text('Favorites'),
                   subtitle: const Text('All your favorite songs are here'),
                   titleTextStyle: TextStyle(
@@ -125,8 +127,8 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                 ),
                 ListTile(
                   //  tileColor: AppTheme.accentColor(ref)!.withAlpha(50),
-                  leading:
-                      Icon(Icons.library_music, color: AppTheme.accentColor(ref)),
+                  leading: Icon(Icons.library_music,
+                      color: AppTheme.accentColor(ref)),
                   title: const Text('All Songs'),
                   subtitle: const Text('Browse all the music on device'),
                   titleTextStyle: TextStyle(
@@ -145,8 +147,8 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                 ),
                 ListTile(
                   //  tileColor: AppTheme.accentColor(ref)!.withAlpha(50),
-                  leading:
-                      Icon(Icons.download_done, color: AppTheme.accentColor(ref)),
+                  leading: Icon(Icons.download_done,
+                      color: AppTheme.accentColor(ref)),
                   title: const Text('Downloads'),
                   subtitle: const Text('Browse all Melodia downloads'),
                   titleTextStyle: TextStyle(
@@ -159,6 +161,25 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                       MaterialPageRoute(
                         builder: (context) =>
                             const MusicPage(isDownloadsFolder: true),
+                      ),
+                    );
+                  },
+                ),
+                ListTile(
+                  //  tileColor: AppTheme.accentColor(ref)!.withAlpha(50),
+                  leading:
+                      Icon(Icons.queue_music, color: AppTheme.accentColor(ref)),
+                  title: const Text('PlayMe'),
+                  subtitle: const Text('Your own custom playing queue'),
+                  titleTextStyle: TextStyle(
+                    color: AppTheme.accentColor(ref),
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const PlayingQueuePage(),
                       ),
                     );
                   },
