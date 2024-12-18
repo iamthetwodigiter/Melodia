@@ -72,6 +72,8 @@ Future<void> ytDownload(Songs song, WidgetRef ref) async {
       tag: tag,
     );
   } catch (e) {
+    NotificationService.showInstanceNotification('Error Occured',
+              e.toString());
     throw Exception(e);
   } finally {
     yt.close();

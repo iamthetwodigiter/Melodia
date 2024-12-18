@@ -24,7 +24,7 @@ class NotificationService {
         'Notification',
         importance: Importance.high,
         priority: Priority.high,
-        playSound: true,
+        enableVibration: false,
         progress: progress ?? 0,
         maxProgress: maxProgress ?? 0,
         showProgress: progress?.isFinite ?? false,

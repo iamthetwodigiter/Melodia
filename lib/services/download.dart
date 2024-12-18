@@ -92,6 +92,7 @@ Future<void> downloadSong(
       },
     );
   } catch (e) {
+    NotificationService.showInstanceNotification('Error Occured', e.toString());
     throw Exception(e);
   }
 }
