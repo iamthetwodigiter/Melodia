@@ -8,12 +8,14 @@ const List<Map<String, List<String>>> changelogs = [
       "Added support to remove song(s) from current playing queue",
       "Added support for a local playing queue PlayMe",
       "Fixed the issue where songs were not playing if suggestions option was off",
+      "Added a persistent music slab, that remembers the playlist you were last listening to",
       "Added OnBackInvokedCallback in manifest",
     ]
   },
   {
     "v4.3.0": [
-      "NOTE: Since this is a beta release, YouTube Download feature might not work as expected. While testing it worked fine and was saving it in storage, but support for playing YouTube downloads from Melodia will be added in future","Added End of Playback option in sleep timer",
+      "NOTE: Since this is a beta release, YouTube Download feature might not work as expected. While testing it worked fine and was saving it in storage, but support for playing YouTube downloads from Melodia will be added in future",
+      "Added End of Playback option in sleep timer",
       "Fixed homepage card image size",
       "Update checker now enables the user to download app from within the settings",
       "Added playing queue provider to manage suggestions and solve clash of original",

@@ -93,7 +93,6 @@ class AudioPlayerNotifier extends StateNotifier<AudioPlayerState> {
   void stop() => _audioPlayer.stop();
 
   void resetSongsList() {
-    
     _songsList = [];
   }
 

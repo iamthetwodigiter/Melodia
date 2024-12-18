@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:melodia/models/songs_model.dart';
 import 'package:melodia/providers/audio_provider.dart';
@@ -21,10 +22,13 @@ class MusicSlab extends ConsumerStatefulWidget {
 }
 
 class _MusicSlabState extends ConsumerState<MusicSlab> {
+  Box audioProviderBox = Hive.box('audioProvider');
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
-    final playingQueue = ref.read(playingQueueProvider);
+
+    final playingQueue = ref.watch(playingQueueProvider);
 
     final audioProvider = ref.watch(audioPlayerProvider);
     final audioPlayerNotifier = ref.watch(audioPlayerProvider.notifier);
@@ -33,14 +37,18 @@ class _MusicSlabState extends ConsumerState<MusicSlab> {
     final offlineAudioNotifier = ref.watch(offlineAudioPlayerProvider.notifier);
 
     final isOnlineSongsPlaying =
-        audioProvider.currentIndex != null && !offlineAudioProvider.isPlaying;
+        (audioProvider.currentIndex != null || audioProviderBox.isNotEmpty) &&
+            !offlineAudioProvider.isPlaying;
 
     final index = isOnlineSongsPlaying
         ? audioProvider.currentIndex
         : offlineAudioProvider.currentIndex;
 
-    final songsList =
-        isOnlineSongsPlaying ? playingQueue : offlineAudioNotifier.songsList;
+    final songsList = isOnlineSongsPlaying
+        ? playingQueue.isEmpty
+            ? audioProviderBox.get('local')
+            : playingQueue
+        : offlineAudioNotifier.songsList;
 
     if (songsList.isNotEmpty) {
       Songs song = songsList.elementAt(index ?? 0);
@@ -50,8 +58,13 @@ class _MusicSlabState extends ConsumerState<MusicSlab> {
             MaterialPageRoute(
               builder: (context) => isOnlineSongsPlaying
                   ? PlayerScreen(
-                      playlist: playingQueue,
+                      playlist: playingQueue.isEmpty
+                          ? (audioProviderBox.get('local') as List)
+                              .cast<Songs>()
+                          : playingQueue,
                       initialIndex: index ?? 0,
+                      // here fromPlayMe is set to true to avoid loading suggestions
+                      fromPlayMe: true,
                     )
                   : OfflinePlayerScreen(
                       playlist: songsList,
@@ -120,7 +133,7 @@ class _MusicSlabState extends ConsumerState<MusicSlab> {
                       ),
                     ),
                     SizedBox(
-                      width: 115,
+                      width: 125,
                       child: Row(
                         children: [
                           GestureDetector(
@@ -177,6 +190,7 @@ class _MusicSlabState extends ConsumerState<MusicSlab> {
                                       .clear();
                                   audioPlayerNotifier.resetSongsList();
                                   audioPlayerNotifier.changeSlabShowStatus();
+                                  audioProviderBox.put('local', []);
                                 } else {
                                   offlineAudioNotifier.stop();
                                   offlineAudioNotifier.resetSongsList();
@@ -184,7 +198,7 @@ class _MusicSlabState extends ConsumerState<MusicSlab> {
                                 }
                               });
                             },
-                            child: const Icon(Icons.cancel_rounded, size: 20),
+                            child: const Icon(Icons.cancel_rounded, size: 25),
                           ),
                         ],
                       ),

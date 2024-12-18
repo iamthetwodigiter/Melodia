@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:just_audio_background/just_audio_background.dart';
+import 'package:melodia/constants/constants.dart';
 import 'package:melodia/models/albums_model.dart';
 import 'package:melodia/models/artists_model.dart';
 import 'package:melodia/models/playlists_model.dart';
@@ -10,7 +11,7 @@ import 'package:melodia/models/songs_model.dart';
 import 'package:melodia/secrets/secrets.dart';
 import 'package:melodia/services/notification_service.dart';
 import 'package:melodia/utils/colors.dart';
-import 'package:melodia/views/splash_screen.dart';
+import 'package:melodia/views/landing_page.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -47,6 +48,7 @@ void main() async {
   await Hive.openBox('searchHistory');
   await Hive.openBox('version');
   await Hive.openBox<Songs>('playMe');
+  await Hive.openBox('audioProvider');
 
   runApp(const ProviderScope(child: MyApp()));
 }
@@ -91,15 +93,15 @@ class _MyAppState extends ConsumerState<MyApp> {
     Box version = Hive.box('version');
 
     if (!settings.keys.contains('accentColor')) {
-      settings.put('accentColor', Colors.blueAccent);
+      settings.put('accentColor', Colors.teal);
     }
 
     if (!version.keys.contains('last')) {
-      version.put('last', 'v4.3.0');
+      version.put('last', lastVersion);
     }
 
     if (!version.keys.contains('latest')) {
-      version.put('latest', 'v4.4.0');
+      version.put('latest', appVersion);
     }
   }
 
@@ -136,7 +138,7 @@ class _MyAppState extends ConsumerState<MyApp> {
         //   labelSmall: TextStyle(color: Colors.white),
         // ),
       ),
-      home: const SplashScreen(),
+      home: const LandingPage(),
       debugShowCheckedModeBanner: false,
     );
   }

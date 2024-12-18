@@ -1,6 +1,6 @@
 import 'dart:async';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:melodia/models/songs_model.dart';
@@ -9,11 +9,12 @@ import 'package:melodia/providers/settings_provider.dart';
 import 'package:melodia/services/api_calls.dart';
 import 'package:tuple/tuple.dart';
 
-final currentSongsProvider =
-    StateProvider.autoDispose.family<Future<List<AudioSource>>,Tuple2<List<Songs>, bool>>(
+final currentSongsProvider = StateProvider.autoDispose
+    .family<Future<List<AudioSource>>, Tuple2<List<Songs>, bool>>(
   (ref, params) async {
     final playlist = params.item1;
     final fromPlayMe = params.item2;
+    Box audioProviderBox = Hive.box('audioProvider');
 
     final settings = ref.watch(settingsProvider);
     final streamingQuality = settings?.streamingQuality ?? 96;
@@ -29,6 +30,7 @@ final currentSongsProvider =
             playlist != ref.read(playingQueueProvider)) {
           playingQueueNotifier.clear();
           playingQueueNotifier.addAll(playlist + suggestedSongs);
+          audioProviderBox.put('local', finalPlaylist.cast<Songs>());
         }
         return finalPlaylist.map((song) {
           final currentSong = song.copyWith(
@@ -60,6 +62,7 @@ final currentSongsProvider =
                 playlist != ref.read(playingQueueProvider)) {
               playingQueueNotifier.clear();
               playingQueueNotifier.addAll(playlist);
+              audioProviderBox.put('local', playlist.cast<Songs>());
             }
           });
           return AudioSource.uri(
