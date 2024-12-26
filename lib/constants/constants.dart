@@ -1,6 +1,14 @@
-const String lastVersion = "v4.3.0";
-const String appVersion = "v4.4.0";
+const String lastVersion = "v4.4.0";
+const String appVersion = "v4.5.0";
 const List<Map<String, List<String>>> changelogs = [
+  {
+    "v4.5.0": [
+      "Fixed 'Remove from Playlist' option not showing up [both online and offline]",
+      "Removed swipe to remove songs from playlist [both online and offline]",
+      "All songs from currently playing queue can be added to PlayMe",
+      "Entire album/playlist can be added to PlayMe now",
+    ]
+  },
   {
     "v4.4.0": [
       "Added changelog dialog",
@@ -27,5 +35,8 @@ const List<Map<String, List<String>>> changelogs = [
       "Fixed incorrect song playing when playing from history",
       "Added changelog section to track updates"
     ]
+  },
+  {
+    "Older versions": ["Visit GitHub or official site to see the changelog"]
   }
 ];

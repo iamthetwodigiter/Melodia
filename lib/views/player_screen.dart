@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:melodia/models/audio_player_state_model.dart';
@@ -55,6 +56,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
   Timer? _countdownTimer;
 
   Duration? endOfSongAfter;
+
+  Box<Songs> playMeBox = Hive.box('playMe');
 
   void startSleepTimer(Duration duration) {
     setState(() {
@@ -203,10 +206,26 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                 itemCount: playingQueue.length + 1,
                 itemBuilder: (context, index) {
                   if (index == 0) {
-                    return const ListTile(
-                      title: Text(
+                    return ListTile(
+                      title: const Text(
                         'Playing Queue',
                         style: TextStyle(fontSize: 25),
+                      ),
+                      trailing: IconButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          try {
+                            playMeBox.addAll(playingQueue);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                customSnackBar(
+                                    'All songs added to PlayMe', ref));
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                customSnackBar(
+                                    'Songs add to PlayMe failed', ref));
+                          }
+                        },
+                        icon: const Icon(Icons.playlist_add),
                       ),
                     );
                   }

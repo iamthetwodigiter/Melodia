@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:melodia/models/songs_model.dart';
 import 'package:melodia/providers/audio_provider.dart';
 import 'package:melodia/providers/playlists_data_provider.dart';
@@ -25,6 +26,8 @@ class PlaylistsPage extends ConsumerStatefulWidget {
 }
 
 class _PlaylistsPageState extends ConsumerState<PlaylistsPage> {
+  Box<Songs> playMeBox = Hive.box('playMe');
+  List<Songs> playlistSongs = [];
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
@@ -43,6 +46,25 @@ class _PlaylistsPageState extends ConsumerState<PlaylistsPage> {
             fontWeight: FontWeight.bold,
           ),
         ),
+        actions: [
+          IconButton(
+              onPressed: () {
+                try {
+                  if (playlistSongs.isNotEmpty) {
+                    playMeBox.addAll(playlistSongs);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        customSnackBar('All songs added to PlayMe', ref));
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(customSnackBar(
+                        'Try after songs are loaded properly', ref));
+                  }
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      customSnackBar('Songs add to PlayMe failed', ref));
+                }
+              },
+              icon: const Icon(Icons.add))
+        ],
         centerTitle: true,
         toolbarHeight: 50,
       ),
@@ -52,6 +74,7 @@ class _PlaylistsPageState extends ConsumerState<PlaylistsPage> {
           children: [
             playlistsData.when(
               data: (data) {
+                playlistSongs = data.songs;
                 List<Songs> songsList = data.songs;
                 bool isPlaylistAdded =
                     userPlaylistsNotifier.isPlaylistAdded(data);

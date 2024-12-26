@@ -12,7 +12,6 @@ import 'package:melodia/utils/colors.dart';
 import 'package:melodia/views/offline_player_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:melodia/widgets/custom_snackbar.dart';
-import 'package:swipe_to/swipe_to.dart';
 
 class OfflineSongsListItem extends ConsumerStatefulWidget {
   final List<Songs> songList;
@@ -20,6 +19,7 @@ class OfflineSongsListItem extends ConsumerStatefulWidget {
   final int index;
   final bool fromPlayingQueue;
   final Playlists? playlist;
+  final bool fromPlaylist;
   const OfflineSongsListItem({
     super.key,
     required this.songList,
@@ -27,6 +27,7 @@ class OfflineSongsListItem extends ConsumerStatefulWidget {
     required this.index,
     this.fromPlayingQueue = false,
     this.playlist,
+    this.fromPlaylist = false,
   });
 
   @override
@@ -168,163 +169,159 @@ class _OfflineSongsListItemState extends ConsumerState<OfflineSongsListItem> {
       );
     }
 
-    return SwipeTo(
-      iconOnLeftSwipe: Icons.delete,
-      iconColor: Colors.red,
-      onLeftSwipe: widget.playlist != null
-          ? (details) {
-              if (widget.playlist != null) {
-                try {
-                  offlinePlaylistNotifier.removeSongFromPlaylist(
-                      widget.playlist!, widget.song);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    customSnackBar(
-                        '${widget.song.title} removed from playlist ${widget.playlist!.title}\nRefresh the page to update the list',
-                        ref),
-                  );
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    customSnackBar('Unable to remove song from playlist', ref),
-                  );
-                  throw Exception(e);
-                }
-              }
-            }
-          : null,
-      child: ListTile(
-        splashColor: Colors.white.withAlpha(50),
-        enableFeedback: true,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
+    return ListTile(
+      splashColor: Colors.white.withAlpha(50),
+      enableFeedback: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      contentPadding: EdgeInsets.zero,
+      leading: ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: Image.file(
+          File(widget.song.image),
+          height: 50,
+          width: 50,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return Image.asset('assets/song_thumb.png', height: 50, width: 50);
+          },
         ),
-        contentPadding: EdgeInsets.zero,
-        leading: ClipRRect(
-          borderRadius: BorderRadius.circular(10),
-          child: Image.file(
-            File(widget.song.image),
-            height: 50,
-            width: 50,
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) {
-              return Image.asset('assets/song_thumb.png',
-                  height: 50, width: 50);
-            },
-          ),
-        ),
-        trailing: SizedBox(
-          width: 68,
-          child: Row(
-            children: [
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    if (isFavorite) {
-                      favoritesNotifier.removeFavorite(widget.song);
-                    } else {
-                      favoritesNotifier.addFavorite(widget.song);
-                    }
-                  });
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    customSnackBar(
-                        isFavorite
-                            ? '${widget.song.title} removed from Favorites'
-                            : '${widget.song.title} added to Favorites',
-                        ref),
-                  );
-                },
-                child: Icon(
-                  isFavorite ? Icons.favorite : Icons.favorite_border,
-                  color: isFavorite ? Colors.red : null,
-                ),
+      ),
+      trailing: SizedBox(
+        width: 68,
+        child: Row(
+          children: [
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  if (isFavorite) {
+                    favoritesNotifier.removeFavorite(widget.song);
+                  } else {
+                    favoritesNotifier.addFavorite(widget.song);
+                  }
+                });
+                ScaffoldMessenger.of(context).showSnackBar(
+                  customSnackBar(
+                      isFavorite
+                          ? '${widget.song.title} removed from Favorites'
+                          : '${widget.song.title} added to Favorites',
+                      ref),
+                );
+              },
+              child: Icon(
+                isFavorite ? Icons.favorite : Icons.favorite_border,
+                color: isFavorite ? Colors.red : null,
               ),
-              CupertinoButton(
-                padding: EdgeInsets.zero,
-                child: Icon(Icons.more_vert, color: AppTheme.accentColor(ref)),
-                onPressed: () {
-                  showCupertinoDialog(
-                    context: context,
-                    builder: (context) {
-                      return CupertinoActionSheet(
-                        cancelButton: CupertinoActionSheetAction(
-                          isDestructiveAction: true,
+            ),
+            CupertinoButton(
+              padding: EdgeInsets.zero,
+              child: Icon(Icons.more_vert, color: AppTheme.accentColor(ref)),
+              onPressed: () {
+                showCupertinoDialog(
+                  context: context,
+                  builder: (context) {
+                    return CupertinoActionSheet(
+                      cancelButton: CupertinoActionSheetAction(
+                        isDestructiveAction: true,
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Text('Cancel'),
+                      ),
+                      title: Text(
+                        widget.song.title,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      actions: [
+                        CupertinoActionSheetAction(
                           onPressed: () {
                             Navigator.pop(context);
-                          },
-                          child: const Text('Cancel'),
-                        ),
-                        title: Text(
-                          widget.song.title,
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        actions: [
-                          CupertinoActionSheetAction(
-                            onPressed: () {
-                              Navigator.pop(context);
+                            if (widget.fromPlaylist) {
+                              if (widget.playlist != null) {
+                                try {
+                                  offlinePlaylistNotifier
+                                      .removeSongFromPlaylist(
+                                          widget.playlist!, widget.song);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    customSnackBar(
+                                        '${widget.song.title} removed from playlist ${widget.playlist!.title}\nRefresh the page to update the list',
+                                        ref),
+                                  );
+                                } catch (e) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    customSnackBar(
+                                        'Unable to remove song from playlist',
+                                        ref),
+                                  );
+                                  throw Exception(e);
+                                }
+                              }
+                            } else {
                               addToPlaylist();
-                            },
-                            child: Text(
-                              'Add to Playlist',
-                              style:
-                                  TextStyle(color: AppTheme.accentColor(ref)),
-                            ),
+                            }
+                          },
+                          child: Text(
+                            widget.fromPlaylist
+                                ? 'Remove from Playlist'
+                                : 'Add to Playlist',
+                            style: TextStyle(color: AppTheme.accentColor(ref)),
                           ),
-                          CupertinoActionSheetAction(
-                            onPressed: () {
-                              Navigator.pop(context);
-                              filesNotifier
-                                  .deleteSong([widget.song.downloadUrl]);
-                              filesNotifier.refreshFiles;
-                            },
-                            child: Text(
-                              'Delete',
-                              style:
-                                  TextStyle(color: AppTheme.accentColor(ref)),
-                            ),
+                        ),
+                        CupertinoActionSheetAction(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            filesNotifier.deleteSong([widget.song.downloadUrl]);
+                            filesNotifier.refreshFiles;
+                          },
+                          child: Text(
+                            'Delete',
+                            style: TextStyle(color: AppTheme.accentColor(ref)),
                           ),
-                        ],
-                      );
-                    },
-                  );
-                },
-              ),
-            ],
-          ),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+            ),
+          ],
         ),
-        title: Text(
-          widget.song.title,
-          style: const TextStyle(fontSize: 18),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        subtitle: Text(
-          widget.song.artists.map((artist) => artist.name).toSet().join(', '),
-          style: const TextStyle(color: Colors.grey, fontSize: 15),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        onTap: () {
-          if (widget.fromPlayingQueue) {
-            setState(() {
-              Navigator.pop(context);
-              audioNotifier.seek(Duration.zero, index: widget.index);
-              audioNotifier.play();
-            });
-          } else {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => OfflinePlayerScreen(
-                  playlist: widget.songList,
-                  initialIndex: widget.index,
-                ),
-              ),
-            );
-          }
-        },
       ),
+      title: Text(
+        widget.song.title,
+        style: const TextStyle(fontSize: 18),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+      subtitle: Text(
+        widget.song.artists.map((artist) => artist.name).toSet().join(', '),
+        style: const TextStyle(color: Colors.grey, fontSize: 15),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+      onTap: () {
+        if (widget.fromPlayingQueue) {
+          setState(() {
+            Navigator.pop(context);
+            audioNotifier.seek(Duration.zero, index: widget.index);
+            audioNotifier.play();
+          });
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => OfflinePlayerScreen(
+                playlist: widget.songList,
+                initialIndex: widget.index,
+              ),
+            ),
+          );
+        }
+      },
     );
   }
 }

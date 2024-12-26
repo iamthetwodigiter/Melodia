@@ -79,6 +79,7 @@ class _OfflinePlaylistsPageState extends ConsumerState<OfflinePlaylistsPage> {
                       songList: songsList,
                       index: index,
                       playlist: widget.playlist,
+                      fromPlaylist: true,
                     );
                   },
                 ),

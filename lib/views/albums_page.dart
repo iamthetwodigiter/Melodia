@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:melodia/models/artists_model.dart';
 import 'package:melodia/models/songs_model.dart';
 import 'package:melodia/providers/albums_data_provider.dart';
@@ -26,6 +27,9 @@ class AlbumsPage extends ConsumerStatefulWidget {
 }
 
 class _AlbumsPageState extends ConsumerState<AlbumsPage> {
+  Box<Songs> playMeBox = Hive.box('playMe');
+  List<Songs> albumSongs = [];
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
@@ -44,6 +48,25 @@ class _AlbumsPageState extends ConsumerState<AlbumsPage> {
             fontWeight: FontWeight.bold,
           ),
         ),
+        actions: [
+          IconButton(
+              onPressed: () {
+                try {
+                  if (albumSongs.isNotEmpty) {
+                    playMeBox.addAll(albumSongs);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        customSnackBar('All songs added to PlayMe', ref));
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(customSnackBar(
+                        'Try after songs are loaded properly', ref));
+                  }
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      customSnackBar('Songs add to PlayMe failed', ref));
+                }
+              },
+              icon: const Icon(Icons.add))
+        ],
         centerTitle: true,
         toolbarHeight: 50,
       ),
@@ -53,6 +76,7 @@ class _AlbumsPageState extends ConsumerState<AlbumsPage> {
           children: [
             albumsData.when(
               data: (data) {
+                albumSongs = data.songs;
                 List<Songs> songsList = data.songs;
                 List<Artists> artistsList = data.artists;
                 bool isAlbumAdded = userAlbumsNotifier.isAlbumAdded(data);

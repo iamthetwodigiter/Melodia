@@ -100,7 +100,8 @@ class _MyAppState extends ConsumerState<MyApp> {
       version.put('last', lastVersion);
     }
 
-    if (!version.keys.contains('latest')) {
+    if (!version.keys.contains('latest') ||
+        version.get('latest') != appVersion) {
       version.put('latest', appVersion);
     }
   }

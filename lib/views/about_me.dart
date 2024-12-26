@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_flip_card/flutter_flip_card.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:melodia/utils/colors.dart';
 import 'package:melodia/widgets/custom_snackbar.dart';
@@ -38,7 +39,23 @@ class _AboutMeState extends ConsumerState<AboutMe> {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(25),
-                child: Image.asset('assets/dev.jpg', height: 200, width: 200),
+                child: FlipCard(
+                  rotateSide: RotateSide.left,
+                  onTapFlipping:
+                      true, 
+                  axis: FlipAxis.vertical,
+                  controller: FlipCardController(),
+                  frontWidget: Center(
+                    child: Image.asset(
+                      'assets/dev.jpg',
+                      fit: BoxFit.fitWidth,
+                    ),
+                  ),
+                  backWidget: Image.asset(
+                    'assets/dev.jpg',
+                    fit: BoxFit.cover,
+                  ),
+                ),
               ),
               const SizedBox(height: 10),
               RichText(
@@ -94,6 +111,7 @@ class _AboutMeState extends ConsumerState<AboutMe> {
               ),
               const Spacer(flex: 2),
               Column(
+                spacing: 10,
                 children: [
                   const Text(
                     'You can contribute to the project here',
@@ -118,7 +136,6 @@ class _AboutMeState extends ConsumerState<AboutMe> {
                       );
                     },
                   ),
-                  const SizedBox(height: 10),
                   const Text(
                     'And if you feel like, you can buy me a coffee',
                     style: TextStyle(

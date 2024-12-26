@@ -95,7 +95,7 @@ class Songs {
   factory Songs.fromMap(Map<String, dynamic> map, {Video? video}) {
     return Songs(
       id: map['id'] as String,
-      title: map['name'].replaceAll("&quot;", "\"").replaceAll("&amp;", "&")
+      title: map['name'].replaceAll("&quot;", '').replaceAll("&amp;", "&")
           as String,
       type: map['type'] as String,
       year: map['year'] as String,
@@ -110,7 +110,7 @@ class Songs {
           (x) => Artists.fromMap(x as Map<String, dynamic>),
         ),
       ),
-      albumTitle: map['album']['name'] as String? ?? '',
+      albumTitle: map['album']['name'].replaceAll("&quot;", '').replaceAll("&amp;", "&") as String? ?? '',
     );
   }
 }

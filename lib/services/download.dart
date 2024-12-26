@@ -22,7 +22,7 @@ Future<void> downloadSong(
 
   try {
     final settings = ref.watch(settingsProvider);
-    final cacheDirectory = await getApplicationCacheDirectory();
+    final cacheDirectory = await getApplicationDocumentsDirectory();
     final path = ref.watch(downloadPathProvider);
     path.then(
       (downloadDir) async {

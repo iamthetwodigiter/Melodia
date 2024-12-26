@@ -87,6 +87,7 @@ class _UserPlaylistsPageState extends ConsumerState<UserPlaylistsPage> {
                       songsList: songsList,
                       index: index,
                       playlist: widget.playlist,
+                      fromPlaylist: true,
                     );
                   },
                 ),

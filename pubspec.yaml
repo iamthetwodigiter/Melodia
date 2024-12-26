@@ -27,12 +27,12 @@ dependencies:
   url_launcher: ^6.3.1
   youtube_explode_dart: ^2.3.6
   salomon_bottom_bar: ^3.3.2
-  swipe_to: ^1.0.6
   device_info_plus: ^11.1.1
   flutter_local_notifications: ^18.0.1
   google_fonts: ^6.2.1
   video_player: ^2.9.2
   tuple: ^2.0.2
+  flutter_flip_card: ^0.0.6
 
 dev_dependencies:
   flutter_test:
