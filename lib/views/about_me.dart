@@ -39,21 +39,21 @@ class _AboutMeState extends ConsumerState<AboutMe> {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(25),
-                child: FlipCard(
-                  rotateSide: RotateSide.left,
-                  onTapFlipping:
-                      true, 
-                  axis: FlipAxis.vertical,
-                  controller: FlipCardController(),
-                  frontWidget: Center(
-                    child: Image.asset(
+                child: SizedBox(
+                  height: size.height * 0.35,
+                  child: FlipCard(
+                    rotateSide: RotateSide.left,
+                    onTapFlipping: true,
+                    axis: FlipAxis.vertical,
+                    controller: FlipCardController(),
+                    frontWidget: Image.asset(
                       'assets/dev.jpg',
                       fit: BoxFit.fitWidth,
                     ),
-                  ),
-                  backWidget: Image.asset(
-                    'assets/dev.jpg',
-                    fit: BoxFit.cover,
+                    backWidget: Image.asset(
+                      'assets/dev.jpg',
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
               ),
