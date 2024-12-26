@@ -1,7 +1,7 @@
 name: melodia
 description: "A minimal music streaming/ downloader/ player app, baked with loads of 💙"
 publish_to: 'none'
-version: 4.4.0
+version: 4.5.0
 
 environment:
   sdk: ^3.5.4
