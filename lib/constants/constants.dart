@@ -2,7 +2,7 @@ const String lastVersion = "v4.5.0";
 const String appVersion = "v4.6.0";
 const List<Map<String, List<String>>> changelogs = [
   {
-    "v4.5.1": [
+    "v4.6.0": [
       "Fixed notification bug where it kept on playing notification sound",
       "Fixed PlayMe title alignment",
       "Moved History section to Library as a separate page",
