@@ -21,25 +21,19 @@ class HistoryNotifier extends StateNotifier<List<Songs>> {
   }
 
   void addHistory(Songs song) {
-    if (!_historyBox.containsKey(song.id)) {
-      _historyBox.put(song.id, song);
+    if (!_historyBox.values.contains(song)) {
+      _historyBox.add(song);
       state = [...state, song];
     }
   }
 
   void removeHistory(Songs song) {
-    if (_historyBox.containsKey(song.id)) {
-      _historyBox.delete(song.id);
-      state = state.where((item) => item.id != song.id).toList();
-    }
+    _historyBox.delete(song);
+    state = state.where((item) => item.id != song.id).toList();
   }
 
   void clearHistory() {
     _historyBox.clear();
     state = [];
-  }
-
-  bool isHistory(Songs song) {
-    return _historyBox.containsKey(song.id);
   }
 }

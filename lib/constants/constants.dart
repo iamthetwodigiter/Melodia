@@ -9,6 +9,8 @@ const List<Map<String, List<String>>> changelogs = [
       "Better history track, now all songs that plays are saved rather than the songs that are clicked to play",
       "Added music slab to PlayMe page",
       "Homepage history cards are now optional, can be hidden",
+      "Added a provider to manage PlayMe",
+      "Added Play All and Remove All options in PlayMe and History pages",
       "YouTube download quality option removed from settings until further update with downloads",
     ]
   },

@@ -7,7 +7,7 @@ import 'package:melodia/views/history_page.dart';
 import 'package:melodia/views/menu_page.dart';
 import 'package:melodia/views/music_page.dart';
 import 'package:melodia/views/offline_playlists_list.dart';
-import 'package:melodia/views/playing_queue_page.dart';
+import 'package:melodia/views/play_me_page.dart';
 import 'package:melodia/views/user_albums_list.dart';
 import 'package:melodia/views/user_playlists_list.dart';
 import 'package:melodia/widgets/music_slab.dart';
@@ -180,7 +180,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => const PlayingQueuePage(),
+                        builder: (context) => const PlayMePage(),
                       ),
                     );
                   },

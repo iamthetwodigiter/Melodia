@@ -2,15 +2,16 @@ import 'dart:math';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/adapters.dart';
 import 'package:melodia/models/playlists_model.dart';
 import 'package:melodia/models/songs_model.dart';
 import 'package:melodia/providers/audio_provider.dart';
 import 'package:melodia/providers/favorites_provider.dart';
 import 'package:melodia/providers/offline_files_provider.dart';
+import 'package:melodia/providers/play_me_provider.dart';
 import 'package:melodia/providers/playing_queue_provider.dart';
 import 'package:melodia/providers/settings_provider.dart';
 import 'package:melodia/providers/user_playlists_provider.dart';
+import 'package:melodia/providers/watch_history_provider.dart';
 import 'package:melodia/services/download.dart';
 import 'package:melodia/utils/colors.dart';
 import 'package:melodia/views/player_screen.dart';
@@ -25,6 +26,7 @@ class SongsListItem extends ConsumerStatefulWidget {
   final Playlists? playlist;
   final bool fromPlayMe;
   final bool fromPlaylist;
+  final bool fromHistory;
   const SongsListItem({
     super.key,
     required this.songsList,
@@ -34,6 +36,7 @@ class SongsListItem extends ConsumerStatefulWidget {
     this.playlist,
     this.fromPlayMe = false,
     this.fromPlaylist = false,
+    this.fromHistory = false,
   });
 
   @override
@@ -42,7 +45,6 @@ class SongsListItem extends ConsumerStatefulWidget {
 
 class _SongsListItemState extends ConsumerState<SongsListItem> {
   late TextEditingController _playlistNameController;
-  Box<Songs> playMeBox = Hive.box('playMe');
 
   @override
   void initState() {
@@ -68,6 +70,8 @@ class _SongsListItemState extends ConsumerState<SongsListItem> {
     bool isDownloaded = files.isDownloaded(widget.song.title);
     final audioNotifier = ref.watch(audioPlayerProvider.notifier);
     final playingQueue = ref.watch(playingQueueProvider.notifier);
+    final historyNotifier = ref.watch(historyProvider.notifier);
+    final playMeNotifier = ref.watch(playMeProvider.notifier);
 
     void addToPlaylist() {
       showCupertinoDialog(
@@ -340,7 +344,7 @@ class _SongsListItemState extends ConsumerState<SongsListItem> {
                         if (!widget.fromPlayMe)
                           CupertinoActionSheetAction(
                             onPressed: () {
-                              playMeBox.add(widget.song);
+                              playMeNotifier.addToPlayMe(widget.song);
 
                               ScaffoldMessenger.of(context).showSnackBar(
                                 customSnackBar(
@@ -360,11 +364,11 @@ class _SongsListItemState extends ConsumerState<SongsListItem> {
                           CupertinoActionSheetAction(
                             onPressed: () {
                               setState(() {
-                                playMeBox.deleteAt(widget.index);
+                                playMeNotifier.removeFromPlayMe(widget.song);
                               });
                               ScaffoldMessenger.of(context).showSnackBar(
                                 customSnackBar(
-                                  '${widget.song.title} removed from PlayMe\nGo back to update the list',
+                                  '${widget.song.title} removed from PlayMe',
                                   ref,
                                 ),
                               );
@@ -372,6 +376,26 @@ class _SongsListItemState extends ConsumerState<SongsListItem> {
                             },
                             child: Text(
                               'Remove from PlayMe',
+                              style:
+                                  TextStyle(color: AppTheme.accentColor(ref)),
+                            ),
+                          ),
+                        if (widget.fromHistory)
+                          CupertinoActionSheetAction(
+                            onPressed: () {
+                              setState(() {
+                                historyNotifier.removeHistory(widget.song);
+                              });
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                customSnackBar(
+                                  '${widget.song.title} removed from History',
+                                  ref,
+                                ),
+                              );
+                              Navigator.pop(context);
+                            },
+                            child: Text(
+                              'Remove from History',
                               style:
                                   TextStyle(color: AppTheme.accentColor(ref)),
                             ),
@@ -425,6 +449,9 @@ class _SongsListItemState extends ConsumerState<SongsListItem> {
           });
         } else {
           ref.read(playingQueueProvider.notifier).clear();
+          if (widget.fromPlayMe) {
+            historyNotifier.addHistory(widget.songsList[widget.index]);
+          }
           Navigator.push(
             context,
             MaterialPageRoute(

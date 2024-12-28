@@ -26,14 +26,14 @@ class AudioPlayerNotifier extends StateNotifier<AudioPlayerState> {
 
   void _initialize() {
     final settings = ref.watch(settingsProvider);
-    final history = ref.watch(historyProvider);
+    final historyNotifier = ref.watch(historyProvider.notifier);
     _audioPlayer.setShuffleModeEnabled(settings?.shuffleMode ?? false);
     _audioPlayer.setLoopMode(
         settings?.repeatMode == true ? LoopMode.all : LoopMode.off);
 
     _audioPlayer.currentIndexStream.listen((index) {
       if (index != null) {
-        history.add(songsList.elementAt(index));
+        historyNotifier.addHistory(songsList.elementAt(index));
         state = state.copyWith(currentIndex: index);
       }
     });

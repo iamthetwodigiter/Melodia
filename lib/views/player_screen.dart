@@ -5,7 +5,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:melodia/models/audio_player_state_model.dart';
@@ -16,6 +15,7 @@ import 'package:melodia/providers/current_songs_provider.dart';
 import 'package:melodia/providers/favorites_provider.dart';
 import 'package:melodia/providers/offline_audio_provider.dart';
 import 'package:melodia/providers/offline_files_provider.dart';
+import 'package:melodia/providers/play_me_provider.dart';
 import 'package:melodia/providers/playing_queue_provider.dart';
 import 'package:melodia/providers/settings_provider.dart';
 import 'package:melodia/providers/user_playlists_provider.dart';
@@ -56,8 +56,6 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
   Timer? _countdownTimer;
 
   Duration? endOfSongAfter;
-
-  Box<Songs> playMeBox = Hive.box('playMe');
 
   void startSleepTimer(Duration duration) {
     setState(() {
@@ -161,6 +159,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
     final userPlaylist = ref.watch(userPlaylistsProvider);
     final userPlaylistNotifier = ref.watch(userPlaylistsProvider.notifier);
     final playingQueue = ref.watch(playingQueueProvider);
+    final playMeNotifier = ref.watch(playMeProvider.notifier);
     final size = MediaQuery.of(context).size;
 
     if (playingQueue.isEmpty) {
@@ -215,7 +214,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                         onPressed: () {
                           Navigator.pop(context);
                           try {
-                            playMeBox.addAll(playingQueue);
+                            playMeNotifier.addAllToPlayMe(playingQueue);
                             ScaffoldMessenger.of(context).showSnackBar(
                                 customSnackBar(
                                     'All songs added to PlayMe', ref));

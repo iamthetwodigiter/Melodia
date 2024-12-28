@@ -1,27 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:melodia/providers/watch_history_provider.dart';
+import 'package:melodia/providers/play_me_provider.dart';
 import 'package:melodia/utils/colors.dart';
 import 'package:melodia/views/player_screen.dart';
 import 'package:melodia/widgets/music_slab.dart';
 import 'package:melodia/widgets/songs_list_item.dart';
 
-class HistoryPage extends ConsumerStatefulWidget {
-  const HistoryPage({super.key});
+class PlayMePage extends ConsumerStatefulWidget {
+  const PlayMePage({super.key});
 
   @override
-  ConsumerState<HistoryPage> createState() => _HistoryPageState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _PlayMePageState();
 }
 
-class _HistoryPageState extends ConsumerState<HistoryPage> {
+class _PlayMePageState extends ConsumerState<PlayMePage> {
   @override
   Widget build(BuildContext context) {
-    final history = ref.watch(historyProvider);
-    final historyNotifier = ref.watch(historyProvider.notifier);
+    final playMe = ref.watch(playMeProvider);
+    final playMeNotifier = ref.watch(playMeProvider.notifier);
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "History",
+          "PlayMe",
           style: TextStyle(
             color: AppTheme.accentColor(ref),
             fontSize: 25,
@@ -33,7 +33,7 @@ class _HistoryPageState extends ConsumerState<HistoryPage> {
         actions: [
           IconButton(
             onPressed: () {
-              historyNotifier.clearHistory();
+              playMeNotifier.clearPlayMe();
             },
             icon: const Icon(
               Icons.delete,
@@ -45,10 +45,10 @@ class _HistoryPageState extends ConsumerState<HistoryPage> {
       body: SafeArea(
         child: Stack(
           children: [
-            history.isEmpty
+            playMe.isEmpty
                 ? const Center(
                     child: Text(
-                      'Go play something first',
+                      'Go add something first',
                       style: TextStyle(fontSize: 25),
                       textAlign: TextAlign.center,
                     ),
@@ -72,7 +72,7 @@ class _HistoryPageState extends ConsumerState<HistoryPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  '${history.length.toString()} Songs\nPlayed by user',
+                                  '${playMe.length.toString()} Songs\nAdded by user',
                                   style: const TextStyle(fontSize: 18),
                                 ),
                                 const SizedBox(height: 10),
@@ -84,7 +84,7 @@ class _HistoryPageState extends ConsumerState<HistoryPage> {
                                           context,
                                           MaterialPageRoute(
                                             builder: (_) => PlayerScreen(
-                                              playlist: history,
+                                              playlist: playMe,
                                               initialIndex: 0,
                                             ),
                                           ),
@@ -117,16 +117,16 @@ class _HistoryPageState extends ConsumerState<HistoryPage> {
                       ),
                       Expanded(
                         child: ListView.builder(
-                          itemCount: history.length,
+                          itemCount: playMe.length,
                           itemBuilder: (context, index) {
                             return Padding(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 10.0),
                               child: SongsListItem(
-                                songsList: history,
-                                song: history.elementAt(index),
+                                songsList: playMe,
+                                song: playMe.elementAt(index),
                                 index: index,
-                                fromHistory: true,
+                                fromPlayMe: true,
                               ),
                             );
                           },
