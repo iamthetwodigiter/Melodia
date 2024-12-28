@@ -381,33 +381,33 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 }).toList(),
               ),
             ),
-            ListTile(
-              leading: const Icon(Icons.download),
-              iconColor: AppTheme.accentColor(ref),
-              title: const Text("YouTube Download"),
-              titleTextStyle: TextStyle(
-                color: AppTheme.accentColor(ref),
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-              subtitle: const Text("Select YouTube Download Quality"),
-              trailing: DropdownButton<int>(
-                value: settings.ytDownloadQuality,
-                icon: const Icon(Icons.arrow_drop_down),
-                dropdownColor: const Color.fromARGB(255, 39, 39, 39),
-                onChanged: (int? newValue) {
-                  if (newValue != null) {
-                    notifier.updateYTDownloadQuality(newValue);
-                  }
-                },
-                items: youtubeQualities.map((int quality) {
-                  return DropdownMenuItem<int>(
-                    value: quality,
-                    child: Text('$quality kbps'),
-                  );
-                }).toList(),
-              ),
-            ),
+            // ListTile(
+            //   leading: const Icon(Icons.download),
+            //   iconColor: AppTheme.accentColor(ref),
+            //   title: const Text("YouTube Download"),
+            //   titleTextStyle: TextStyle(
+            //     color: AppTheme.accentColor(ref),
+            //     fontSize: 20,
+            //     fontWeight: FontWeight.bold,
+            //   ),
+            //   subtitle: const Text("Select YouTube Download Quality"),
+            //   trailing: DropdownButton<int>(
+            //     value: settings.ytDownloadQuality,
+            //     icon: const Icon(Icons.arrow_drop_down),
+            //     dropdownColor: const Color.fromARGB(255, 39, 39, 39),
+            //     onChanged: (int? newValue) {
+            //       if (newValue != null) {
+            //         notifier.updateYTDownloadQuality(newValue);
+            //       }
+            //     },
+            //     items: youtubeQualities.map((int quality) {
+            //       return DropdownMenuItem<int>(
+            //         value: quality,
+            //         child: Text('$quality kbps'),
+            //       );
+            //     }).toList(),
+            //   ),
+            // ),
             ListTile(
               leading: const Icon(Icons.audiotrack),
               iconColor: AppTheme.accentColor(ref),

@@ -11,6 +11,7 @@ class Settings {
   final bool separatePlaylistFolder;
   final Color accentColor;
   final List<String> bottomTabSelection;
+  final bool isHistoryCardVisible;
 
   Settings({
     required this.downloadQuality,
@@ -23,6 +24,7 @@ class Settings {
     required this.separatePlaylistFolder,
     required this.accentColor,
     required this.bottomTabSelection,
+    required this.isHistoryCardVisible,
   });
 
   Map<String, dynamic> toMap() {
@@ -37,6 +39,7 @@ class Settings {
       'separatePlaylistFolder': separatePlaylistFolder,
       'accentColor': accentColor,
       'bottomTabSelection': bottomTabSelection,
+      'isHistoryCardVisible': isHistoryCardVisible,
     };
   }
 
@@ -52,6 +55,7 @@ class Settings {
       separatePlaylistFolder: map['separatePlaylistFolder'] as bool,
       accentColor: map['accentColor'] as Color,
       bottomTabSelection: map['bottomTabSelection'] as List<String>,
+      isHistoryCardVisible: map['isHistoryCardVisible'] as bool,
     );
   }
 }

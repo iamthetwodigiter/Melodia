@@ -4,6 +4,7 @@ import 'package:melodia/models/audio_player_state_model.dart';
 import 'package:melodia/models/songs_model.dart';
 import 'package:melodia/providers/playing_queue_provider.dart';
 import 'package:melodia/providers/settings_provider.dart';
+import 'package:melodia/providers/watch_history_provider.dart';
 import 'package:rxdart/rxdart.dart';
 
 final audioPlayerProvider =
@@ -25,13 +26,14 @@ class AudioPlayerNotifier extends StateNotifier<AudioPlayerState> {
 
   void _initialize() {
     final settings = ref.watch(settingsProvider);
-
+    final history = ref.watch(historyProvider);
     _audioPlayer.setShuffleModeEnabled(settings?.shuffleMode ?? false);
     _audioPlayer.setLoopMode(
         settings?.repeatMode == true ? LoopMode.all : LoopMode.off);
 
     _audioPlayer.currentIndexStream.listen((index) {
       if (index != null) {
+        history.add(songsList.elementAt(index));
         state = state.copyWith(currentIndex: index);
       }
     });

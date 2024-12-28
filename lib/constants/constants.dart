@@ -1,6 +1,17 @@
-const String lastVersion = "v4.4.0";
-const String appVersion = "v4.5.0";
+const String lastVersion = "v4.5.0";
+const String appVersion = "v4.6.0";
 const List<Map<String, List<String>>> changelogs = [
+  {
+    "v4.5.1": [
+      "Fixed notification bug where it kept on playing notification sound",
+      "Fixed PlayMe title alignment",
+      "Moved History section to Library as a separate page",
+      "Better history track, now all songs that plays are saved rather than the songs that are clicked to play",
+      "Added music slab to PlayMe page",
+      "Homepage history cards are now optional, can be hidden",
+      "YouTube download quality option removed from settings until further update with downloads",
+    ]
+  },
   {
     "v4.5.0": [
       "Fixed 'Remove from Playlist' option not showing up [both online and offline]",

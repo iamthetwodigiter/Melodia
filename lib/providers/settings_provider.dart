@@ -30,6 +30,8 @@ class SettingsNotifier extends StateNotifier<Settings?> {
     final bottomTabSelection = _box.get('bottomTabSelection',
         defaultValue: ['favorites', 'playlists', 'settings', 'profile']);
     final suggestions = _box.get('suggestions', defaultValue: true);
+    final isHistoryCardVisible =
+        _box.get('historyBoxVisible', defaultValue: false);
 
     state = Settings(
       downloadQuality: downloadQuality,
@@ -42,6 +44,7 @@ class SettingsNotifier extends StateNotifier<Settings?> {
       separatePlaylistFolder: separatePlaylistFolder,
       accentColor: accentColorValue,
       bottomTabSelection: bottomTabSelection,
+      isHistoryCardVisible: isHistoryCardVisible,
     );
   }
 
@@ -59,6 +62,7 @@ class SettingsNotifier extends StateNotifier<Settings?> {
         separatePlaylistFolder: state!.separatePlaylistFolder,
         accentColor: state!.accentColor,
         bottomTabSelection: state!.bottomTabSelection,
+        isHistoryCardVisible: state!.isHistoryCardVisible,
       );
     }
   }
@@ -77,6 +81,7 @@ class SettingsNotifier extends StateNotifier<Settings?> {
         separatePlaylistFolder: state!.separatePlaylistFolder,
         accentColor: state!.accentColor,
         bottomTabSelection: state!.bottomTabSelection,
+        isHistoryCardVisible: state!.isHistoryCardVisible,
       );
     }
   }
@@ -95,6 +100,7 @@ class SettingsNotifier extends StateNotifier<Settings?> {
         separatePlaylistFolder: state!.separatePlaylistFolder,
         accentColor: state!.accentColor,
         bottomTabSelection: state!.bottomTabSelection,
+        isHistoryCardVisible: state!.isHistoryCardVisible,
       );
     }
   }
@@ -113,6 +119,7 @@ class SettingsNotifier extends StateNotifier<Settings?> {
         separatePlaylistFolder: state!.separatePlaylistFolder,
         accentColor: state!.accentColor,
         bottomTabSelection: state!.bottomTabSelection,
+        isHistoryCardVisible: state!.isHistoryCardVisible,
       );
     }
   }
@@ -131,6 +138,7 @@ class SettingsNotifier extends StateNotifier<Settings?> {
         separatePlaylistFolder: isEnabled,
         accentColor: state!.accentColor,
         bottomTabSelection: state!.bottomTabSelection,
+        isHistoryCardVisible: state!.isHistoryCardVisible,
       );
     }
   }
@@ -149,6 +157,7 @@ class SettingsNotifier extends StateNotifier<Settings?> {
         separatePlaylistFolder: state!.separatePlaylistFolder,
         accentColor: accentColor,
         bottomTabSelection: state!.bottomTabSelection,
+        isHistoryCardVisible: state!.isHistoryCardVisible,
       );
     }
   }
@@ -167,6 +176,7 @@ class SettingsNotifier extends StateNotifier<Settings?> {
         separatePlaylistFolder: state!.separatePlaylistFolder,
         accentColor: state!.accentColor,
         bottomTabSelection: state!.bottomTabSelection,
+        isHistoryCardVisible: state!.isHistoryCardVisible,
       );
     }
   }
@@ -185,6 +195,7 @@ class SettingsNotifier extends StateNotifier<Settings?> {
         separatePlaylistFolder: state!.separatePlaylistFolder,
         accentColor: state!.accentColor,
         bottomTabSelection: state!.bottomTabSelection,
+        isHistoryCardVisible: state!.isHistoryCardVisible,
       );
     }
   }
@@ -203,6 +214,7 @@ class SettingsNotifier extends StateNotifier<Settings?> {
         separatePlaylistFolder: state!.separatePlaylistFolder,
         accentColor: state!.accentColor,
         bottomTabSelection: updateList,
+        isHistoryCardVisible: state!.isHistoryCardVisible,
       );
     }
   }
@@ -221,6 +233,26 @@ class SettingsNotifier extends StateNotifier<Settings?> {
         separatePlaylistFolder: state!.separatePlaylistFolder,
         accentColor: state!.accentColor,
         bottomTabSelection: state!.bottomTabSelection,
+        isHistoryCardVisible: state!.isHistoryCardVisible,
+      );
+    }
+  }
+
+  void updateisHistoryCardVisible(bool isVisible) {
+    _box.put('isHistoryCardVisible', isVisible);
+    if (state != null) {
+      state = Settings(
+        downloadQuality: state!.downloadQuality,
+        streamingQuality: state!.streamingQuality,
+        ytDownloadQuality: state!.ytDownloadQuality,
+        ytStreamingQuality: state!.ytStreamingQuality,
+        shuffleMode: state!.shuffleMode,
+        repeatMode: state!.repeatMode,
+        suggestions: state!.suggestions,
+        separatePlaylistFolder: state!.separatePlaylistFolder,
+        accentColor: state!.accentColor,
+        bottomTabSelection: state!.bottomTabSelection,
+        isHistoryCardVisible: isVisible,
       );
     }
   }

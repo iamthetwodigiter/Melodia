@@ -1,28 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive_flutter/adapters.dart';
-import 'package:melodia/models/songs_model.dart';
+import 'package:melodia/providers/watch_history_provider.dart';
 import 'package:melodia/utils/colors.dart';
 import 'package:melodia/widgets/music_slab.dart';
 import 'package:melodia/widgets/songs_list_item.dart';
 
-class PlayingQueuePage extends ConsumerStatefulWidget {
-  const PlayingQueuePage({super.key});
+class HistoryPage extends ConsumerStatefulWidget {
+  const HistoryPage({super.key});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() =>
-      _PlayingQueuePageState();
+  ConsumerState<HistoryPage> createState() => _HistoryPageState();
 }
 
-class _PlayingQueuePageState extends ConsumerState<PlayingQueuePage> {
-  Box<Songs> playMeBox = Hive.box('playMe');
-
+class _HistoryPageState extends ConsumerState<HistoryPage> {
   @override
   Widget build(BuildContext context) {
+    final history = ref.watch(historyProvider);
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "PlayMe",
+          "History",
           style: TextStyle(
             color: AppTheme.accentColor(ref),
             fontSize: 25,
@@ -36,22 +33,23 @@ class _PlayingQueuePageState extends ConsumerState<PlayingQueuePage> {
       body: SafeArea(
         child: Stack(
           children: [
-            playMeBox.isEmpty
+            history.isEmpty
                 ? const Center(
                     child: Text(
-                      'Go add something first',
+                      'Go play something first',
                       style: TextStyle(fontSize: 25),
                       textAlign: TextAlign.center,
                     ),
                   )
                 : ListView.builder(
-                    itemCount: playMeBox.values.length,
+                    itemCount: history.length,
                     itemBuilder: (context, index) {
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10.0),
                         child: SongsListItem(
-                          songsList: playMeBox.values.toList(),
-                          song: playMeBox.values.elementAt(index),
+                          songsList:
+                              history,
+                          song: history.elementAt(index),
                           index: index,
                           fromPlayMe: true,
                         ),

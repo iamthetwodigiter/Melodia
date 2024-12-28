@@ -11,7 +11,6 @@ import 'package:melodia/providers/offline_files_provider.dart';
 import 'package:melodia/providers/playing_queue_provider.dart';
 import 'package:melodia/providers/settings_provider.dart';
 import 'package:melodia/providers/user_playlists_provider.dart';
-import 'package:melodia/providers/watch_history_provider.dart';
 import 'package:melodia/services/download.dart';
 import 'package:melodia/utils/colors.dart';
 import 'package:melodia/views/player_screen.dart';
@@ -64,7 +63,6 @@ class _SongsListItemState extends ConsumerState<SongsListItem> {
     final userPlaylist = ref.watch(userPlaylistsProvider);
     final userPlaylistNotifier = ref.watch(userPlaylistsProvider.notifier);
     final settings = ref.watch(settingsProvider);
-    final history = ref.watch(historyProvider.notifier);
     ref.watch(filesProvider);
     final files = ref.watch(filesProvider.notifier);
     bool isDownloaded = files.isDownloaded(widget.song.title);
@@ -419,7 +417,6 @@ class _SongsListItemState extends ConsumerState<SongsListItem> {
         overflow: TextOverflow.ellipsis,
       ),
       onTap: () {
-        history.addHistory(widget.song);
         if (widget.fromPlayingQueue) {
           setState(() {
             Navigator.pop(context);

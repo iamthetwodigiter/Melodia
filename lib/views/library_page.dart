@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:melodia/utils/colors.dart';
 import 'package:melodia/views/favorites_page.dart';
+import 'package:melodia/views/history_page.dart';
 import 'package:melodia/views/menu_page.dart';
 import 'package:melodia/views/music_page.dart';
 import 'package:melodia/views/offline_playlists_list.dart';
@@ -180,6 +181,25 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) => const PlayingQueuePage(),
+                      ),
+                    );
+                  },
+                ),
+                ListTile(
+                  //  tileColor: AppTheme.accentColor(ref)!.withAlpha(50),
+                  leading:
+                      Icon(Icons.history, color: AppTheme.accentColor(ref)),
+                  title: const Text('History'),
+                  subtitle: const Text('All the songs you played are here'),
+                  titleTextStyle: TextStyle(
+                    color: AppTheme.accentColor(ref),
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const HistoryPage(),
                       ),
                     );
                   },

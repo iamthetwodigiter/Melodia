@@ -22,8 +22,11 @@ class NotificationService {
       android: AndroidNotificationDetails(
         'com.thetwodigiter.melodia.notification',
         'Notification',
-        importance: Importance.high,
-        priority: Priority.high,
+        // importance: Importance.high,
+        // priority: Priority.high,
+        ongoing: true,
+        onlyAlertOnce: true,
+        showWhen: true,
         enableVibration: false,
         progress: progress ?? 0,
         maxProgress: maxProgress ?? 0,
