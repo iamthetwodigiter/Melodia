@@ -10,7 +10,6 @@ import 'package:melodia/providers/settings_provider.dart';
 import 'package:melodia/services/api_calls.dart';
 import 'package:melodia/services/notification_service.dart';
 import 'package:melodia/utils/helper_function.dart';
-import 'package:path_provider/path_provider.dart';
 
 Future<void> downloadSong(
   List<Songs> songsList,
@@ -22,7 +21,11 @@ Future<void> downloadSong(
 
   try {
     final settings = ref.watch(settingsProvider);
-    final cacheDirectory = await getApplicationDocumentsDirectory();
+    final cacheDirectory =
+        Directory('/storage/emulated/0/Music/Melodia/.thumbnails/');
+    if (!cacheDirectory.existsSync()) {
+      cacheDirectory.createSync();
+    }
     final path = ref.watch(downloadPathProvider);
     path.then(
       (downloadDir) async {

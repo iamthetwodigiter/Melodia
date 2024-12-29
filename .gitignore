@@ -46,3 +46,4 @@ app.*.map.json
 /lib/secrets/
 /android/app/key.properties
 /android/app/melodia-key.jks
+/.env

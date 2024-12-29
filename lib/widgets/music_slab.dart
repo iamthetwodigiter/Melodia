@@ -95,6 +95,9 @@ class _MusicSlabState extends ConsumerState<MusicSlab> {
                       child: isOnlineSongsPlaying
                           ? CachedNetworkImage(
                               imageUrl: song.image,
+                              height: 75,
+                              width: 75,
+                              fit: BoxFit.cover,
                               placeholder: (context, url) =>
                                   const CircularProgressIndicator(),
                               errorWidget: (context, url, error) =>
@@ -102,6 +105,9 @@ class _MusicSlabState extends ConsumerState<MusicSlab> {
                             )
                           : Image.file(
                               File(song.image),
+                              height: 75,
+                              width: 75,
+                              fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) {
                                 return Image.asset('assets/song_thumb.png');
                               },

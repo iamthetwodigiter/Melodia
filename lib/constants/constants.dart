@@ -1,6 +1,12 @@
-const String lastVersion = "v4.5.0";
-const String appVersion = "v4.6.0";
+const String lastVersion = "v4.6.0";
+const String appVersion = "v4.6.1";
 const List<Map<String, List<String>>> changelogs = [
+  {
+    "v4.6.1": [
+      "Fixed song cover arts not showing for downloaded songs",
+      "Fixed the music slab image size",
+    ]
+  },
   {
     "v4.6.0": [
       "Fixed notification bug where it kept on playing notification sound",

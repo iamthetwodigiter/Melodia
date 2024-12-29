@@ -54,7 +54,7 @@ class FilesNotifier extends StateNotifier<List<Songs>> {
     final fileSize = File(filePath).statSync().size;
     final tag = await tagger.readTags(path: filePath) ?? Tag();
     final id = Random().nextInt(100000).toString();
-    final cacheDirectory = await getApplicationCacheDirectory();
+    final cacheDirectory = Directory('/storage/emulated/0/Music/Melodia/.thumbnails/');
 
     final imageFilePath =
         '${cacheDirectory.path}/${filePath.split('/').last.split(".").first}_artwork.jpg';
