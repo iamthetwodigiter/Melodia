@@ -122,62 +122,64 @@ class _MusicPageState extends ConsumerState<MusicPage> {
         centerTitle: true,
         toolbarHeight: 50,
       ),
-      body: Stack(
-        alignment: Alignment.bottomCenter,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            child: files.isEmpty
-                ? const Center(
-                    child: Text(
-                      'No Songs found!!\nTry refreshing the library',
-                      style: TextStyle(fontSize: 25),
-                      textAlign: TextAlign.center,
-                    ),
-                  )
-                : ListView.builder(
-                    itemCount: filteredSongs.length,
-                    itemBuilder: (context, index) {
-                      final file = filteredSongs[index];
-                      final isSelected = _selectedIndices.contains(index);
-
-                      return GestureDetector(
-                        onLongPress: () {
-                          if (!_selectionMode) {
-                            _toggleSelectionMode();
-                            _toggleSelection(index);
-                          }
-                        },
-                        child: Stack(
-                          children: [
-                            Container(
-                              color: isSelected
-                                  ? AppTheme.accentColor(ref).withAlpha(50)
-                                  : null,
-                              child: OfflineSongsListItem(
-                                songList: filteredSongs,
-                                song: file,
-                                index: index,
-                              ),
-                            ),
-                            if (_selectionMode)
-                              Positioned(
-                                left: 15,
-                                top: 15,
-                                child: Checkbox(
-                                  value: isSelected,
-                                  onChanged: (_) => _toggleSelection(index),
-                                  activeColor: AppTheme.accentColor(ref),
+      body: SafeArea(
+        child: Stack(
+          alignment: Alignment.bottomCenter,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: files.isEmpty
+                  ? const Center(
+                      child: Text(
+                        'No Songs found!!\nTry refreshing the library',
+                        style: TextStyle(fontSize: 25),
+                        textAlign: TextAlign.center,
+                      ),
+                    )
+                  : ListView.builder(
+                      itemCount: filteredSongs.length,
+                      itemBuilder: (context, index) {
+                        final file = filteredSongs[index];
+                        final isSelected = _selectedIndices.contains(index);
+        
+                        return GestureDetector(
+                          onLongPress: () {
+                            if (!_selectionMode) {
+                              _toggleSelectionMode();
+                              _toggleSelection(index);
+                            }
+                          },
+                          child: Stack(
+                            children: [
+                              Container(
+                                color: isSelected
+                                    ? AppTheme.accentColor(ref).withAlpha(50)
+                                    : null,
+                                child: OfflineSongsListItem(
+                                  songList: filteredSongs,
+                                  song: file,
+                                  index: index,
                                 ),
                               ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-          ),
-          const MusicSlab()
-        ],
+                              if (_selectionMode)
+                                Positioned(
+                                  left: 15,
+                                  top: 15,
+                                  child: Checkbox(
+                                    value: isSelected,
+                                    onChanged: (_) => _toggleSelection(index),
+                                    activeColor: AppTheme.accentColor(ref),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+            ),
+            const MusicSlab()
+          ],
+        ),
       ),
     );
   }

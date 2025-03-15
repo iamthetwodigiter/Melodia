@@ -5,6 +5,7 @@ import 'package:melodia/models/songs_model.dart';
 import 'package:melodia/providers/playing_queue_provider.dart';
 import 'package:melodia/providers/settings_provider.dart';
 import 'package:melodia/providers/watch_history_provider.dart';
+import 'package:melodia/services/audio_services.dart';
 import 'package:rxdart/rxdart.dart';
 
 final audioPlayerProvider =
@@ -13,20 +14,19 @@ final audioPlayerProvider =
 );
 
 class AudioPlayerNotifier extends StateNotifier<AudioPlayerState> {
-  final AudioPlayer _audioPlayer;
+  final AudioPlayer _audioPlayer = AudioService().audioPlayer;
   List<AudioSource> _currentPlaylist = [];
   List<Songs> _songsList = [];
   final Ref ref;
 
-  AudioPlayerNotifier(this.ref)
-      : _audioPlayer = AudioPlayer(),
-        super(const AudioPlayerState()) {
+  AudioPlayerNotifier(this.ref) : super(const AudioPlayerState()) {
     _initialize();
   }
 
   void _initialize() {
-    final settings = ref.watch(settingsProvider);
-    final historyNotifier = ref.watch(historyProvider.notifier);
+    // Use read so that settings changes here don't recreate the notifier.
+    final settings = ref.read(settingsProvider);
+    final historyNotifier = ref.read(historyProvider.notifier);
     _audioPlayer.setShuffleModeEnabled(settings?.shuffleMode ?? false);
     _audioPlayer.setLoopMode(
         settings?.repeatMode == true ? LoopMode.all : LoopMode.off);
@@ -37,23 +37,18 @@ class AudioPlayerNotifier extends StateNotifier<AudioPlayerState> {
         state = state.copyWith(currentIndex: index);
       }
     });
-
     _audioPlayer.playingStream.listen((isPlaying) {
       state = state.copyWith(isPlaying: isPlaying);
     });
-
     _audioPlayer.volumeStream.listen((volume) {
       state = state.copyWith(volume: volume);
     });
-
     _audioPlayer.loopModeStream.listen((loopMode) {
       state = state.copyWith(loopMode: loopMode);
     });
-
     _audioPlayer.shuffleModeEnabledStream.listen((isShuffleMode) {
       state = state.copyWith(isShuffleMode: isShuffleMode);
     });
-
     durationStateStream.listen((updatedState) {
       state = updatedState;
     });
@@ -132,14 +127,11 @@ class AudioPlayerNotifier extends StateNotifier<AudioPlayerState> {
     state = state.copyWith(loopMode: newLoopMode);
   }
 
-  void setVolume(double volume) {
+  void adjustVolume(double volume) {
+    // final newVolume = (_audioPlayer.volume + delta).clamp(0.0, 1.0);
+    // setVolume(newVolume);
     _audioPlayer.setVolume(volume);
     state = state.copyWith(volume: volume);
-  }
-
-  void adjustVolume(double delta) {
-    final newVolume = (_audioPlayer.volume + delta).clamp(0.0, 1.0);
-    setVolume(newVolume);
   }
 
   bool get isPlaylistSet =>
@@ -160,7 +152,7 @@ class AudioPlayerNotifier extends StateNotifier<AudioPlayerState> {
 
   @override
   void dispose() {
-    _audioPlayer.dispose();
+    // _audioPlayer.dispose();
     super.dispose();
   }
 }

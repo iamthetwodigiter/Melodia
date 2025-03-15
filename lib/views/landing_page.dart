@@ -37,6 +37,10 @@ class _LandingPageState extends ConsumerState<LandingPage> {
       if (bottomTabIndices.contains('settings')) const SettingsPage(),
     ];
 
+    if (_currentIndex >= pages.length) {
+      _currentIndex = 0;
+    }
+    
     return Scaffold(
       body: Stack(
         alignment: Alignment.bottomCenter,
@@ -47,8 +51,9 @@ class _LandingPageState extends ConsumerState<LandingPage> {
           ),
           if (latest != last)
             ElevatedButton(
-              style:  ButtonStyle(
-                  shadowColor: WidgetStatePropertyAll(AppTheme.accentColor(ref))),
+              style: ButtonStyle(
+                  shadowColor:
+                      WidgetStatePropertyAll(AppTheme.accentColor(ref))),
               onPressed: () {
                 setState(() {
                   version.put('last', latest);

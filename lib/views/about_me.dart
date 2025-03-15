@@ -132,7 +132,8 @@ class _AboutMeState extends ConsumerState<AboutMe> {
                     onTap: () {
                       launchUrl(
                         Uri.parse(
-                            'https://github.com/iamthetwodigiter/Melodia'),
+                          'https://github.com/iamthetwodigiter/Melodia',
+                        ),
                       );
                     },
                   ),
@@ -147,9 +148,15 @@ class _AboutMeState extends ConsumerState<AboutMe> {
                   ),
                   TextButton(
                     style: const ButtonStyle(
-                        padding: WidgetStatePropertyAll(
-                            EdgeInsets.symmetric(horizontal: 10)),
-                        backgroundColor: WidgetStatePropertyAll(Colors.white)),
+                      padding: WidgetStatePropertyAll(
+                        EdgeInsets.symmetric(
+                          horizontal: 10,
+                        ),
+                      ),
+                      backgroundColor: WidgetStatePropertyAll(
+                        Colors.white,
+                      ),
+                    ),
                     child: Image.asset(
                       'assets/social/google_pay.png',
                       height: 50,
@@ -157,10 +164,15 @@ class _AboutMeState extends ConsumerState<AboutMe> {
                     ),
                     onPressed: () {
                       Clipboard.setData(
-                          const ClipboardData(text: 'itsmeprabhatjana@oksbi'));
+                        const ClipboardData(
+                          text: 'itsmeprabhatjana@okaxis',
+                        ),
+                      );
                       ScaffoldMessenger.of(context).showSnackBar(
                         customSnackBar(
-                            'UPI ID has been copied to clipboard', ref),
+                          'UPI ID has been copied to clipboard',
+                          ref,
+                        ),
                       );
                     },
                   ),

@@ -98,8 +98,11 @@ class _MusicSlabState extends ConsumerState<MusicSlab> {
                               height: 75,
                               width: 75,
                               fit: BoxFit.cover,
-                              placeholder: (context, url) =>
-                                  const CircularProgressIndicator(),
+                              placeholder: (context, url) => const SizedBox(
+                                height: 25,
+                                width: 25,
+                                child: CircularProgressIndicator(),
+                              ),
                               errorWidget: (context, url, error) =>
                                   const Icon(Icons.music_note),
                             )

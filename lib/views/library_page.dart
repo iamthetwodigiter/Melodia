@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ionicons/ionicons.dart';
+import 'package:melodia/providers/audio_provider.dart';
+import 'package:melodia/providers/offline_audio_provider.dart';
 import 'package:melodia/utils/colors.dart';
 import 'package:melodia/views/favorites_page.dart';
 import 'package:melodia/views/history_page.dart';
@@ -22,6 +24,8 @@ class LibraryPage extends ConsumerStatefulWidget {
 class _LibraryPageState extends ConsumerState<LibraryPage> {
   @override
   Widget build(BuildContext context) {
+    final audioProvider = ref.watch(audioPlayerProvider);
+    final offlineAudioProvider = ref.watch(offlineAudioPlayerProvider);
     return Scaffold(
       appBar: AppBar(
         leading: InkWell(
@@ -204,6 +208,11 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                     );
                   },
                 ),
+                SizedBox(
+                    height: audioProvider.isSlabShown ||
+                            offlineAudioProvider.isSlabShown
+                        ? 75
+                        : 0),
               ],
             ),
             const MusicSlab()

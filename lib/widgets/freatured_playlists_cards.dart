@@ -30,7 +30,7 @@ class FeaturedPlaylistsCards extends ConsumerWidget {
           ),
         ),
         SizedBox(
-          height: size.height * 0.32,
+          height: size.height * 0.28,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             itemCount: featuredPlaylistsData.length,
@@ -76,15 +76,15 @@ class FeaturedPlaylistsCards extends ConsumerWidget {
                           maxLines: 1,
                           textAlign: TextAlign.center,
                         ),
-                        Text(
-                          '${playlistItem.count} Songs',
-                          style: const TextStyle(
-                            fontSize: 12,
-                          ),
-                          maxLines: 1,
-                          textAlign: TextAlign.center,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                        // Text(
+                        //   '${playlistItem.count} Songs',
+                        //   style: const TextStyle(
+                        //     fontSize: 12,
+                        //   ),
+                        //   maxLines: 1,
+                        //   textAlign: TextAlign.center,
+                        //   overflow: TextOverflow.ellipsis,
+                        // ),
                         Text(
                           playlistItem.dataType.toUpperCase(),
                           style: const TextStyle(

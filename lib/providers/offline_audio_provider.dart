@@ -141,7 +141,7 @@ class OfflineAudioPlayerNotifier extends StateNotifier<AudioPlayerState> {
 
   bool get isPlaylistSet =>
       _audioPlayer.sequence != null && _audioPlayer.sequence!.isNotEmpty;
-
+  bool get isPlaying => _audioPlayer.playing;
   List<AudioSource> get currentPlaylist => _currentPlaylist;
   List<Songs> get songsList => _songsList;
 

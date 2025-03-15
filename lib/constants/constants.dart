@@ -2,6 +2,11 @@ const String lastVersion = "v4.6.0";
 const String appVersion = "v4.6.1";
 const List<Map<String, List<String>>> changelogs = [
   {
+    "v4.6.2": [
+      "Fixed the issue where music stops playing for a moment when changing settings or navigating to Player Screen from Music Slab",
+    ]
+  },
+  {
     "v4.6.1": [
       "Fixed song cover arts not showing for downloaded songs",
       "Fixed the music slab image size",
