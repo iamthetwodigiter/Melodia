@@ -203,8 +203,6 @@ class _SongsListItemState extends ConsumerState<SongsListItem> {
               height: 50,
               width: 50,
               fit: BoxFit.cover,
-              memCacheHeight: 50,
-              memCacheWidth: 50,
               errorWidget: (context, url, error) {
                 return Center(
                   child: Image.asset('assets/song_thumb.png'),

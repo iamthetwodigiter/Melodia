@@ -8,12 +8,13 @@ import 'package:melodia/models/songs_model.dart';
 
 const homepageUrl =
     'https://www.jiosaavn.com//api.php?__call=content.getHomepageData';
-const albumAPI = "https://melodia-six.vercel.app/api/albums?id=";
-const playlistAPI = "https://melodia-six.vercel.app/api/playlists?id=";
-const lyricsAPI = "https://melodia-six.vercel.app/api/songs";
-const suggestionAPI = "https://melodia-six.vercel.app/api/songs";
-const searchAPI = "https://melodia-six.vercel.app/api/search?query=";
-const songAPI = "https://melodia-six.vercel.app/api/songs";
+const baseURL = 'https://melodia-api.vercel.app/';
+const albumAPI = "$baseURL/api/albums?id=";
+const playlistAPI = "$baseURL/api/playlists?id=";
+const lyricsAPI = "$baseURL/api/songs";
+const suggestionAPI = "$baseURL/api/songs";
+const searchAPI = "$baseURL/api/search?query=";
+const songAPI = "$baseURL/api/songs";
 const repositoryURL =
     'https://api.github.com/repos/iamthetwodigiter/melodia/releases/latest';
 const totalDownloadsURL =

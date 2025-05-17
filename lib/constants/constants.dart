@@ -1,6 +1,12 @@
-const String lastVersion = "v4.6.0";
-const String appVersion = "v4.6.1";
+const String lastVersion = "v4.6.2";
+const String appVersion = "v4.7.0";
 const List<Map<String, List<String>>> changelogs = [
+  {
+    "v4.7.0": [
+      "MAJOR: Fixed API not working",
+      "Fixed thumbnails showing very compressed",
+    ]
+  },
   {
     "v4.6.2": [
       "Fixed the issue where music stops playing for a moment when changing settings or navigating to Player Screen from Music Slab",

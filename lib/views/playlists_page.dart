@@ -95,10 +95,6 @@ class _PlaylistsPageState extends ConsumerState<PlaylistsPage> {
                                     imageUrl: data.image,
                                     height: 175,
                                     width: 175,
-                                    maxHeightDiskCache: 175,
-                                    maxWidthDiskCache: 175,
-                                    memCacheHeight: 175,
-                                    memCacheWidth: 175,
                                     placeholder: (context, url) {
                                       return const Center(
                                         child: CircularProgressIndicator
