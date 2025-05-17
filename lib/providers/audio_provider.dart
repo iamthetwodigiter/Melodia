@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:melodia/models/audio_player_state_model.dart';
 import 'package:melodia/models/songs_model.dart';
 import 'package:melodia/providers/playing_queue_provider.dart';
@@ -24,7 +25,6 @@ class AudioPlayerNotifier extends StateNotifier<AudioPlayerState> {
   }
 
   void _initialize() {
-    // Use read so that settings changes here don't recreate the notifier.
     final settings = ref.read(settingsProvider);
     final historyNotifier = ref.read(historyProvider.notifier);
     _audioPlayer.setShuffleModeEnabled(settings?.shuffleMode ?? false);
@@ -70,20 +70,50 @@ class AudioPlayerNotifier extends StateNotifier<AudioPlayerState> {
 
   Future<void> setPlaylist(List<AudioSource> playlist, List<Songs>? songsList,
       {int? initialIndex}) async {
-    _currentPlaylist = playlist;
+    try {
+      final wasPlaying = _audioPlayer.playing;
 
-    if (songsList != null) {
-      _songsList = ref.read(playingQueueProvider);
-    } else {
-      _songsList = [];
+      _currentPlaylist = playlist;
+
+      if (songsList != null) {
+        _songsList = ref.read(playingQueueProvider);
+      } else {
+        _songsList = [];
+      }
+
+      await _audioPlayer.stop();
+
+      await Future.delayed(const Duration(milliseconds: 100));
+
+      final audioSource = ConcatenatingAudioSource(
+        children: _currentPlaylist,
+        useLazyPreparation: true,
+      );
+
+      await _audioPlayer.setAudioSource(
+        audioSource,
+        initialIndex: initialIndex,
+        initialPosition: Duration.zero,
+        preload: false,
+      );
+
+      state = state.copyWith(currentIndex: initialIndex);
+
+      if (wasPlaying) {
+        await _audioPlayer.play();
+      }
+    } catch (e) {
+      state = state.copyWith(isLoading: false);
     }
-
-    final audioSource = ConcatenatingAudioSource(children: _currentPlaylist);
-    await _audioPlayer.setAudioSource(audioSource, initialIndex: initialIndex);
-    state = state.copyWith(currentIndex: initialIndex);
   }
 
-  void play() => _audioPlayer.play();
+  void play() {
+    try {
+      _audioPlayer.play();
+    } finally {
+      state = state.copyWith(isPlaying: true);
+    }
+  }
 
   void pause() => _audioPlayer.pause();
 
@@ -128,8 +158,6 @@ class AudioPlayerNotifier extends StateNotifier<AudioPlayerState> {
   }
 
   void adjustVolume(double volume) {
-    // final newVolume = (_audioPlayer.volume + delta).clamp(0.0, 1.0);
-    // setVolume(newVolume);
     _audioPlayer.setVolume(volume);
     state = state.copyWith(volume: volume);
   }
@@ -150,9 +178,32 @@ class AudioPlayerNotifier extends StateNotifier<AudioPlayerState> {
 
   bool get isSlabShown => state.isSlabShown;
 
+  Future<bool> retryCurrentSong() async {
+    try {
+      final currentIndex = state.currentIndex;
+      if (currentIndex != null && currentIndex < _songsList.length) {
+        final currentSong = _songsList[currentIndex];
+
+        final singleSource = AudioSource.uri(
+          Uri.parse(currentSong.downloadUrl),
+          tag: MediaItem(
+            id: currentSong.id,
+            title: currentSong.title,
+            artist: currentSong.artists.map((artist) => artist.name).join(", "),
+            artUri: Uri.parse(currentSong.image),
+          ),
+        );
+        await _audioPlayer.setAudioSource(singleSource);
+        await _audioPlayer.play();
+        return true;
+      }
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
   @override
   void dispose() {
-    // _audioPlayer.dispose();
     super.dispose();
   }
 }
